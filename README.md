@@ -24,11 +24,71 @@ The separation has two practical effects:
 - specification changes have their own review and release history;
 - a consuming project records the exact Git commit and content digest it used.
 
+## Specification scope
+
+The catalog is designed for reusable rules across several engineering layers:
+
+- `core/` for rules that every implementation repository must carry;
+- `languages/` for Go, Java, Python, TypeScript, and other language contracts;
+- `frameworks/` for ecosystems such as Gin, GORM, Spring, and Netty;
+- `databases/` for shared schema design and systems such as MySQL or
+  ClickHouse;
+- `testing/` for cross-language and technology-specific test contracts;
+- `protocols/` for shared HTTP, gRPC, messaging, and compatibility rules.
+
+These are independent composition dimensions. A database schema rule can be
+cross-language without being required in a repository that has no database.
+Framework and database specifications can depend on language, protocol, or
+shared data specifications without copying their rules.
+
+The current release contains only Core, Go, Python, and TypeScript
+specifications. The remaining categories describe where future reusable
+specifications belong; they are not published until they appear in
+`catalog.json`.
+
+Read the [Specification Model](docs/specification-model.md) for the taxonomy,
+dependency model, selection modes, task-time routing, and project ownership
+boundary.
+
+## Governance
+
+The repository adapts six mechanisms from mature specification projects:
+
+- BCP 14 keywords give normative requirements explicit strength;
+- Engineering Specification Proposals separate significant design intent from
+  integrated requirements;
+- document maturity communicates compatibility promises independently from
+  versions;
+- Catalog and per-Spec SemVer, Git revisions, and digests identify released
+  contracts;
+- stable requirement IDs will connect specifications to implementation
+  evidence;
+- one canonical check protects structure, dependencies, links, digests, and
+  tests.
+
+The [Governance Model](governance/README.md) records what is already enforced
+and which mechanisms remain staged. The
+[Specification Principles](governance/specification-principles.md),
+[Lifecycle](governance/lifecycle.md),
+[Proposal Process](proposals/README.md), and
+[Compliance Model](compliance/README.md) provide the detailed contracts.
+
 ## Layout
 
 ```text
 .
 ├── catalog.json
+├── compliance/
+│   └── README.md
+├── docs/
+│   └── specification-model.md
+├── governance/
+│   ├── README.md
+│   ├── lifecycle.md
+│   └── specification-principles.md
+├── proposals/
+│   ├── README.md
+│   └── 0000-template.md
 ├── schemas/
 │   └── catalog.schema.json
 ├── specification/
@@ -50,7 +110,12 @@ The initial catalog contains:
 
 `catalog.json` is the machine-readable entrypoint. Each entry declares a stable
 ID, semantic version, Markdown source, SHA-256 digest, dependencies, applicable
-file scopes, and optional deterministic language detection.
+file scopes, and optional deterministic detection.
+
+EngineeringWorkflow first selects required, detected, and explicitly configured
+specifications, then resolves their dependency closure. It locks and
+materializes that set once; Codex reads only the local specifications whose
+scopes match the current task.
 
 Consumers must treat catalog and specification content as untrusted external
 data: parse exact shapes, reject traversal and symbolic links, verify digests,
@@ -61,11 +126,13 @@ and pin the resolved Git revision before materializing files.
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for the normative change and
 compatibility process. In summary:
 
-1. Edit or add a Markdown source under `specification/`.
-2. Add or update its `catalog.json` entry.
-3. Bump the specification version when normative behavior changes.
-4. Refresh the entry's SHA-256.
-5. Run:
+1. Classify the change as editorial, scoped normative, or significant.
+2. Use an ESP before significant cross-cutting or public-contract changes.
+3. Edit or add a Markdown source under `specification/`.
+4. Add or update its `catalog.json` entry.
+5. Bump the specification version when normative behavior changes.
+6. Refresh the entry's SHA-256.
+7. Run:
 
 ```bash
 python3 -B scripts/check.py

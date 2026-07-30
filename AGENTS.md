@@ -8,6 +8,10 @@ specifications consumed by EngineeringWorkflow.
 ## Read First
 
 - Read `README.md` for the repository contract.
+- Read `docs/specification-model.md` before adding a new category or dependency.
+- Read `governance/README.md` before changing normative behavior, maturity, or
+  the Catalog contract.
+- Read `proposals/README.md` when a change is cross-cutting or significant.
 - Read `catalog.json` before adding or moving a specification.
 - Read the relevant file under `specification/` before changing its rules.
 
@@ -18,6 +22,16 @@ specifications consumed by EngineeringWorkflow.
 - Bump a specification version when its normative content changes.
 - Update its SHA-256 in `catalog.json` after editing the Markdown source.
 - Keep dependencies acyclic and reference only cataloged specification IDs.
+- Put shared rules in the broadest layer where they remain true; narrower
+  specifications depend on them instead of copying them.
+- Reserve `core/` for rules required by every implementation repository.
+- Treat language, framework, database, testing, and protocol as independent
+  composition dimensions.
+- Use BCP 14 keywords for explicit requirement strength and keep rationale
+  clearly non-normative.
+- Significant cross-cutting or public-contract changes require an approved ESP
+  before normative integration.
+- Treat specifications without an explicit maturity marker as Development.
 - Keep detection rules deterministic and based on filenames or extensions.
 - Do not add project-specific rules unless they are intentionally reusable
   across repositories.
@@ -32,4 +46,3 @@ python3 -B scripts/check.py
 
 The check validates the catalog schema, paths, digests, dependency graph,
 Markdown links, and unit tests.
-
