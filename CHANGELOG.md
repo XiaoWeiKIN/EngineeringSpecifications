@@ -14,6 +14,8 @@ All notable Catalog and normative specification changes are recorded here.
   lifecycle, and impact-based contribution lanes.
 - Added the non-normative Engineering Specification Proposal process and
   template.
+- Added a Harness-oriented formal Specification template that connects
+  applicability, stable Requirement IDs, enforcement, and evidence.
 - Defined the evidence-first compliance model without claiming implementation
   conformance.
 

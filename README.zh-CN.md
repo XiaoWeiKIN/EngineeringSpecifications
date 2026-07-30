@@ -78,6 +78,7 @@ Catalog 面向多个工程层级的可复用规则：
 ├── schemas/
 │   └── catalog.schema.json
 ├── specification/
+│   ├── 0000-template.md
 │   ├── core/
 │   └── languages/
 ├── scripts/
@@ -109,7 +110,8 @@ EngineeringWorkflow 先组合必选、检测到和项目显式配置的规范，
 
 1. 把变更分为编辑性、局部规范性或重大变更。
 2. 跨领域或公共契约的重大变化先提交 ESP。
-3. 修改或新增 `specification/` 下的 Markdown。
+3. 新规范从
+   [正式 Spec 模板](specification/0000-template.md)开始。
 4. 新增或更新 `catalog.json` 条目。
 5. 规范行为变化时提升规范版本。
 6. 刷新条目的 SHA-256。

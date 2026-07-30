@@ -25,6 +25,10 @@ Current `0.1.0` specifications do not yet publish requirement IDs. No
 implementation matrix should be created until the affected specifications
 adopt them through normal versioned changes.
 
+New documents use the
+[Formal Specification Template](../specification/0000-template.md) to connect
+each load-bearing Requirement ID to enforcement and expected evidence.
+
 ## Evidence carries more weight than a status symbol
 
 Each implementation record should identify:
