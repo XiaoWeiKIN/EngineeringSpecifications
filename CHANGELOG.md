@@ -16,6 +16,11 @@ All notable Catalog and normative specification changes are recorded here.
   template.
 - Added a Harness-oriented formal Specification template that connects
   applicability, stable Requirement IDs, enforcement, and evidence.
+- Formalized Core semantic naming and Go implementation guidance as version
+  `0.2.0` contracts with stable Requirement IDs, applicability, enforcement,
+  evidence, patterns, exceptions, and migration guidance.
+- Added canonical validation for Requirement ID format and Catalog-wide
+  uniqueness.
 - Defined the evidence-first compliance model without claiming implementation
   conformance.
 

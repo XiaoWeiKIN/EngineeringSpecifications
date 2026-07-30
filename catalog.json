@@ -1,19 +1,19 @@
 {
   "catalog_id": "io.github.xiaoweikin.engineering-specifications",
-  "catalog_version": "0.1.0",
+  "catalog_version": "0.2.0",
   "schema_version": 1,
   "specs": [
     {
       "applies_to": [
         "**/*"
       ],
-      "description": "Shared semantic verbs, boundary naming, types, units, and review contracts",
+      "description": "Shared semantic names, verbs, boundary parsing, cross-surface mappings, types, units, and compatibility",
       "id": "core/semantic-naming",
       "path": "specification/core/semantic-naming.md",
       "required": true,
       "requires": [],
-      "sha256": "3819cdc91f1aaf330f33019a79474624e7fc2912058afe80dcbc94bd50b9c24c",
-      "version": "0.1.0"
+      "sha256": "5330ddafede67417623f0ffbba9464d1bef466e403eedfa7c10687ecd26041b0",
+      "version": "0.2.0"
     },
     {
       "applies_to": [
@@ -21,7 +21,7 @@
         "**/go.mod",
         "**/go.work"
       ],
-      "description": "Go APIs, errors, boundary data, concurrency, resources, and tests",
+      "description": "Go naming, APIs, boundary parsing, errors, lifecycle, compatibility, and tests",
       "detection": {
         "extensions": [
           ".go"
@@ -37,8 +37,8 @@
       "requires": [
         "core/semantic-naming"
       ],
-      "sha256": "4bd1de07330a8309d22ce6c0d03f1cab61f5675739c2a040e596714303461b8b",
-      "version": "0.1.0"
+      "sha256": "0688b4e26196273fe85a8ca2e9dd7a9adefa7a9889f35d4ec78b0db30561a477",
+      "version": "0.2.0"
     },
     {
       "applies_to": [
@@ -99,4 +99,3 @@
     }
   ]
 }
-
