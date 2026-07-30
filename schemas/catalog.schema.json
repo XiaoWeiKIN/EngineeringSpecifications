@@ -1,0 +1,113 @@
+{
+  "$id": "https://github.com/XiaoWeiKIN/EngineeringSpecifications/blob/main/schemas/catalog.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "catalog_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "catalog_version": {
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "specs": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "applies_to": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "description": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "detection": {
+            "additionalProperties": false,
+            "properties": {
+              "extensions": {
+                "items": {
+                  "pattern": "^\\.[a-z0-9]+$",
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              },
+              "filenames": {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "type": "array",
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "extensions",
+              "filenames"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "pattern": "^[a-z0-9][a-z0-9._-]*(/[a-z0-9][a-z0-9._-]*)*$",
+            "type": "string"
+          },
+          "path": {
+            "pattern": "^[^/\\\\].*\\.md$",
+            "type": "string"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "requires": {
+            "items": {
+              "pattern": "^[a-z0-9][a-z0-9._-]*(/[a-z0-9][a-z0-9._-]*)*$",
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "version": {
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "version",
+          "path",
+          "sha256",
+          "required",
+          "requires",
+          "applies_to",
+          "description"
+        ],
+        "type": "object"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "catalog_id",
+    "catalog_version",
+    "specs"
+  ],
+  "title": "Engineering Specification Catalog",
+  "type": "object"
+}
+
