@@ -22,11 +22,59 @@ flowchart LR
 - 规范变更拥有独立的评审与发布历史；
 - 消费项目记录实际使用的 Git commit 与内容摘要，可复现且可审计。
 
+## 规范范围
+
+Catalog 面向多个工程层级的可复用规则：
+
+- `core/` 存放所有实现型仓库都应携带的规则；
+- `languages/` 存放 Go、Java、Python、TypeScript 等语言契约；
+- `frameworks/` 存放 Gin、GORM、Spring、Netty 等技术生态规范；
+- `databases/` 存放共享 Schema 设计，以及 MySQL、ClickHouse 等数据库规范；
+- `testing/` 存放跨语言和特定技术的测试契约；
+- `protocols/` 存放 HTTP、gRPC、消息和兼容性规则。
+
+这些是独立的组合维度。数据库 Schema 规则可以跨语言复用，但没有数据库的仓库
+不需要安装。框架和数据库规范可以依赖语言、协议或共享数据规范，无需复制上游规则。
+
+当前版本只发布 Core、Go、Python 和 TypeScript 规范。其余分类用于约束未来可复用
+规范的归属；只有进入 `catalog.json` 的规范才视为已经发布。
+
+分类、依赖、选择方式、任务时路由和项目规则边界见
+[规范模型](docs/specification-model.zh-CN.md)。
+
+## 规范治理
+
+仓库参考成熟规范项目，引入六项相互独立的机制：
+
+- 用 BCP 14 关键词明确规范要求强度；
+- 用 Engineering Specification Proposal 分离重大设计意图与正式要求；
+- 用文档成熟度表达兼容承诺，成熟度与版本独立演进；
+- 用 Catalog 与单项 Spec SemVer、Git revision 和摘要标识发布契约；
+- 用稳定 Requirement ID 连接规范与实现证据；
+- 用唯一 canonical check 验证结构、依赖、链接、摘要和测试。
+
+[治理模型](governance/README.md)记录已经执行的约束和分阶段机制。详细契约见
+[规范原则](governance/specification-principles.md)、
+[生命周期](governance/lifecycle.md)、
+[Proposal 流程](proposals/README.md)和
+[合规模型](compliance/README.md)。
+
 ## 目录
 
 ```text
 .
 ├── catalog.json
+├── compliance/
+│   └── README.md
+├── docs/
+│   └── specification-model.md
+├── governance/
+│   ├── README.md
+│   ├── lifecycle.md
+│   └── specification-principles.md
+├── proposals/
+│   ├── README.md
+│   └── 0000-template.md
 ├── schemas/
 │   └── catalog.schema.json
 ├── specification/
@@ -47,7 +95,10 @@ flowchart LR
 ## Catalog 契约
 
 `catalog.json` 是机器入口。每个条目声明稳定 ID、语义版本、Markdown
-源文件、SHA-256、依赖、适用文件范围，以及可选的确定性语言检测规则。
+源文件、SHA-256、依赖、适用文件范围，以及可选的确定性检测规则。
+
+EngineeringWorkflow 先组合必选、检测到和项目显式配置的规范，再解析依赖闭包。
+这组规范只锁定和物化一次；Codex 执行任务时只读取作用域匹配的本地规范。
 
 消费方必须把 Catalog 和规范正文视为外部不可信数据：严格解析字段、拒绝路径穿越
 与符号链接、验证内容摘要，并在安装前锁定解析后的 Git revision。
@@ -56,11 +107,13 @@ flowchart LR
 
 规范变更与兼容流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。摘要如下：
 
-1. 修改或新增 `specification/` 下的 Markdown。
-2. 新增或更新 `catalog.json` 条目。
-3. 规范行为变化时提升规范版本。
-4. 刷新条目的 SHA-256。
-5. 运行：
+1. 把变更分为编辑性、局部规范性或重大变更。
+2. 跨领域或公共契约的重大变化先提交 ESP。
+3. 修改或新增 `specification/` 下的 Markdown。
+4. 新增或更新 `catalog.json` 条目。
+5. 规范行为变化时提升规范版本。
+6. 刷新条目的 SHA-256。
+7. 运行：
 
 ```bash
 python3 -B scripts/check.py
