@@ -51,7 +51,33 @@ class CatalogTestCase(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "digest mismatch"):
                 CHECK.load_catalog(root)
 
+    def test_formal_specification_template_is_an_authoring_resource(self) -> None:
+        template_path = ROOT / "specification" / "0000-template.md"
+        template = template_path.read_text(encoding="utf-8")
+        for marker in (
+            "> **Status:** Development",
+            "> **Catalog ID:**",
+            "## Applicability",
+            "## Requirements",
+            "### AREA-TOPIC-001",
+            "**Enforcement:**",
+            "**Evidence:**",
+            "## Approved patterns",
+            "## Rejected patterns",
+            "## Exceptions",
+            "## Verification",
+            "## Compatibility and migration",
+        ):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, template)
+
+        catalog = CHECK.load_catalog(ROOT)
+        catalog_paths = {item["path"] for item in catalog["specs"]}
+        self.assertNotIn(
+            "specification/0000-template.md",
+            catalog_paths,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
-

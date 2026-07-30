@@ -19,6 +19,18 @@ Current documents without an explicit status are Development. See the
 [Specification Lifecycle](../governance/lifecycle.md) for compatibility
 expectations.
 
+## Authoring
+
+Start new normative documents from the
+[Formal Specification Template](0000-template.md). The template is optimized
+for Harness Engineering: it connects task applicability, stable Requirement
+IDs, enforcement mechanisms, and implementation evidence.
+
+The template is an authoring resource, not a published specification. A
+document becomes published only after it has its own path and stable Catalog
+entry. `catalog.json` remains authoritative for version, dependencies, scopes,
+detection evidence, and digest.
+
 ## Core
 
 - [Semantic naming](core/semantic-naming.md)
