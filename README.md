@@ -151,3 +151,9 @@ identify released catalog revisions; consumers may follow a branch or tag, but
 their lock file always records the immutable resolved commit.
 
 See [CHANGELOG.md](CHANGELOG.md) for released changes.
+
+## License
+
+EngineeringSpecifications is licensed under the
+[Apache License 2.0](LICENSE), the same license used by the OpenTelemetry
+Specification repository.
