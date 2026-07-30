@@ -92,6 +92,7 @@ and which mechanisms remain staged. The
 ├── schemas/
 │   └── catalog.schema.json
 ├── specification/
+│   ├── 0000-template.md
 │   ├── core/
 │   └── languages/
 ├── scripts/
@@ -128,7 +129,8 @@ compatibility process. In summary:
 
 1. Classify the change as editorial, scoped normative, or significant.
 2. Use an ESP before significant cross-cutting or public-contract changes.
-3. Edit or add a Markdown source under `specification/`.
+3. Start a new normative document from the
+   [Formal Specification Template](specification/0000-template.md).
 4. Add or update its `catalog.json` entry.
 5. Bump the specification version when normative behavior changes.
 6. Refresh the entry's SHA-256.

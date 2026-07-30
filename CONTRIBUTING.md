@@ -71,6 +71,28 @@ Use these terms sparingly:
 New specifications state their maturity immediately after the title. Until the
 Catalog carries machine-readable maturity, a missing marker means Development.
 
+## New specifications close the Harness feedback loop
+
+Copy the
+[Formal Specification Template](specification/0000-template.md) when creating a
+normative document. The template separates four concerns that a coding agent
+and reviewer both need:
+
+1. applicability says when the rule enters task context;
+2. a stable Requirement ID identifies the behavioral contract;
+3. enforcement says how the repository detects a violation;
+4. evidence says how a consumer demonstrates compliance.
+
+Keep proposal reasoning in the related ESP. The integrated specification
+retains only the purpose, observable requirements, rationale needed to apply
+them correctly, approved and rejected patterns, exceptions, verification, and
+migration contract.
+
+Catalog metadata is not duplicated as free-form normative text. The template
+shows human-readable status, ID, and selection intent, while `catalog.json`
+remains authoritative for version, dependencies, scopes, detection evidence,
+and digest.
+
 ## Change process
 
 1. Explain the engineering problem and affected specification IDs.
@@ -78,15 +100,17 @@ Catalog carries machine-readable maturity, a missing marker means Development.
 3. Link an approved ESP when the change is significant.
 4. Provide prototype, test, implementation, or repository evidence appropriate
    to the requirement.
-5. Edit or add Markdown under `specification/`.
-6. Keep each rule testable, scoped, and independent of one private repository.
-7. Update `catalog.json`:
+5. For a new specification, copy `specification/0000-template.md` to its final
+   category path and replace every authoring placeholder.
+6. Edit or add normative Markdown under `specification/`.
+7. Keep each rule testable, scoped, and independent of one private repository.
+8. Update `catalog.json`:
    - preserve stable IDs;
    - bump the affected specification version for normative changes;
    - refresh the source SHA-256;
    - declare dependencies and deterministic detection evidence.
-8. Update `CHANGELOG.md` for externally observable changes.
-9. Run the canonical check:
+9. Update `CHANGELOG.md` for externally observable changes.
+10. Run the canonical check:
 
 ```bash
 python3 -B scripts/check.py

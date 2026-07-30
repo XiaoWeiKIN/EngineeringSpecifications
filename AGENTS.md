@@ -13,6 +13,7 @@ specifications consumed by EngineeringWorkflow.
   the Catalog contract.
 - Read `proposals/README.md` when a change is cross-cutting or significant.
 - Read `catalog.json` before adding or moving a specification.
+- Start a new normative document from `specification/0000-template.md`.
 - Read the relevant file under `specification/` before changing its rules.
 
 ## Change Rules
@@ -29,6 +30,8 @@ specifications consumed by EngineeringWorkflow.
   composition dimensions.
 - Use BCP 14 keywords for explicit requirement strength and keep rationale
   clearly non-normative.
+- Give load-bearing requirements stable IDs and connect them to enforcement and
+  expected implementation evidence.
 - Significant cross-cutting or public-contract changes require an approved ESP
   before normative integration.
 - Treat specifications without an explicit maturity marker as Development.
