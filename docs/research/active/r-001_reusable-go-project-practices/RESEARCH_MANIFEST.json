@@ -1,0 +1,81 @@
+{
+  "documents": [
+    {
+      "base": "package",
+      "bytes": 16599,
+      "path": "notes/cross-project-go-naming.md",
+      "role": "topic",
+      "sha256": "e112c8bd998d754939fe24d4979fdb0d7523d9a0bb93da2f6abb1156d65e4718",
+      "topic_id": "RT-004"
+    },
+    {
+      "base": "package",
+      "bytes": 13948,
+      "path": "notes/cross-project-go-requirements.md",
+      "role": "topic",
+      "sha256": "60332836e0c151474bd9c5f407cd7e875bbd3501cfa31768a82a6435ae7d37cf",
+      "topic_id": "RT-003"
+    },
+    {
+      "base": "package",
+      "bytes": 10151,
+      "path": "notes/grafana-observability-practices.md",
+      "role": "topic",
+      "sha256": "7f16d65a5a07fb7b050b7aee1619b75ba263d57a8101790df7d0c1a98e4026a1",
+      "topic_id": "RT-002"
+    },
+    {
+      "base": "package",
+      "bytes": 9622,
+      "path": "notes/opentelemetry-collector-practices.md",
+      "role": "topic",
+      "sha256": "dd23a96fb05119b2c152b920f52da97ed9862b770e732473a966cbf40013e170",
+      "topic_id": "RT-001"
+    },
+    {
+      "base": "package",
+      "bytes": 2895,
+      "path": "rounds/rr-001_baseline.md",
+      "role": "round",
+      "sha256": "d40c8eab1c2744489e5b489d565c6a8e80fe54e54c58f50872bd4fab8471c250"
+    },
+    {
+      "base": "package",
+      "bytes": 6098,
+      "path": "snapshots/synthesis-v001.md",
+      "role": "snapshot",
+      "sha256": "b5730f22bb00a3cd72c9f9974a74ca762dd37c82b2c125cbd37b9f1594c9234f"
+    }
+  ],
+  "entrypoints": [],
+  "mode": "managed",
+  "payload_sha256": "",
+  "research_id": "R-001",
+  "roots": [
+    {
+      "base": "package",
+      "include": [
+        "**/*.md"
+      ],
+      "path": "notes"
+    },
+    {
+      "base": "package",
+      "include": [
+        "**/*.md"
+      ],
+      "path": "rounds",
+      "role": "round"
+    },
+    {
+      "base": "package",
+      "include": [
+        "**/*.md"
+      ],
+      "path": "snapshots",
+      "role": "snapshot"
+    }
+  ],
+  "schema_version": "1",
+  "status": "active"
+}
