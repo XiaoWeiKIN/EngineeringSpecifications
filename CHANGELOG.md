@@ -4,6 +4,13 @@ All notable Catalog and normative specification changes are recorded here.
 
 ## Unreleased
 
+### Removed
+
+- Removed the Development `languages/python` and `languages/typescript`
+  specifications from the Catalog and deleted their normative sources.
+  Consumers selecting either ID must remove it from their manifest and
+  regenerate the lock before updating to Catalog `1.0.0`.
+
 ### Changed
 
 - Clarified the multi-layer specification model for Core, languages,
@@ -23,6 +30,9 @@ All notable Catalog and normative specification changes are recorded here.
   uniqueness.
 - Defined the evidence-first compliance model without claiming implementation
   conformance.
+- Released Catalog `1.0.0` to identify the breaking removal while leaving the
+  independently versioned Core and Go specifications at `0.2.0` and
+  Development maturity.
 
 ## [0.1.0] - 2026-07-31
 

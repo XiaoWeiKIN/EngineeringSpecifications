@@ -1,6 +1,6 @@
 {
   "catalog_id": "io.github.xiaoweikin.engineering-specifications",
-  "catalog_version": "0.2.0",
+  "catalog_version": "1.0.0",
   "schema_version": 1,
   "specs": [
     {
@@ -39,63 +39,6 @@
       ],
       "sha256": "0688b4e26196273fe85a8ca2e9dd7a9adefa7a9889f35d4ec78b0db30561a477",
       "version": "0.2.0"
-    },
-    {
-      "applies_to": [
-        "**/*.ts",
-        "**/*.tsx",
-        "**/*.mts",
-        "**/*.cts",
-        "**/tsconfig*.json"
-      ],
-      "description": "TypeScript types, unknown-data parsing, control flow, and tests",
-      "detection": {
-        "extensions": [
-          ".cts",
-          ".mts",
-          ".ts",
-          ".tsx"
-        ],
-        "filenames": [
-          "tsconfig.json"
-        ]
-      },
-      "id": "languages/typescript",
-      "path": "specification/languages/typescript.md",
-      "required": false,
-      "requires": [
-        "core/semantic-naming"
-      ],
-      "sha256": "eae09477119f5cfd89823b8f90753e13ac58080207a5d42c7d9d5c8b9b78f2af",
-      "version": "0.1.0"
-    },
-    {
-      "applies_to": [
-        "**/*.py",
-        "**/*.pyi",
-        "**/pyproject.toml",
-        "**/requirements*.txt"
-      ],
-      "description": "Python APIs, errors, typed boundary data, resources, concurrency, and tests",
-      "detection": {
-        "extensions": [
-          ".py",
-          ".pyi"
-        ],
-        "filenames": [
-          "pyproject.toml",
-          "requirements.txt",
-          "setup.py"
-        ]
-      },
-      "id": "languages/python",
-      "path": "specification/languages/python.md",
-      "required": false,
-      "requires": [
-        "core/semantic-naming"
-      ],
-      "sha256": "a92125a73e47083f5b2ae93ec4906ae5d89d8608091cbb2be85acbf6f140ab04",
-      "version": "0.1.0"
     }
   ]
 }

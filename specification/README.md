@@ -20,9 +20,7 @@ Current documents without an explicit status are Development. See the
 expectations.
 
 `core/semantic-naming` and `languages/go` publish stable Requirement IDs
-beginning with version `0.2.0`. The Python and TypeScript `0.1.0` documents
-remain valid Development specifications under the earlier imperative style;
-their future formalization requires normal versioned changes.
+beginning with version `0.2.0`.
 
 ## Authoring
 
@@ -43,8 +41,6 @@ detection evidence, and digest.
 ## Languages
 
 - [Go implementation](languages/go.md)
-- [Python implementation](languages/python.md)
-- [TypeScript implementation](languages/typescript.md)
 
 The Markdown files are the normative sources. `catalog.json` supplies stable
 IDs, versions, dependencies, scopes, detection evidence, and content digests

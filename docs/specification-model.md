@@ -184,9 +184,7 @@ changelog, and validation process.
 The current release publishes:
 
 - `core/semantic-naming`, required for implementation repositories;
-- `languages/go`;
-- `languages/python`;
-- `languages/typescript`.
+- `languages/go`.
 
 See the [Specification Index](../specification/README.md) for the current
 normative documents and [catalog.json](../catalog.json) for the machine-readable

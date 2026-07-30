@@ -23,8 +23,12 @@ class CatalogTestCase(unittest.TestCase):
             catalog["catalog_id"],
             "io.github.xiaoweikin.engineering-specifications",
         )
-        self.assertEqual(catalog["catalog_version"], "0.2.0")
-        self.assertEqual(len(catalog["specs"]), 4)
+        self.assertEqual(catalog["catalog_version"], "1.0.0")
+        self.assertEqual(len(catalog["specs"]), 2)
+        self.assertEqual(
+            {item["id"] for item in catalog["specs"]},
+            {"core/semantic-naming", "languages/go"},
+        )
         self.assertEqual(
             CHECK.check_requirement_ids(ROOT, catalog),
             (
@@ -59,8 +63,6 @@ class CatalogTestCase(unittest.TestCase):
             for relative in (
                 "specification/core/semantic-naming.md",
                 "specification/languages/go.md",
-                "specification/languages/python.md",
-                "specification/languages/typescript.md",
             ):
                 target = root / relative
                 target.parent.mkdir(parents=True, exist_ok=True)

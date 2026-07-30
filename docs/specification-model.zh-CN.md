@@ -164,9 +164,7 @@ Specification Proposal，以及它承载什么成熟度承诺。版本、摘要�
 当前版本发布：
 
 - `core/semantic-naming`，实现型仓库必选；
-- `languages/go`；
-- `languages/python`；
-- `languages/typescript`。
+- `languages/go`。
 
 当前规范正文见[规范索引](../specification/README.md)，机器事实源见
 [catalog.json](../catalog.json)。
