@@ -50,8 +50,9 @@ Catalog 面向多个工程层级的可复用规则：
 - 用 Engineering Specification Proposal 分离重大设计意图与正式要求；
 - 用文档成熟度表达兼容承诺，成熟度与版本独立演进；
 - 用 Catalog 与单项 Spec SemVer、Git revision 和摘要标识发布契约；
-- 用稳定 Requirement ID 连接规范与实现证据；
-- 用唯一 canonical check 验证结构、依赖、链接、摘要和测试。
+- 用稳定 Requirement ID 连接已正式整理的规范与实现证据；
+- 用唯一 canonical check 验证结构、依赖、Requirement ID 唯一性、链接、摘要和
+  测试。
 
 [治理模型](governance/README.md)记录已经执行的约束和分阶段机制。详细契约见
 [规范原则](governance/specification-principles.md)、

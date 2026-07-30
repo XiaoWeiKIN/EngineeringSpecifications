@@ -48,4 +48,4 @@ python3 -B scripts/check.py
 ```
 
 The check validates the catalog schema, paths, digests, dependency graph,
-Markdown links, and unit tests.
+Requirement ID uniqueness, Markdown links, and unit tests.

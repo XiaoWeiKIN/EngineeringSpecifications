@@ -61,10 +61,10 @@ The repository adapts six mechanisms from mature specification projects:
   versions;
 - Catalog and per-Spec SemVer, Git revisions, and digests identify released
   contracts;
-- stable requirement IDs will connect specifications to implementation
+- stable Requirement IDs connect formalized specifications to implementation
   evidence;
-- one canonical check protects structure, dependencies, links, digests, and
-  tests.
+- one canonical check protects structure, dependencies, Requirement ID
+  uniqueness, links, digests, and tests.
 
 The [Governance Model](governance/README.md) records what is already enforced
 and which mechanisms remain staged. The

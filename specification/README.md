@@ -19,6 +19,11 @@ Current documents without an explicit status are Development. See the
 [Specification Lifecycle](../governance/lifecycle.md) for compatibility
 expectations.
 
+`core/semantic-naming` and `languages/go` publish stable Requirement IDs
+beginning with version `0.2.0`. The Python and TypeScript `0.1.0` documents
+remain valid Development specifications under the earlier imperative style;
+their future formalization requires normal versioned changes.
+
 ## Authoring
 
 Start new normative documents from the

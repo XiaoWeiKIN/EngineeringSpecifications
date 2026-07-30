@@ -17,6 +17,9 @@ SPEC_ID_RE = re.compile(
 )
 SEMVER_RE = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
 SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+REQUIREMENT_HEADING_RE = re.compile(
+    r"^### ([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+-[0-9]{3}) — \S.*$"
+)
 
 
 def expect_object(value: object, label: str) -> dict[str, object]:
@@ -246,6 +249,51 @@ def check_markdown_links() -> None:
                 )
 
 
+def check_requirement_ids(
+    root: Path,
+    catalog: dict[str, object],
+) -> tuple[str, ...]:
+    seen: dict[str, str] = {}
+    for raw_spec in catalog["specs"]:
+        spec = expect_object(raw_spec, "catalog.spec")
+        spec_id = expect_string(spec["id"], "catalog.spec.id")
+        relative = safe_relative(spec["path"], f"{spec_id}.path")
+        path = root / relative
+        content = path.read_text(encoding="utf-8")
+        in_requirements = False
+        publishes_requirements = False
+        local_ids: list[str] = []
+        for line in content.splitlines():
+            if line == "## Requirements":
+                in_requirements = True
+                publishes_requirements = True
+                continue
+            if line.startswith("## "):
+                in_requirements = False
+                continue
+            if not in_requirements or not line.startswith("### "):
+                continue
+            match = REQUIREMENT_HEADING_RE.fullmatch(line)
+            if match is None:
+                raise ValueError(
+                    f"{relative}: malformed Requirement heading: {line}"
+                )
+            requirement_id = match.group(1)
+            previous = seen.get(requirement_id)
+            if previous is not None:
+                raise ValueError(
+                    f"{relative}: duplicate Requirement ID {requirement_id}; "
+                    f"already declared in {previous}"
+                )
+            seen[requirement_id] = relative
+            local_ids.append(requirement_id)
+        if publishes_requirements and not local_ids:
+            raise ValueError(
+                f"{relative}: Requirements section has no stable IDs"
+            )
+    return tuple(sorted(seen))
+
+
 def run_tests() -> None:
     subprocess.run(
         [
@@ -267,6 +315,7 @@ def run_tests() -> None:
 def main() -> int:
     try:
         catalog = load_catalog(ROOT)
+        check_requirement_ids(ROOT, catalog)
         check_markdown_links()
         run_tests()
     except (OSError, subprocess.CalledProcessError, ValueError) as exc:
@@ -282,4 +331,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
