@@ -58,6 +58,9 @@ and pin the resolved Git revision before materializing files.
 
 ## Contributing
 
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for the normative change and
+compatibility process. In summary:
+
 1. Edit or add a Markdown source under `specification/`.
 2. Add or update its `catalog.json` entry.
 3. Bump the specification version when normative behavior changes.
@@ -78,3 +81,4 @@ Catalog and specification versions follow Semantic Versioning. Git tags may
 identify released catalog revisions; consumers may follow a branch or tag, but
 their lock file always records the immutable resolved commit.
 
+See [CHANGELOG.md](CHANGELOG.md) for released changes.

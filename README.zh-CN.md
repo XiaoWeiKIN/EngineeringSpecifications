@@ -54,6 +54,8 @@ flowchart LR
 
 ## 贡献
 
+规范变更与兼容流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。摘要如下：
+
 1. 修改或新增 `specification/` 下的 Markdown。
 2. 新增或更新 `catalog.json` 条目。
 3. 规范行为变化时提升规范版本。
@@ -72,3 +74,4 @@ python3 -B scripts/check.py
 Catalog 与单项规范遵循语义化版本。Git tag 可以标识发布版本；消费方既可以跟随
 分支，也可以指定 tag，但其 lock 始终记录不可变的实际 commit。
 
+已发布变更见 [CHANGELOG.md](CHANGELOG.md)。
