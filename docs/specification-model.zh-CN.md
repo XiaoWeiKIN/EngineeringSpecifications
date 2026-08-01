@@ -14,7 +14,7 @@ Catalog 会沿独立的工程维度扩展。下面的分类定义未来规范的
 
 | 层级 | 职责 | 典型选择方式 |
 | --- | --- | --- |
-| `core/` | 对所有实现型仓库成立的规则，例如共享语义动词和边界术语 | 必选 |
+| `core/` | 每个实现型仓库都必须携带的规则，例如语义操作和外部数据边界 | 必选安装；任务激活仍按需判断 |
 | `languages/` | 语言惯用法、API、错误、并发、资源和语言特有测试实践 | 仓库检测 |
 | `frameworks/` | 框架或重要库契约，例如 Go Gin/GORM、Java Spring/Netty | 显式选择；未来可增加确定性的依赖检测 |
 | `databases/` | 与厂商无关的 Schema 设计，以及 MySQL、ClickHouse 等数据库特有行为 | 显式选择或确定性仓库证据 |
@@ -32,7 +32,8 @@ Catalog 会沿独立的工程维度扩展。下面的分类定义未来规范的
 
 ```mermaid
 flowchart TB
-    Core["core/semantic-naming"]
+    Naming["core/semantic-naming"]
+    Boundary["core/data-boundaries"]
     Go["languages/go"]
     Java["languages/java"]
     HTTP["protocols/http-api"]
@@ -45,10 +46,13 @@ flowchart TB
     Testing["testing/foundations"]
     Project["项目自有规范"]
 
-    Core --> Go
-    Core --> Java
-    Core --> Schema
-    Core --> Testing
+    Naming --> Boundary
+    Naming --> Go
+    Boundary --> Go
+    Naming --> Java
+    Boundary --> Java
+    Naming --> Schema
+    Naming --> Testing
     Go --> Gin
     HTTP --> Gin
     Go --> Gorm
@@ -90,14 +94,15 @@ flowchart LR
     Select --> Closure["计算 requires 闭包"]
     Closure --> Lock["锁定 Git commit + SHA-256"]
     Lock --> Local["物化本地副本"]
-    Local --> Scope["按 applies_to 过滤"]
+    Local --> Scope["文件候选集<br/>applies_to"]
     Project["项目自有规范"] --> Scope
-    Scope --> Codex["Codex 任务上下文"]
+    Scope --> Activate["任务激活<br/>description + Applicability"]
+    Activate --> Codex["Codex 任务上下文"]
 ```
 
 规范选择有三个来源：
 
-- **必选规范**进入所有实现型仓库。
+- **必选规范**进入所有实现型仓库并物化为本地副本。必选不代表每个任务都阅读全文。
 - **检测规范**依赖确定性的仓库证据。
 - **显式规范**由消费项目声明。
 
@@ -105,10 +110,14 @@ flowchart LR
 自动检测。这足以识别编程语言。框架和数据库规范应暂时保持显式选择，直到 Catalog
 与 EngineeringWorkflow 引入经过评审的确定性依赖证据契约。
 
-执行任务时，`applies_to` 作用域会排除无关规范。修改普通 Go 源文件时可以读取
-Core 与 Go 规范；修改 Gin Handler 时再加入 HTTP 和 Gin 规范；修改 ClickHouse
-Migration 时读取 Schema 设计与 ClickHouse 规范。项目自有架构和组件规则进入同一
-路由，不需要复制到本仓库。
+执行任务时，`applies_to` 先产生保守的文件候选集。Catalog `description` 为本地
+索引提供简短激活摘要；只有任务意图也符合 Applicability，Codex 才读取候选规范
+全文。
+
+例如，修改 Go 文件会让 Go 规范成为候选。重命名公共 API 会激活 Semantic Naming；
+解析 HTTP Request 会激活 Data Boundaries；只修改内部算术逻辑时，可能只需读取
+相关 Go 要求。Gin Handler 还可以激活 HTTP、Gin 和项目 Handler 规则。项目自有
+架构与组件规则进入同一路由，无需复制到本仓库。
 
 ## 项目组合保持精简
 
@@ -116,12 +125,13 @@ Migration 时读取 Schema 设计与 ClickHouse 规范。项目自有架构和�
 
 | 项目或任务 | 适用规范集合 |
 | --- | --- |
-| Go 命令行服务 | Core + Go + 测试基础 |
-| 使用 MySQL 的 Gin 服务 | Core + Go + HTTP + Gin + Schema 设计 + MySQL + 测试 |
-| 写入 ClickHouse 的 Java Netty 服务 | Core + Java + Netty + Schema 设计 + ClickHouse + 测试 |
-| 不使用持久化的 Python 库 | Core + Python + 测试；不加载数据库规范 |
+| Go 命令行服务 | 安装 Core，检测 Go，再按任务意图激活需要的子集 |
+| 使用 MySQL 的 Gin 服务 | Core + Go + HTTP + Gin + Schema 设计 + MySQL + 测试候选集 |
+| 写入 ClickHouse 的 Java Netty 服务 | Core + Java + Netty + Schema 设计 + ClickHouse + 测试候选集 |
+| 不使用持久化的 Python 库 | Core + Python + 测试候选集；没有数据库规范 |
 
-解析器只安装一次依赖闭包。任务路由器只读取作用域与当前修改文件匹配的子集。
+解析器只安装一次依赖闭包。任务路由器先按文件作用域过滤，再判断任务激活。这个
+两阶段路由让 Core 契约始终在本地可用，同时避免每个任务都注入全部 Core 文档。
 
 ## 三个仓库边界保持明确
 
@@ -152,8 +162,9 @@ flowchart LR
 2. 选择规则始终成立的最宽 Catalog 层级，避免意外把条件规则变成全局规则。
 3. 找出可复用的上游契约并写入 `requires`。
 4. 定义确定性的 `applies_to` 作用域。
-5. 只有文件名或扩展名能够提供可靠证据时才增加 detection；否则要求项目显式选择。
-6. 项目名称、私有路径、内部框架和领域专属术语留在消费项目。
+5. 把 Catalog `description` 写成简短的“何时加载”摘要，并让 Applicability 作最终判断。
+6. 只有文件名或扩展名能够提供可靠证据时才增加 detection；否则要求项目显式选择。
+7. 项目名称、私有路径、内部框架和领域专属术语留在消费项目。
 
 先通过[治理模型](../governance/README.md)判断变更是否需要 Engineering
 Specification Proposal，以及它承载什么成熟度承诺。版本、摘要、Changelog
@@ -164,6 +175,7 @@ Specification Proposal，以及它承载什么成熟度承诺。版本、摘要�
 当前版本发布：
 
 - `core/semantic-naming`，实现型仓库必选；
+- `core/data-boundaries`，实现型仓库必选；
 - `languages/go`。
 
 当前规范正文见[规范索引](../specification/README.md)，机器事实源见

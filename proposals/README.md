@@ -62,9 +62,11 @@ The integration change:
 1. links the approved ESP;
 2. translates intent into clear normative and non-normative text;
 3. updates affected Spec versions, dependencies, scopes, and SHA-256 digests;
-4. adds migration or compatibility guidance;
-5. updates the Changelog;
-6. passes `python3 -B scripts/check.py`.
+4. preserves the distinction between installation selection and task
+   activation;
+5. adds migration or compatibility guidance;
+6. updates the Changelog;
+7. passes `python3 -B scripts/check.py`.
 
 Integration review confirms that the specification implements the approved
 direction. New architectural trade-offs return to the Proposal process.

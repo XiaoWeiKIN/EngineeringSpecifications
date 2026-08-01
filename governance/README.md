@@ -47,8 +47,11 @@ before every enforcement mechanism:
   maturity definitions are documented now.
 - Catalog and per-Spec versions, content digests, dependency validation, link
   checking, and tests are already mechanically enforced.
-- Current `0.1.0` specifications predate explicit maturity markers and are
-  treated as Development.
+- Published documents carry explicit Development maturity markers. Their
+  pinned requirements are normative while future Development revisions may
+  change incompatibly.
+- Requirement metadata, enforcement class, and Verification coverage are
+  mechanically checked before publication.
 - Compliance data remains empty until specifications publish stable requirement
   IDs and implementation repositories provide reviewable evidence.
 - A future machine-readable Catalog maturity field or dependency-package

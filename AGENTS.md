@@ -36,6 +36,10 @@ specifications consumed by EngineeringWorkflow.
   before normative integration.
 - Treat specifications without an explicit maturity marker as Development.
 - Keep detection rules deterministic and based on filenames or extensions.
+- Write Catalog descriptions as compact task-activation summaries.
+- Treat Required as local installation, not unconditional task-time reading.
+- Give each Requirement a rationale, enforcement class, evidence contract, and
+  exactly one Verification entry.
 - Do not add project-specific rules unless they are intentionally reusable
   across repositories.
 
@@ -48,4 +52,5 @@ python3 -B scripts/check.py
 ```
 
 The check validates the catalog schema, paths, digests, dependency graph,
-Requirement ID uniqueness, Markdown links, and unit tests.
+document metadata, Requirement blocks, Verification coverage, Markdown links,
+and unit tests.

@@ -28,7 +28,9 @@
             "uniqueItems": true
           },
           "description": {
+            "maxLength": 180,
             "minLength": 1,
+            "pattern": "^Load when ",
             "type": "string"
           },
           "detection": {
@@ -110,4 +112,3 @@
   "title": "Engineering Specification Catalog",
   "type": "object"
 }
-

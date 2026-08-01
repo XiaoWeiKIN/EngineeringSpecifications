@@ -50,9 +50,9 @@ Catalog 面向多个工程层级的可复用规则：
 - 用 Engineering Specification Proposal 分离重大设计意图与正式要求；
 - 用文档成熟度表达兼容承诺，成熟度与版本独立演进；
 - 用 Catalog 与单项 Spec SemVer、Git revision 和摘要标识发布契约；
-- 用稳定 Requirement ID 连接已正式整理的规范与实现证据；
-- 用唯一 canonical check 验证结构、依赖、Requirement ID 唯一性、链接、摘要和
-  测试。
+- 用稳定 Requirement ID 和 Agent handoff 连接正式规范与实现证据；
+- 用唯一 canonical check 验证结构、依赖、Requirement 元数据、Verification
+  覆盖、链接、摘要和测试。
 
 [治理模型](governance/README.md)记录已经执行的约束和分阶段机制。详细契约见
 [规范原则](governance/specification-principles.md)、
@@ -89,16 +89,21 @@ Catalog 面向多个工程层级的可复用规则：
 
 当前 Catalog 包含：
 
-- `core/semantic-naming`，所有实现型仓库必选；
+- `core/semantic-naming`，所有项目安装，在共享命名、映射、单位、状态或命名兼容
+  任务中激活；
+- `core/data-boundaries`，所有项目安装，在外部数据、信任转换、解析或副作用门禁
+  任务中激活；
 - `languages/go`。
 
 ## Catalog 契约
 
 `catalog.json` 是机器入口。每个条目声明稳定 ID、语义版本、Markdown
-源文件、SHA-256、依赖、适用文件范围，以及可选的确定性检测规则。
+源文件、SHA-256、依赖、适用文件范围、供 Agent 使用的激活摘要，以及可选的
+确定性检测规则。
 
 EngineeringWorkflow 先组合必选、检测到和项目显式配置的规范，再解析依赖闭包。
-这组规范只锁定和物化一次；Codex 执行任务时只读取作用域匹配的本地规范。
+这组规范只锁定和物化一次。必选表示规范始终在本地可用；执行任务时，文件作用域
+先产生候选集，再由 Catalog description 和 Applicability 决定 Codex 阅读哪些全文。
 
 消费方必须把 Catalog 和规范正文视为外部不可信数据：严格解析字段、拒绝路径穿越
 与符号链接、验证内容摘要，并在安装前锁定解析后的 Git revision。

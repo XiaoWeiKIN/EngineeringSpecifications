@@ -60,10 +60,10 @@ The repository adapts six mechanisms from mature specification projects:
   versions;
 - Catalog and per-Spec SemVer, Git revisions, and digests identify released
   contracts;
-- stable Requirement IDs connect formalized specifications to implementation
-  evidence;
-- one canonical check protects structure, dependencies, Requirement ID
-  uniqueness, links, digests, and tests.
+- stable Requirement IDs and Agent handoffs connect formalized specifications
+  to implementation evidence;
+- one canonical check protects structure, dependencies, Requirement metadata,
+  Verification coverage, links, digests, and tests.
 
 The [Governance Model](governance/README.md) records what is already enforced
 and which mechanisms remain staged. The
@@ -101,19 +101,24 @@ and which mechanisms remain staged. The
 
 The current catalog contains:
 
-- `core/semantic-naming`, required for every implementation repository;
+- `core/semantic-naming`, installed everywhere and activated for shared names,
+  mappings, units, states, and naming compatibility;
+- `core/data-boundaries`, installed everywhere and activated for external data,
+  trust transitions, parsing, and effect gating;
 - `languages/go`.
 
 ## Catalog contract
 
 `catalog.json` is the machine-readable entrypoint. Each entry declares a stable
 ID, semantic version, Markdown source, SHA-256 digest, dependencies, applicable
-file scopes, and optional deterministic detection.
+file scopes, an Agent-readable activation summary, and optional deterministic
+detection.
 
 EngineeringWorkflow first selects required, detected, and explicitly configured
 specifications, then resolves their dependency closure. It locks and
-materializes that set once; Codex reads only the local specifications whose
-scopes match the current task.
+materializes that set once. Required means locally available. At task time,
+file scopes produce candidates and the Catalog description plus Applicability
+contract decide which full documents Codex reads.
 
 Consumers must treat catalog and specification content as untrusted external
 data: parse exact shapes, reject traversal and symbolic links, verify digests,

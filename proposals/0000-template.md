@@ -32,6 +32,7 @@ Identify:
 - new or affected specification IDs;
 - required upstream specifications;
 - default `applies_to` scopes;
+- Catalog activation summary and task-intent Applicability;
 - required, detected, or explicit selection behavior;
 - project-owned rules that remain outside the central Catalog.
 
