@@ -22,9 +22,8 @@ semantic change creates a new requirement ID or follows an explicitly
 documented compatibility transition.
 
 `core/semantic-naming` and `languages/go` publish Requirement IDs beginning
-with version `0.2.0`. The current Python and TypeScript `0.1.0` specifications
-remain legacy documents without IDs. No implementation matrix should claim
-coverage for a requirement that lacks a published stable ID.
+with version `0.2.0`. No implementation matrix should claim coverage for a
+requirement that lacks a published stable ID.
 
 New documents use the
 [Formal Specification Template](../specification/0000-template.md) to connect

@@ -41,10 +41,9 @@ cross-language without being required in a repository that has no database.
 Framework and database specifications can depend on language, protocol, or
 shared data specifications without copying their rules.
 
-The current release contains only Core, Go, Python, and TypeScript
-specifications. The remaining categories describe where future reusable
-specifications belong; they are not published until they appear in
-`catalog.json`.
+The current release contains only Core and Go specifications. The remaining
+categories describe where future reusable specifications belong; they are not
+published until they appear in `catalog.json`.
 
 Read the [Specification Model](docs/specification-model.md) for the taxonomy,
 dependency model, selection modes, task-time routing, and project ownership
@@ -100,12 +99,10 @@ and which mechanisms remain staged. The
 └── tests/
 ```
 
-The initial catalog contains:
+The current catalog contains:
 
 - `core/semantic-naming`, required for every implementation repository;
-- `languages/go`;
-- `languages/python`;
-- `languages/typescript`.
+- `languages/go`.
 
 ## Catalog contract
 
