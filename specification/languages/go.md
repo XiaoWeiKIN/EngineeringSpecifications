@@ -24,6 +24,8 @@ defined by `core/data-boundaries`.
 ### Load this specification when
 
 - creating or changing hand-written `.go` files;
+- changing `go.mod`, `go.sum`, `go.work`, committed vendor state, generator
+  inputs, generator commands, or committed artifacts owned by a Go module;
 - designing exported Go APIs, package boundaries, errors, goroutines, resource
   ownership, or tests;
 - mapping external data into Go domain types;
@@ -31,8 +33,9 @@ defined by `core/data-boundaries`.
 
 ### Do not apply this specification when
 
-- editing generated, vendored, cgo, or protocol-owned code whose source defines
-  a different form;
+- editing generated, vendored, cgo, or protocol-owned code as its authoritative
+  source; module and generation consistency requirements still apply to
+  repository-owned inputs and projections;
 - changing fixed wire, storage, or telemetry names solely to match Go casing;
 - replacing a stricter project contract that remains compatible with this
   specification.
@@ -42,12 +45,15 @@ defined by `core/data-boundaries`.
 When this Specification is activated, the implementing or reviewing agent:
 
 1. reads the applicable Core Specifications and the closest project guidance;
-2. inspects package call sites before naming or exporting an API;
-3. identifies context, error, goroutine, resource, boundary, and compatibility
-   ownership affected by the change;
-4. runs formatting, static analysis, focused tests, and the repository's
-   canonical validation command;
-5. reports affected `GO-*` Requirement IDs, evidence, and any governed
+2. inventories affected modules, workspaces, committed generated artifacts,
+   and their declared validation commands;
+3. inspects package call sites before naming or exporting an API;
+4. identifies context, error, goroutine, resource, boundary, compatibility,
+   platform, toolchain, and build-tag ownership affected by the change;
+5. runs applicable formatting, module normalization, regeneration, static
+   analysis, focused tests, risk checks, and the repository's canonical
+   validation command;
+6. reports affected `GO-*` Requirement IDs, evidence, and any governed
    exception.
 
 ## Terminology
@@ -58,6 +64,11 @@ When this Specification is activated, the implementing or reviewing agent:
   behavior, rather than by the package that supplies a concrete implementation.
 - An **initialism** is an abbreviation pronounced as letters, such as `API`,
   `HTTP`, `ID`, or `URL`.
+- A **declared module inventory** is the repository-owned set of Go modules and
+  workspaces that its canonical dependency check is expected to cover.
+- A **committed generated artifact** is a tracked file whose authoritative
+  source is a schema, template, grammar, generator input, or other declared
+  source rather than the generated file itself.
 
 ## Requirements
 
@@ -74,6 +85,51 @@ decisions from agent output and human review.
 changed Go files.
 
 **Evidence:** A clean formatter check for the reviewed revision.
+
+### GO-MODULE-001 — Module dependency state is reproducible
+
+Every checked-in Go module **MUST** have `go.mod` and `go.sum` state that is
+canonical for the repository's declared Go toolchain. Dependency changes
+**MUST** run `go mod tidy` or an equivalent deterministic no-diff check over
+the declared module inventory. CI **MUST** fail when normalization produces an
+uncommitted difference.
+
+A committed vendor tree **MUST** be regenerated from the same module state.
+Multi-module repositories **MUST** identify and check every repository-owned
+module rather than validating only the module at the repository root.
+
+**Rationale (non-normative):** Tests can pass while module metadata, checksums,
+workspace replacements, or vendored content remain stale. Canonical dependency
+state makes a revision reproducible for agents, reviewers, and CI.
+
+**Enforcement (mechanical):** Run the repository's declared tidy or dependency
+normalization command with the declared Go toolchain, regenerate committed
+vendor state when present, and require a clean tracked diff.
+
+**Evidence:** A revision-bound dependency check that names the module inventory,
+toolchain, normalization command, and clean result.
+
+### GO-GENERATE-001 — Committed generated artifacts are reproducible
+
+When a Go package or module commits generated artifacts, the repository
+**MUST** identify their authoritative inputs and a reproducible generation
+command. CI **MUST** regenerate those artifacts with the declared toolchain and
+**MUST** fail when the resulting tracked files differ.
+
+Generated output **MUST NOT** be edited as the authoritative source. A scoped
+local edit **MAY** support debugging, but the reviewed revision **MUST** be
+produced by updating the owning input and rerunning the declared generator.
+
+**Rationale (non-normative):** `go build` and `go test` do not automatically
+run `go generate` or project generators, so ordinary test success does not
+prove that committed projections match their sources.
+
+**Enforcement (mechanical):** Regenerate the declared artifact inventory in a
+clean worktree with the declared generator and toolchain, then require a clean
+tracked diff.
+
+**Evidence:** A revision-bound generation check identifying the authoritative
+inputs, command, tool versions, generated paths, and clean result.
 
 ### GO-NAME-001 — Identifiers follow Go casing and context
 
@@ -107,6 +163,13 @@ stable compatibility surfaces may retain it. Constructors **SHOULD** use names
 whose behavior matches the shared semantic vocabulary: `New`, `NewType`,
 `Open`, `Compile`, or an explicit domain operation. `MustX` **MUST** be limited
 to contracts where failure is intentionally unrecoverable.
+
+Single-method interfaces **SHOULD** use a grammatical agent noun derived from
+the method when one is clear, such as `Reader`, `Writer`, `Formatter`, or
+`CloseNotifier`. A method that reuses a canonical Go operation name such as
+`Read`, `Write`, `Close`, `Flush`, or `String` **SHOULD** preserve its
+established meaning and signature; otherwise it **SHOULD** use a domain-specific
+name.
 
 Boolean methods **SHOULD** read as predicates or capabilities, such as
 `IsReady`, `HasEndpoint`, or `CanRetry`. A state expected to grow beyond two
@@ -206,14 +269,20 @@ Shared mutable state **MUST** have explicit synchronization or ownership.
 Implementations **SHOULD** prefer ownership transfer or immutable values when
 that reduces lifecycle ambiguity.
 
+Concurrency-bearing packages **MUST** run race-enabled tests on the
+repository's declared race-capable validation target when the changed path can
+execute there. Any package, platform, or path omitted from race coverage
+**MUST** record a scoped reason and alternate concurrency evidence.
+
 **Rationale (non-normative):** The garbage collector does not stop leaked
 goroutines or close external resources.
 
 **Enforcement (hybrid):** Race-enabled tests, leak checks where available, and
 lifecycle review cover creation, cancellation, shutdown, and error paths.
 
-**Evidence:** Tests that terminate all goroutines, release resources, and pass
-the repository's configured race or concurrency checks.
+**Evidence:** Revision-bound tests that terminate all goroutines, release
+resources, and pass the declared race or alternate concurrency checks, plus
+the scope and reason for any omitted path.
 
 ### GO-COMPAT-001 — Exported Go contracts migrate deliberately
 
@@ -244,13 +313,20 @@ not trigger downstream effects.
 Formatting, static analysis, focused tests, and the repository's canonical
 validation command **MUST** pass before completion.
 
+Validation **MUST** include a risk-based compile or test matrix for each
+changed behavior that depends on supported Go versions, target platforms,
+architectures, or build tags. A materially affected dimension that is not
+exercised **MUST** be disclosed as a scoped exception with alternate evidence.
+
 **Rationale (non-normative):** Agent-generated implementations need fast,
 specific feedback at the violated contract.
 
 **Enforcement (mechanical):** Repository CI runs the declared formatter,
-analyzer, focused test targets, and canonical validation command.
+analyzer, focused test targets, canonical validation command, and applicable
+toolchain, platform, architecture, and build-tag matrix dimensions.
 
-**Evidence:** Revision-bound CI results and focused test output.
+**Evidence:** Revision-bound CI results, focused test output, the exercised
+matrix, and governed exceptions for intentionally uncovered dimensions.
 
 ## Approved patterns
 
@@ -282,16 +358,29 @@ func ParseCreateCommand(req CreateRequest) (CreateCommand, error) {
 The transport request cannot enter core logic until the parser constructs a
 domain command.
 
+A multi-module repository can satisfy `GO-MODULE-001` with one deterministic
+command that enumerates every declared module, runs the repository's selected
+tidy policy, regenerates vendor state when present, and fails on a tracked
+diff. A generator check can use the same pattern for its declared artifact
+inventory.
+
 ## Rejected patterns
 
 - `type HttpClient` and `parseUrl` violate `GO-NAME-001`.
 - Package and type pairs such as `http.HTTPServer` may violate `GO-NAME-002`
   when the package already supplies the missing context.
+- Committing changed module metadata without normalizing every declared module
+  violates `GO-MODULE-001`.
+- Hand-editing a committed generated file without updating its authoritative
+  input and regenerating it violates `GO-GENERATE-001`.
 - `response := decoded.(DomainType)` violates `GO-BOUNDARY-001`.
 - Logging an error in every layer before returning it violates
   `GO-ERROR-001`.
 - Starting a goroutine without cancellation or shutdown violates
   `GO-LIFECYCLE-001`.
+- Changing tag- or platform-specific behavior while testing only the default
+  build violates `GO-TEST-001` unless a scoped exception supplies alternate
+  evidence.
 - Renaming a published exported symbol for casing alone violates
   `GO-COMPAT-001`.
 
@@ -303,11 +392,18 @@ Exceptions must identify their source, scope, and removal condition. They do
 not permit new hand-written code to bypass boundary, error, lifecycle, or
 compatibility requirements.
 
+Toolchain, platform, architecture, build-tag, and race exceptions must identify
+the untested dimension, why the canonical CI cannot exercise it, the alternate
+evidence, and a review or removal condition. They do not permit a repository to
+silently omit materially affected supported behavior.
+
 ## Verification
 
 | Requirement | Minimum verification |
 | --- | --- |
 | `GO-FORMAT-001` | No-diff `gofmt` check |
+| `GO-MODULE-001` | Declared module inventory normalization and clean tracked diff |
+| `GO-GENERATE-001` | Declared artifact regeneration and clean tracked diff |
 | `GO-NAME-001` | AST-aware casing check and contextual review |
 | `GO-NAME-002` | Exported API and call-site review |
 | `GO-API-001` | Type checking and API contract tests |
@@ -324,20 +420,26 @@ An agent applying this Specification reports:
 ```text
 Activated requirements: <GO-* IDs and applicable upstream Core IDs>
 Packages and public contracts: <affected packages, APIs, errors, and schemas>
-Verification: <gofmt, analyzer, focused tests, race or lifecycle evidence>
+Dependency and generation state: <module inventory, generators, or not applicable>
+Verification: <gofmt, tidy/no-diff, regeneration/no-diff, analyzer, focused tests, race, matrix, or lifecycle evidence>
 Exceptions: none | <generated, vendored, protocol-owned, or legacy scope>
 Compatibility or migration: none | <preserved API and removal condition>
 ```
 
 ## Compatibility and migration
 
-Version `0.3.0` preserves every `GO-*` Requirement ID and adds an explicit
-dependency on `core/data-boundaries`. `GO-BOUNDARY-001` now identifies the
-upstream `DATA-*` contracts it realizes without changing its Go behavior.
+Version `0.4.0` preserves every existing `GO-*` Requirement ID, adds
+`GO-MODULE-001` and `GO-GENERATE-001`, and strengthens `GO-NAME-002`,
+`GO-LIFECYCLE-001`, and `GO-TEST-001`. The naming change is Go-specific and
+does not govern Java, Python, database, configuration, wire, storage, or
+telemetry names.
 
-Repositories should apply the rules to new and modified code. They must not
-bulk-rename stable APIs, schemas, or stored values without a reviewed
-migration.
+Repositories adopting `0.4.0` should first inventory modules, committed
+generated artifacts, concurrency-bearing packages, and supported validation
+dimensions. They must not bulk-rename stable APIs, schemas, or stored values
+without a reviewed migration. Consumers that cannot yet satisfy the new
+Development requirements can remain pinned to an earlier Catalog revision
+while they prepare the required checks.
 
 ## References
 
@@ -348,3 +450,6 @@ migration.
 - [Go Code Review Comments](https://go.dev/wiki/CodeReviewComments)
 - [Go Doc Comments](https://go.dev/doc/comment)
 - [Go `context` package](https://pkg.go.dev/context)
+- [Go Modules Reference: `go mod tidy`](https://go.dev/ref/mod#go-mod-tidy)
+- [Go command documentation: generate](https://pkg.go.dev/cmd/go#hdr-Generate_Go_files_by_processing_source)
+- [Go Data Race Detector](https://go.dev/doc/articles/race_detector)

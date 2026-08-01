@@ -1,6 +1,6 @@
 {
   "catalog_id": "io.github.xiaoweikin.engineering-specifications",
-  "catalog_version": "1.1.0",
+  "catalog_version": "1.2.0",
   "schema_version": 1,
   "specs": [
     {
@@ -33,9 +33,11 @@
       "applies_to": [
         "**/*.go",
         "**/go.mod",
-        "**/go.work"
+        "**/go.sum",
+        "**/go.work",
+        "**/vendor/modules.txt"
       ],
-      "description": "Load when changing hand-written Go APIs, names, boundary adapters, errors, lifecycle, compatibility, or tests",
+      "description": "Load when changing hand-written Go code, module or generator state, APIs, names, boundaries, lifecycle, or tests",
       "detection": {
         "extensions": [
           ".go"
@@ -52,8 +54,8 @@
         "core/semantic-naming",
         "core/data-boundaries"
       ],
-      "sha256": "7051ec82c4493a757cfaf1af58f9d3eb38ba7998c6918979c2cac3cc7122b741",
-      "version": "0.3.0"
+      "sha256": "da320823a0dc3f09c449a635328b3c397b5af3fbdfe6dcb8b6ae367aecc6f820",
+      "version": "0.4.0"
     }
   ]
 }

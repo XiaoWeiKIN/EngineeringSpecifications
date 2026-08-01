@@ -6,6 +6,10 @@ All notable Catalog and normative specification changes are recorded here.
 
 ### Added
 
+- Added `GO-MODULE-001` to require reproducible, no-diff module and committed
+  vendor state across the declared module inventory.
+- Added `GO-GENERATE-001` to require authoritative inputs, reproducible
+  generation, and clean-diff evidence for committed generated artifacts.
 - Approved ESP-0007 to separate Specification selection, file candidacy, and
   task activation without changing Catalog schema version 1.
 - Added Development `core/data-boundaries` version `0.1.0` for untrusted
@@ -25,6 +29,12 @@ All notable Catalog and normative specification changes are recorded here.
 
 ### Changed
 
+- Advanced Catalog to `1.2.0` and `languages/go` to `0.4.0`. The Go
+  Specification now routes module metadata and committed vendor state, adds
+  single-method interface and canonical method naming to `GO-NAME-002`,
+  requires scoped race evidence in `GO-LIFECYCLE-001`, and requires a
+  risk-based toolchain/platform/architecture/build-tag matrix in
+  `GO-TEST-001`.
 - Advanced Catalog to `1.1.0` with activation-oriented descriptions and the
   new required Data Boundaries Specification; the JSON shape remains schema
   version 1.
