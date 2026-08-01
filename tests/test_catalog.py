@@ -65,7 +65,7 @@ class CatalogTestCase(unittest.TestCase):
             catalog["catalog_id"],
             "io.github.xiaoweikin.engineering-specifications",
         )
-        self.assertEqual(catalog["catalog_version"], "1.1.0")
+        self.assertEqual(catalog["catalog_version"], "1.2.0")
         self.assertEqual(len(catalog["specs"]), 3)
         self.assertEqual(
             {item["id"] for item in catalog["specs"]},
@@ -81,6 +81,12 @@ class CatalogTestCase(unittest.TestCase):
                 len(item["description"]),
                 CHECK.MAX_ACTIVATION_SUMMARY_LENGTH,
             )
+        go_spec = next(
+            item for item in catalog["specs"] if item["id"] == "languages/go"
+        )
+        self.assertEqual(go_spec["version"], "0.4.0")
+        self.assertIn("**/go.sum", go_spec["applies_to"])
+        self.assertIn("**/vendor/modules.txt", go_spec["applies_to"])
         self.assertEqual(
             CHECK.check_requirement_ids(ROOT, catalog),
             (
@@ -94,7 +100,9 @@ class CatalogTestCase(unittest.TestCase):
                 "GO-COMPAT-001",
                 "GO-ERROR-001",
                 "GO-FORMAT-001",
+                "GO-GENERATE-001",
                 "GO-LIFECYCLE-001",
+                "GO-MODULE-001",
                 "GO-NAME-001",
                 "GO-NAME-002",
                 "GO-TEST-001",
