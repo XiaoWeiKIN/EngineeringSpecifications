@@ -6,7 +6,7 @@ All notable Catalog and normative specification changes are recorded here.
 
 ### Added
 
-- Approved ESP-0000 to separate Specification selection, file candidacy, and
+- Approved ESP-0007 to separate Specification selection, file candidacy, and
   task activation without changing Catalog schema version 1.
 - Added Development `core/data-boundaries` version `0.1.0` for untrusted
   shapes, domain parsing, effect gating, boundary errors, and protocol-owned

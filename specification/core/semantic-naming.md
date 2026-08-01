@@ -276,6 +276,6 @@ version. Requirement IDs `SEM-NAME-001`, `SEM-VERB-001`, `SEM-SURFACE-001`,
 
 ## References
 
-- [ESP-0000: Separate Spec selection from task activation](../../proposals/0000_agent-task-activation-and-data-boundaries.md)
+- [ESP-0007: Separate Spec selection from task activation](../../proposals/0007_agent-task-activation-and-data-boundaries.md)
 - [BCP 14](https://www.rfc-editor.org/info/bcp14)
 - [Data Boundaries](data-boundaries.md)

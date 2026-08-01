@@ -1,4 +1,4 @@
-# ESP-0000: Separate Spec selection from task activation
+# ESP-0007: Separate Spec selection from task activation
 
 > - **Status:** Approved
 > - **Normative:** No

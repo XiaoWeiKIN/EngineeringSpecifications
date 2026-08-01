@@ -265,7 +265,7 @@ internal boundary without changing an owning external surface.
 
 ## References
 
-- [ESP-0000: Separate Spec selection from task activation](../../proposals/0000_agent-task-activation-and-data-boundaries.md)
+- [ESP-0007: Separate Spec selection from task activation](../../proposals/0007_agent-task-activation-and-data-boundaries.md)
 - [Semantic Naming](semantic-naming.md)
 - [BCP 14](https://www.rfc-editor.org/info/bcp14)
 - [Parse, don't validate](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/)

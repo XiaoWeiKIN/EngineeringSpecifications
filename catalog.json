@@ -12,7 +12,7 @@
       "path": "specification/core/semantic-naming.md",
       "required": true,
       "requires": [],
-      "sha256": "5b8a267fede7a52cb90458111ec72bf4e68b60c88012a85bc4e8f9e9f2aa44de",
+      "sha256": "85acf330819952e5c1994a3c3dde776847c8e309e8ecb523f638f4d80db6993b",
       "version": "1.0.0"
     },
     {
@@ -26,7 +26,7 @@
       "requires": [
         "core/semantic-naming"
       ],
-      "sha256": "e88a7947bdd707a2842619d2b59c20e49b3b5eaa0780afe57cd80057aa290495",
+      "sha256": "74a345f6f848b66d3f2fac69e3b758780113de5c6a69c6bc92057cf48559ce0f",
       "version": "0.1.0"
     },
     {
@@ -52,7 +52,7 @@
         "core/semantic-naming",
         "core/data-boundaries"
       ],
-      "sha256": "d6a65265a70e2bcc50e54f1045ced968b8a14268b1b07f5ad6454076900db317",
+      "sha256": "7051ec82c4493a757cfaf1af58f9d3eb38ba7998c6918979c2cac3cc7122b741",
       "version": "0.3.0"
     }
   ]

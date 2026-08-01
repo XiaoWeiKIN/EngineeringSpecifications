@@ -341,7 +341,7 @@ migration.
 
 ## References
 
-- [ESP-0000: Separate Spec selection from task activation](../../proposals/0000_agent-task-activation-and-data-boundaries.md)
+- [ESP-0007: Separate Spec selection from task activation](../../proposals/0007_agent-task-activation-and-data-boundaries.md)
 - [Semantic Naming](../core/semantic-naming.md)
 - [Data Boundaries](../core/data-boundaries.md)
 - [Effective Go](https://go.dev/doc/effective_go)
