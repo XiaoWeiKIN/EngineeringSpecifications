@@ -131,3 +131,8 @@ Catalog 与单项规范遵循语义化版本。Git tag 可以标识发布版本�
 分支，也可以指定 tag，但其 lock 始终记录不可变的实际 commit。
 
 已发布变更见 [CHANGELOG.md](CHANGELOG.md)。
+
+## 许可证
+
+EngineeringSpecifications 使用
+[Apache License 2.0](LICENSE)，与 OpenTelemetry Specification 仓库一致。
