@@ -20,6 +20,25 @@ SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 REQUIREMENT_HEADING_RE = re.compile(
     r"^### ([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+-[0-9]{3}) — \S.*$"
 )
+STATUS_RE = re.compile(
+    r"^> \*\*Status:\*\* (Development|Stable|Deprecated)$",
+    re.MULTILINE,
+)
+CATALOG_ID_LINE_RE = re.compile(
+    r"^> \*\*Catalog ID:\*\* `([^`]+)`$",
+    re.MULTILINE,
+)
+SELECTION_RE = re.compile(
+    r"^> \*\*Selection:\*\* (Required|Detected|Explicit)$",
+    re.MULTILINE,
+)
+ENFORCEMENT_RE = re.compile(
+    r"\*\*Enforcement \((mechanical|review|hybrid)\):\*\*"
+)
+VERIFICATION_ROW_RE = re.compile(
+    r"^\| `([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+-[0-9]{3})` \| \S.*\|$"
+)
+MAX_ACTIVATION_SUMMARY_LENGTH = 180
 
 
 def expect_object(value: object, label: str) -> dict[str, object]:
@@ -160,7 +179,20 @@ def load_catalog(root: Path) -> dict[str, object]:
         )
         if not scopes:
             raise ValueError(f"{label}.applies_to: at least one scope required")
-        expect_string(item["description"], f"{label}.description")
+        description = expect_string(
+            item["description"],
+            f"{label}.description",
+        )
+        if not description.startswith("Load when "):
+            raise ValueError(
+                f"{label}.description: expected an activation summary "
+                "starting with 'Load when '"
+            )
+        if len(description) > MAX_ACTIVATION_SUMMARY_LENGTH:
+            raise ValueError(
+                f"{label}.description: activation summary exceeds "
+                f"{MAX_ACTIVATION_SUMMARY_LENGTH} characters"
+            )
         if "detection" in item:
             detection = expect_object(
                 item["detection"],
@@ -249,6 +281,48 @@ def check_markdown_links() -> None:
                 )
 
 
+def single_metadata_value(
+    pattern: re.Pattern[str],
+    content: str,
+    relative: str,
+    label: str,
+) -> str:
+    matches = pattern.findall(content)
+    if len(matches) != 1:
+        raise ValueError(
+            f"{relative}: expected exactly one {label} metadata marker"
+        )
+    return matches[0]
+
+
+def markdown_section(
+    content: str,
+    heading: str,
+    relative: str,
+) -> list[str]:
+    lines = content.splitlines()
+    positions = [index for index, line in enumerate(lines) if line == heading]
+    if len(positions) != 1:
+        raise ValueError(
+            f"{relative}: expected exactly one {heading} section"
+        )
+    start = positions[0] + 1
+    end = len(lines)
+    for index in range(start, len(lines)):
+        if lines[index].startswith("## "):
+            end = index
+            break
+    return lines[start:end]
+
+
+def expected_selection(spec: dict[str, object]) -> str:
+    if spec["required"] is True:
+        return "Required"
+    if "detection" in spec:
+        return "Detected"
+    return "Explicit"
+
+
 def check_requirement_ids(
     root: Path,
     catalog: dict[str, object],
@@ -260,25 +334,99 @@ def check_requirement_ids(
         relative = safe_relative(spec["path"], f"{spec_id}.path")
         path = root / relative
         content = path.read_text(encoding="utf-8")
-        in_requirements = False
-        publishes_requirements = False
-        local_ids: list[str] = []
-        for line in content.splitlines():
-            if line == "## Requirements":
-                in_requirements = True
-                publishes_requirements = True
-                continue
-            if line.startswith("## "):
-                in_requirements = False
-                continue
-            if not in_requirements or not line.startswith("### "):
+
+        single_metadata_value(STATUS_RE, content, relative, "Status")
+        document_id = single_metadata_value(
+            CATALOG_ID_LINE_RE,
+            content,
+            relative,
+            "Catalog ID",
+        )
+        if document_id != spec_id:
+            raise ValueError(
+                f"{relative}: Catalog ID {document_id!r} does not match "
+                f"{spec_id!r}"
+            )
+        selection = single_metadata_value(
+            SELECTION_RE,
+            content,
+            relative,
+            "Selection",
+        )
+        expected = expected_selection(spec)
+        if selection != expected:
+            raise ValueError(
+                f"{relative}: Selection {selection!r} does not match "
+                f"Catalog behavior {expected!r}"
+            )
+        if content.count("> **Routing:**") != 1:
+            raise ValueError(
+                f"{relative}: expected exactly one Routing metadata marker"
+            )
+        if content.count("> **Catalog metadata:**") != 1:
+            raise ValueError(
+                f"{relative}: expected exactly one Catalog metadata marker"
+            )
+
+        markdown_section(content, "## Purpose", relative)
+        markdown_section(content, "## Applicability", relative)
+        markdown_section(content, "## Agent workflow", relative)
+        requirement_lines = markdown_section(
+            content,
+            "## Requirements",
+            relative,
+        )
+        verification_lines = markdown_section(
+            content,
+            "## Verification",
+            relative,
+        )
+        markdown_section(content, "## Agent handoff", relative)
+        markdown_section(
+            content,
+            "## Compatibility and migration",
+            relative,
+        )
+
+        headings: list[tuple[int, str]] = []
+        for index, line in enumerate(requirement_lines):
+            if not line.startswith("### "):
                 continue
             match = REQUIREMENT_HEADING_RE.fullmatch(line)
             if match is None:
                 raise ValueError(
                     f"{relative}: malformed Requirement heading: {line}"
                 )
-            requirement_id = match.group(1)
+            headings.append((index, match.group(1)))
+        if not headings:
+            raise ValueError(
+                f"{relative}: Requirements section has no stable IDs"
+            )
+
+        local_ids: list[str] = []
+        for heading_index, (start, requirement_id) in enumerate(headings):
+            end = (
+                headings[heading_index + 1][0]
+                if heading_index + 1 < len(headings)
+                else len(requirement_lines)
+            )
+            block = "\n".join(requirement_lines[start:end])
+            markers = {
+                "Rationale": block.count("**Rationale (non-normative):**"),
+                "Evidence": block.count("**Evidence:**"),
+            }
+            for label, count in markers.items():
+                if count != 1:
+                    raise ValueError(
+                        f"{relative}: {requirement_id} requires exactly one "
+                        f"{label} marker"
+                    )
+            enforcement = ENFORCEMENT_RE.findall(block)
+            if len(enforcement) != 1:
+                raise ValueError(
+                    f"{relative}: {requirement_id} requires exactly one "
+                    "Enforcement class"
+                )
             previous = seen.get(requirement_id)
             if previous is not None:
                 raise ValueError(
@@ -287,9 +435,38 @@ def check_requirement_ids(
                 )
             seen[requirement_id] = relative
             local_ids.append(requirement_id)
-        if publishes_requirements and not local_ids:
+
+        verification_ids: list[str] = []
+        for line in verification_lines:
+            match = VERIFICATION_ROW_RE.fullmatch(line)
+            if match is not None:
+                verification_ids.append(match.group(1))
+                continue
+            if line.startswith("| `"):
+                raise ValueError(
+                    f"{relative}: malformed Verification row: {line}"
+                )
+        duplicate_verification = sorted(
+            requirement_id
+            for requirement_id in set(verification_ids)
+            if verification_ids.count(requirement_id) > 1
+        )
+        if duplicate_verification:
             raise ValueError(
-                f"{relative}: Requirements section has no stable IDs"
+                f"{relative}: duplicate Verification IDs: "
+                + ", ".join(duplicate_verification)
+            )
+        missing = sorted(set(local_ids) - set(verification_ids))
+        unknown = sorted(set(verification_ids) - set(local_ids))
+        if missing or unknown:
+            details: list[str] = []
+            if missing:
+                details.append("missing " + ", ".join(missing))
+            if unknown:
+                details.append("unknown " + ", ".join(unknown))
+            raise ValueError(
+                f"{relative}: Verification coverage mismatch: "
+                + "; ".join(details)
             )
     return tuple(sorted(seen))
 

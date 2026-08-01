@@ -9,6 +9,11 @@ A Development specification is available for real use and feedback, but its
 requirements may change incompatibly. Consumers should pin an exact revision
 and review every update.
 
+BCP 14 requirements remain normative within the pinned Development version.
+Development describes the compatibility promise of future revisions; it does
+not downgrade `MUST` to advice or prevent a repository from enforcing the
+current version mechanically.
+
 New documents start in Development. The `0.1.0` specifications created before
 this lifecycle was documented are also treated as Development.
 

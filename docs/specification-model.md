@@ -17,7 +17,7 @@ in `catalog.json` are currently published.
 
 | Layer | Responsibility | Typical selection |
 | --- | --- | --- |
-| `core/` | Rules valid in every implementation repository, such as shared semantic verbs and boundary terminology | Required |
+| `core/` | Rules every implementation repository must carry, such as semantic operations and external-data boundaries | Required selection; task activation remains conditional |
 | `languages/` | Language idioms, APIs, errors, concurrency, resources, and language-specific testing practices | Repository detection |
 | `frameworks/` | Framework or major-library contracts, such as Go Gin/GORM or Java Spring/Netty | Explicit selection; deterministic dependency detection may be added later |
 | `databases/` | Vendor-neutral schema design and database-specific behavior for systems such as MySQL or ClickHouse | Explicit selection or deterministic repository evidence |
@@ -37,7 +37,8 @@ inheritance or override precedence.
 
 ```mermaid
 flowchart TB
-    Core["core/semantic-naming"]
+    Naming["core/semantic-naming"]
+    Boundary["core/data-boundaries"]
     Go["languages/go"]
     Java["languages/java"]
     HTTP["protocols/http-api"]
@@ -50,10 +51,13 @@ flowchart TB
     Testing["testing/foundations"]
     Project["Project-owned specifications"]
 
-    Core --> Go
-    Core --> Java
-    Core --> Schema
-    Core --> Testing
+    Naming --> Boundary
+    Naming --> Go
+    Boundary --> Go
+    Naming --> Java
+    Boundary --> Java
+    Naming --> Schema
+    Naming --> Testing
     Go --> Gin
     HTTP --> Gin
     Go --> Gorm
@@ -98,14 +102,16 @@ flowchart LR
     Select --> Closure["Resolve requires closure"]
     Closure --> Lock["Lock Git commit + SHA-256"]
     Lock --> Local["Materialize local copies"]
-    Local --> Scope["Filter by applies_to"]
+    Local --> Scope["File candidates<br/>applies_to"]
     Project["Project-owned specifications"] --> Scope
-    Scope --> Codex["Codex task context"]
+    Scope --> Activate["Task activation<br/>description + Applicability"]
+    Activate --> Codex["Codex task context"]
 ```
 
 Selection has three sources:
 
-- **Required** specifications are selected for every implementation repository.
+- **Required** specifications are selected and materialized for every
+  implementation repository. Required does not mean always read.
 - **Detected** specifications use deterministic repository evidence.
 - **Explicit** specifications are declared by the consuming project.
 
@@ -115,10 +121,15 @@ for language discovery. Framework and database specifications should remain
 explicit until the Catalog and EngineeringWorkflow introduce a reviewed,
 deterministic dependency-evidence contract.
 
-At task time, `applies_to` scopes keep unrelated specifications out of the
-active context. A Go source change can load the shared Core and Go
-specifications. A Gin handler change can additionally load HTTP and Gin
-guidance. A ClickHouse migration can load schema-design and ClickHouse
+At task time, `applies_to` scopes produce a conservative file candidate set.
+The Catalog description provides a compact activation summary for the local
+index. Codex reads a candidate's full text only when the task also matches its
+Applicability section.
+
+For example, a Go source change selects Go as a candidate. A public API rename
+activates Semantic Naming; an HTTP request parser activates Data Boundaries;
+an internal arithmetic change may activate only the relevant Go requirements.
+A Gin handler can additionally activate HTTP, Gin, and project Handler
 guidance. Project-owned architecture and component rules join the same route
 without being copied into this repository.
 
@@ -128,13 +139,15 @@ The following examples use future IDs to demonstrate composition:
 
 | Project or task | Applicable set |
 | --- | --- |
-| Go command-line service | Core + Go + testing foundations |
-| Gin service backed by MySQL | Core + Go + HTTP + Gin + schema design + MySQL + testing |
-| Java Netty service writing ClickHouse | Core + Java + Netty + schema design + ClickHouse + testing |
-| Python library without persistence | Core + Python + testing; no database specification |
+| Go command-line service | Core installed; Go detected; task intent activates the needed subset |
+| Gin service backed by MySQL | Core + Go + HTTP + Gin + schema design + MySQL + testing candidates |
+| Java Netty service writing ClickHouse | Core + Java + Netty + schema design + ClickHouse + testing candidates |
+| Python library without persistence | Core + Python + testing candidates; no database specification |
 
-The resolver installs the dependency closure once. The task router reads only
-the subset whose scopes match the files being changed.
+The resolver installs the dependency closure once. The task router filters by
+file scope and then task activation. This two-stage route keeps broad Core
+contracts locally available without injecting every Core document into every
+task.
 
 ## Repository ownership stays explicit
 
@@ -169,9 +182,11 @@ Before adding a specification:
    accident.
 3. Identify reusable upstream contracts and declare them in `requires`.
 4. Define deterministic `applies_to` scopes.
-5. Add detection only when filenames or extensions provide reliable evidence;
+5. Write the Catalog description as a compact `Load when ...` activation
+   summary and make the Applicability section decisive.
+6. Add detection only when filenames or extensions provide reliable evidence;
    otherwise require explicit project selection.
-6. Keep project names, private paths, internal frameworks, and domain-only
+7. Keep project names, private paths, internal frameworks, and domain-only
    terminology in the consuming project.
 
 Read the [Governance Model](../governance/README.md) to determine whether the
@@ -184,6 +199,7 @@ changelog, and validation process.
 The current release publishes:
 
 - `core/semantic-naming`, required for implementation repositories;
+- `core/data-boundaries`, required for implementation repositories;
 - `languages/go`.
 
 See the [Specification Index](../specification/README.md) for the current

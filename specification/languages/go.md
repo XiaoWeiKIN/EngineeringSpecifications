@@ -6,12 +6,18 @@
 >
 > **Selection:** Detected
 >
+> **Routing:** Selection installs this Specification when Go is detected. Load
+> it only for tasks that create, change, or review hand-written Go contracts.
+>
 > **Catalog metadata:** `catalog.json` is the source of truth for version,
-> dependencies, file scopes, detection evidence, and content digest.
+> dependencies, file scopes, detection evidence, activation summary, and
+> content digest.
+
+## Purpose
 
 Go implementations use idiomatic language constructs while preserving the
-semantic names, boundary guarantees, and compatibility rules defined by
-`core/semantic-naming`.
+semantic names defined by `core/semantic-naming` and the trust transition
+defined by `core/data-boundaries`.
 
 ## Applicability
 
@@ -30,6 +36,19 @@ semantic names, boundary guarantees, and compatibility rules defined by
 - changing fixed wire, storage, or telemetry names solely to match Go casing;
 - replacing a stricter project contract that remains compatible with this
   specification.
+
+## Agent workflow
+
+When this Specification is activated, the implementing or reviewing agent:
+
+1. reads the applicable Core Specifications and the closest project guidance;
+2. inspects package call sites before naming or exporting an API;
+3. identifies context, error, goroutine, resource, boundary, and compatibility
+   ownership affected by the change;
+4. runs formatting, static analysis, focused tests, and the repository's
+   canonical validation command;
+5. reports affected `GO-*` Requirement IDs, evidence, and any governed
+   exception.
 
 ## Terminology
 
@@ -51,7 +70,8 @@ use a deterministic import organizer when they require import grouping beyond
 **Rationale (non-normative):** Mechanical formatting removes subjective style
 decisions from agent output and human review.
 
-**Enforcement:** Run `gofmt` or an equivalent no-diff check on changed Go files.
+**Enforcement (mechanical):** Run `gofmt` or an equivalent no-diff check on
+changed Go files.
 
 **Evidence:** A clean formatter check for the reviewed revision.
 
@@ -70,8 +90,9 @@ methods. Receivers **SHOULD NOT** be named `this`, `self`, or the full type name
 code predictable without repeating information already supplied by types and
 receivers.
 
-**Enforcement:** Use AST-aware naming checks for mechanical casing rules and
-review scope, receiver consistency, and protocol exceptions in context.
+**Enforcement (hybrid):** Use AST-aware naming checks for mechanical casing
+rules and review scope, receiver consistency, and protocol exceptions in
+context.
 
 **Evidence:** Passing naming checks plus reviewed declarations and call sites.
 
@@ -95,9 +116,9 @@ values **SHOULD** use a typed state instead of accumulating Boolean fields.
 and `store.Save` communicate more than declarations read without package or
 receiver context.
 
-**Enforcement:** Review exported declarations at representative call sites.
-Treat generic package or operation words as review triggers, not automatic
-failures.
+**Enforcement (review):** Review exported declarations at representative call
+sites. Treat generic package or operation words as review triggers, not
+automatic failures.
 
 **Evidence:** API examples or tests demonstrating clear construction, access,
 failure, and predicate behavior.
@@ -120,9 +141,9 @@ Identifiers, units, states, and values that must not be mixed accidentally
 **Rationale (non-normative):** Small consumer-owned contracts reduce accidental
 compatibility promises and give implementations room to evolve.
 
-**Enforcement:** Static checks can verify context position and forbid stored
-contexts. API review verifies interface ownership, exported surface, and
-semantic types.
+**Enforcement (hybrid):** Static checks can verify context position and forbid
+stored contexts. API review verifies interface ownership, exported surface,
+and semantic types.
 
 **Evidence:** Type-checking results, API examples, and focused tests using the
 consumer contract.
@@ -134,6 +155,10 @@ results **MUST** be treated as untrusted shapes. Boundary code **MUST** parse or
 convert them into domain-safe Go values before invoking core logic or side
 effects.
 
+Go boundary code **MUST** satisfy `DATA-SHAPE-001`, `DATA-PARSE-001`, and
+`DATA-EFFECT-001`. Error and normalization behavior **MUST** satisfy
+`DATA-ERROR-001` and `DATA-NORMALIZE-001` when those concerns are present.
+
 Boundary parsers **SHOULD** use focused standard-library facilities such as
 `strconv`, `time`, and `net/url` instead of ad hoc conversions. Unknown
 external enum values and invalid cross-field combinations **MUST** be rejected
@@ -142,7 +167,7 @@ or represented by an explicit unknown policy.
 **Rationale (non-normative):** Go struct decoding establishes structure but
 does not establish domain validity.
 
-**Enforcement:** Keep transport or storage inputs distinct from domain
+**Enforcement (hybrid):** Keep transport or storage inputs distinct from domain
 commands. Tests must assert that rejected input cannot invoke downstream
 effects.
 
@@ -165,7 +190,7 @@ requires otherwise.
 **Rationale (non-normative):** Preserved identity supports recovery while clear
 ownership prevents duplicate signals and leaking implementation details.
 
-**Enforcement:** Static analysis and tests cover returned errors,
+**Enforcement (hybrid):** Static analysis and tests cover returned errors,
 `errors.Is`/`errors.As`, wrapping, boundary translation, and logging ownership.
 
 **Evidence:** Focused error-path tests and reviewed logs or telemetry for a
@@ -184,8 +209,8 @@ that reduces lifecycle ambiguity.
 **Rationale (non-normative):** The garbage collector does not stop leaked
 goroutines or close external resources.
 
-**Enforcement:** Race-enabled tests, leak checks where available, and lifecycle
-review cover creation, cancellation, shutdown, and error paths.
+**Enforcement (hybrid):** Race-enabled tests, leak checks where available, and
+lifecycle review cover creation, cancellation, shutdown, and error paths.
 
 **Evidence:** Tests that terminate all goroutines, release resources, and pass
 the repository's configured race or concurrency checks.
@@ -203,8 +228,8 @@ Generated APIs **MUST** be changed through their source schema.
 **Rationale (non-normative):** A stylistic cleanup can otherwise become a
 source, wire, storage, or behavioral breaking change.
 
-**Enforcement:** API-diff tooling where available, compile-time compatibility
-fixtures, schema checks, and migration review.
+**Enforcement (hybrid):** API-diff tooling where available, compile-time
+compatibility fixtures, schema checks, and migration review.
 
 **Evidence:** Old and new caller tests, deprecation documentation, and a
 versioned removal plan.
@@ -222,8 +247,8 @@ validation command **MUST** pass before completion.
 **Rationale (non-normative):** Agent-generated implementations need fast,
 specific feedback at the violated contract.
 
-**Enforcement:** Repository CI runs the declared formatter, analyzer, focused
-test targets, and canonical validation command.
+**Enforcement (mechanical):** Repository CI runs the declared formatter,
+analyzer, focused test targets, and canonical validation command.
 
 **Evidence:** Revision-bound CI results and focused test output.
 
@@ -292,15 +317,33 @@ compatibility requirements.
 | `GO-COMPAT-001` | API or schema compatibility tests |
 | `GO-TEST-001` | Repository canonical CI |
 
+## Agent handoff
+
+An agent applying this Specification reports:
+
+```text
+Activated requirements: <GO-* IDs and applicable upstream Core IDs>
+Packages and public contracts: <affected packages, APIs, errors, and schemas>
+Verification: <gofmt, analyzer, focused tests, race or lifecycle evidence>
+Exceptions: none | <generated, vendored, protocol-owned, or legacy scope>
+Compatibility or migration: none | <preserved API and removal condition>
+```
+
 ## Compatibility and migration
 
-Version `0.2.0` preserves the `0.1.0` direction and adds stable Requirement
-IDs, explicit Go naming rules, and evidence contracts. Repositories should
-apply the rules to new and modified code. They must not bulk-rename stable APIs,
-schemas, or stored values without a reviewed migration.
+Version `0.3.0` preserves every `GO-*` Requirement ID and adds an explicit
+dependency on `core/data-boundaries`. `GO-BOUNDARY-001` now identifies the
+upstream `DATA-*` contracts it realizes without changing its Go behavior.
+
+Repositories should apply the rules to new and modified code. They must not
+bulk-rename stable APIs, schemas, or stored values without a reviewed
+migration.
 
 ## References
 
+- [ESP-0000: Separate Spec selection from task activation](../../proposals/0000_agent-task-activation-and-data-boundaries.md)
+- [Semantic Naming](../core/semantic-naming.md)
+- [Data Boundaries](../core/data-boundaries.md)
 - [Effective Go](https://go.dev/doc/effective_go)
 - [Go Code Review Comments](https://go.dev/wiki/CodeReviewComments)
 - [Go Doc Comments](https://go.dev/doc/comment)

@@ -75,13 +75,16 @@ Catalog carries machine-readable maturity, a missing marker means Development.
 
 Copy the
 [Formal Specification Template](specification/0000-template.md) when creating a
-normative document. The template separates four concerns that a coding agent
-and reviewer both need:
+normative document. The template separates six concerns that a coding agent and
+reviewer both need:
 
-1. applicability says when the rule enters task context;
-2. a stable Requirement ID identifies the behavioral contract;
-3. enforcement says how the repository detects a violation;
-4. evidence says how a consumer demonstrates compliance.
+1. selection says how the Specification becomes locally available;
+2. applicability says when it enters task context;
+3. a stable Requirement ID identifies the behavioral contract;
+4. enforcement classifies mechanical, review, or hybrid protection;
+5. evidence says how a consumer demonstrates compliance;
+6. the Agent handoff indexes activated IDs, verification, exceptions, and
+   migration effects.
 
 Keep proposal reasoning in the related ESP. The integrated specification
 retains only the purpose, observable requirements, rationale needed to apply
@@ -91,7 +94,13 @@ migration contract.
 Catalog metadata is not duplicated as free-form normative text. The template
 shows human-readable status, ID, and selection intent, while `catalog.json`
 remains authoritative for version, dependencies, scopes, detection evidence,
-and digest.
+activation summary, and digest.
+
+Required selection means every implementation repository installs the
+Specification. It does not mean every task reads the full document. Write the
+Catalog `description` as a compact `Load when ...` summary. Use `applies_to` as
+a conservative file candidate and the Applicability section as the task-intent
+contract.
 
 ## Change process
 
@@ -109,6 +118,7 @@ and digest.
    - bump the affected specification version for normative changes;
    - refresh the source SHA-256;
    - declare dependencies and deterministic detection evidence.
+   - write the description as an Agent-readable activation summary.
 9. Update `CHANGELOG.md` for externally observable changes.
 10. Run the canonical check:
 

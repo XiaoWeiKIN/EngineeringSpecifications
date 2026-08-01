@@ -17,26 +17,34 @@ implementation suggestions should be identified as non-normative.
 
 Current documents without an explicit status are Development. See the
 [Specification Lifecycle](../governance/lifecycle.md) for compatibility
-expectations.
+expectations. Development requirements remain normative within a pinned
+version; the status permits a later version to change incompatibly.
 
-`core/semantic-naming` and `languages/go` publish stable Requirement IDs
-beginning with version `0.2.0`.
+`core/semantic-naming`, `core/data-boundaries`, and `languages/go` publish
+stable Requirement IDs.
 
 ## Authoring
 
 Start new normative documents from the
 [Formal Specification Template](0000-template.md). The template is optimized
 for Harness Engineering: it connects task applicability, stable Requirement
-IDs, enforcement mechanisms, and implementation evidence.
+IDs, enforcement classes, verification mechanisms, implementation evidence,
+and an Agent handoff.
 
 The template is an authoring resource, not a published specification. A
 document becomes published only after it has its own path and stable Catalog
 entry. `catalog.json` remains authoritative for version, dependencies, scopes,
 detection evidence, and digest.
 
+Selection and task activation are separate. Required means the Specification
+is installed and locally available. `applies_to` produces file candidates; the
+Catalog description and the document's Applicability section determine whether
+the full text enters a task's context.
+
 ## Core
 
 - [Semantic naming](core/semantic-naming.md)
+- [Data boundaries](core/data-boundaries.md)
 
 ## Languages
 

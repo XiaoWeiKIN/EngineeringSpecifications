@@ -24,6 +24,11 @@ A shared requirement belongs in the broadest layer where it remains true.
 Language, framework, database, testing, and protocol specifications add their
 own constraints through explicit dependencies.
 
+Selection controls local availability. File scopes produce task candidates.
+Applicability controls whether an agent loads the full contract. Authors keep
+these decisions separate so a broad reusable rule does not consume every task's
+context.
+
 ## Protect consumers from surprise
 
 Stable specifications preserve their observable contract. Changes explain
@@ -63,6 +68,10 @@ Each load-bearing requirement states how a project can demonstrate compliance:
 
 A rule without a plausible verification path remains guidance until its
 expected evidence is clear.
+
+Each Requirement declares its enforcement class as mechanical, review, or
+hybrid. The Verification table covers every local Requirement ID exactly once,
+and the Agent handoff points reviewers to the resulting evidence.
 
 ## Keep project decisions in the project
 

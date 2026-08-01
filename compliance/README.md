@@ -11,6 +11,7 @@ load-bearing requirements, for example:
 
 ```text
 SEM-NAME-001
+DATA-PARSE-001
 GO-BOUNDARY-001
 MYSQL-SCHEMA-001
 GIN-HANDLER-001
@@ -21,8 +22,8 @@ Wording and document paths may evolve without changing an ID's meaning. A
 semantic change creates a new requirement ID or follows an explicitly
 documented compatibility transition.
 
-`core/semantic-naming` and `languages/go` publish Requirement IDs beginning
-with version `0.2.0`. No implementation matrix should claim coverage for a
+`core/semantic-naming`, `core/data-boundaries`, and `languages/go` publish
+Requirement IDs. No implementation matrix should claim coverage for a
 requirement that lacks a published stable ID.
 
 New documents use the
@@ -43,6 +44,11 @@ Each implementation record should identify:
 
 A generated summary can use compact symbols, but the underlying evidence
 record remains the source of truth.
+
+An Agent handoff is a compact evidence index for one task. It identifies the
+activated Requirement IDs, verification results, exceptions, and compatibility
+effects. It does not become conformance evidence until its referenced tests,
+revision, report, or reviewed artifact is durable and reproducible.
 
 ## Generated views must not drift
 

@@ -1,19 +1,33 @@
 {
   "catalog_id": "io.github.xiaoweikin.engineering-specifications",
-  "catalog_version": "1.0.0",
+  "catalog_version": "1.1.0",
   "schema_version": 1,
   "specs": [
     {
       "applies_to": [
         "**/*"
       ],
-      "description": "Shared semantic names, verbs, boundary parsing, cross-surface mappings, types, units, and compatibility",
+      "description": "Load when changing shared names, semantic verbs, cross-surface mappings, units, states, or naming compatibility",
       "id": "core/semantic-naming",
       "path": "specification/core/semantic-naming.md",
       "required": true,
       "requires": [],
-      "sha256": "5330ddafede67417623f0ffbba9464d1bef466e403eedfa7c10687ecd26041b0",
-      "version": "0.2.0"
+      "sha256": "5b8a267fede7a52cb90458111ec72bf4e68b60c88012a85bc4e8f9e9f2aa44de",
+      "version": "1.0.0"
+    },
+    {
+      "applies_to": [
+        "**/*"
+      ],
+      "description": "Load when consuming external data, parsing weak shapes, crossing trust boundaries, or gating effects",
+      "id": "core/data-boundaries",
+      "path": "specification/core/data-boundaries.md",
+      "required": true,
+      "requires": [
+        "core/semantic-naming"
+      ],
+      "sha256": "e88a7947bdd707a2842619d2b59c20e49b3b5eaa0780afe57cd80057aa290495",
+      "version": "0.1.0"
     },
     {
       "applies_to": [
@@ -21,7 +35,7 @@
         "**/go.mod",
         "**/go.work"
       ],
-      "description": "Go naming, APIs, boundary parsing, errors, lifecycle, compatibility, and tests",
+      "description": "Load when changing hand-written Go APIs, names, boundary adapters, errors, lifecycle, compatibility, or tests",
       "detection": {
         "extensions": [
           ".go"
@@ -35,10 +49,11 @@
       "path": "specification/languages/go.md",
       "required": false,
       "requires": [
-        "core/semantic-naming"
+        "core/semantic-naming",
+        "core/data-boundaries"
       ],
-      "sha256": "0688b4e26196273fe85a8ca2e9dd7a9adefa7a9889f35d4ec78b0db30561a477",
-      "version": "0.2.0"
+      "sha256": "d6a65265a70e2bcc50e54f1045ced968b8a14268b1b07f5ad6454076900db317",
+      "version": "0.3.0"
     }
   ]
 }
