@@ -126,6 +126,11 @@ contract.
 python3 -B scripts/check.py
 ```
 
+When preparing a Catalog release, follow [RELEASING.md](RELEASING.md): move
+the Changelog entries into the exact Catalog version, run
+`scripts/check_release.py`, merge the release change, and publish the immutable
+matching `vMAJOR.MINOR.PATCH` tag. Never repoint a published release tag.
+
 Automatic detection is optional. Use it only when filenames or extensions
 provide reliable evidence. Framework and database specifications without such
 evidence remain explicit project selections until the Catalog contract gains a
@@ -140,7 +145,7 @@ reviewed dependency-evidence model.
   specification version bump, but Catalog paths and digests must remain valid.
 
 Consumers lock an immutable Git commit, so merging a change does not update a
-project until it runs an explicit EngineeringWorkflow update.
+project until it runs an explicit RepoFoundry update.
 
 ## Project-specific rules
 

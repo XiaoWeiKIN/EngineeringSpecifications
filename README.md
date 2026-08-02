@@ -4,7 +4,7 @@
 
 EngineeringSpecifications is the versioned source of truth for reusable
 engineering rules consumed by
-[EngineeringWorkflow](https://github.com/XiaoWeiKIN/EngineeringWorkflow).
+[RepoFoundry AI](https://github.com/XiaoWeiKIN/RepoFoundryAI).
 It keeps specification governance separate from the tool that discovers,
 fetches, locks, and materializes those specifications in a project.
 
@@ -12,7 +12,7 @@ fetches, locks, and materializes those specifications in a project.
 
 ```mermaid
 flowchart LR
-    S["EngineeringSpecifications<br/>normative Markdown + catalog"] -->|"Git ref"| W["EngineeringWorkflow resolver"]
+    S["EngineeringSpecifications<br/>normative Markdown + catalog"] -->|"Git ref"| W["RepoFoundry resolver"]
     W -->|"resolved commit + SHA-256"| L["Project lock"]
     W -->|"exact local copies"| M["docs/agent-guides/managed"]
     P["Project-owned specifications"] --> M
@@ -88,6 +88,7 @@ and which mechanisms remain staged. The
 ├── proposals/
 │   ├── README.md
 │   └── 0000-template.md
+├── RELEASING.md
 ├── schemas/
 │   └── catalog.schema.json
 ├── specification/
@@ -95,7 +96,8 @@ and which mechanisms remain staged. The
 │   ├── core/
 │   └── languages/
 ├── scripts/
-│   └── check.py
+│   ├── check.py
+│   └── check_release.py
 └── tests/
 ```
 
@@ -114,7 +116,7 @@ ID, semantic version, Markdown source, SHA-256 digest, dependencies, applicable
 file scopes, an Agent-readable activation summary, and optional deterministic
 detection.
 
-EngineeringWorkflow first selects required, detected, and explicitly configured
+RepoFoundry first selects required, detected, and explicitly configured
 specifications, then resolves their dependency closure. It locks and
 materializes that set once. Required means locally available. At task time,
 file scopes produce candidates and the Catalog description plus Applicability
@@ -142,15 +144,24 @@ compatibility process. In summary:
 python3 -B scripts/check.py
 ```
 
+Catalog releases additionally follow [RELEASING.md](RELEASING.md), including
+the release check and immutable tag publication.
+
 Project-only constraints should normally stay in that project's repository and
-be referenced by its EngineeringWorkflow manifest. Add a rule here only when
+be referenced by its RepoFoundry manifest. Add a rule here only when
 it is intentionally reusable and can be governed as a stable specification.
 
 ## Versioning
 
-Catalog and specification versions follow Semantic Versioning. Git tags may
-identify released catalog revisions; consumers may follow a branch or tag, but
-their lock file always records the immutable resolved commit.
+Catalog and specification versions follow Semantic Versioning. Every
+production Catalog release is published as immutable tag `vMAJOR.MINOR.PATCH`,
+and the tag version must equal `catalog_version`. RepoFoundry selects a fixed
+release, then records both its resolved full commit and content digests in the
+project lock. Branches such as `main` are explicit development channels, not
+production release identities.
+
+Read the [Release Process](RELEASING.md) for the version boundary, preparation,
+tagging, validation, consumer upgrade, and recovery contracts.
 
 See [CHANGELOG.md](CHANGELOG.md) for released changes.
 

@@ -85,12 +85,13 @@ flowchart TB
 
 ## 选择规范与任务时读取是两个阶段
 
-EngineeringWorkflow 在初始化或更新项目时选择规范。Codex 执行任务时，从已经锁定
+RepoFoundry 在初始化或更新项目时选择规范。Codex 执行任务时，从已经锁定
 的本地规范集合中按需读取。
 
 ```mermaid
 flowchart LR
-    Catalog["远程 Catalog"] --> Select["选择<br/>必选 + 检测 + 显式"]
+    Version["固定 Catalog 版本"] --> Catalog["不可变发布 tag + commit"]
+    Catalog --> Select["选择<br/>必选 + 检测 + 显式"]
     Select --> Closure["计算 requires 闭包"]
     Closure --> Lock["锁定 Git commit + SHA-256"]
     Lock --> Local["物化本地副本"]
@@ -108,7 +109,12 @@ flowchart LR
 
 完成初始选择后，解析器再补齐依赖闭包。当前 Catalog 契约只允许通过文件名和扩展名
 自动检测。这足以识别编程语言。框架和数据库规范应暂时保持显式选择，直到 Catalog
-与 EngineeringWorkflow 引入经过评审的确定性依赖证据契约。
+与 RepoFoundry 引入经过评审的确定性依赖证据契约。
+
+生产选择从固定的 Catalog 语义版本开始。RepoFoundry 通过
+`refs/tags/vMAJOR.MINOR.PATCH` 解析 `MAJOR.MINOR.PATCH`，验证 tag 中的 Catalog
+声明了完全相同的版本，再锁定完整 commit 与摘要。这样，人类可评审的发布身份与
+不可变内容证据彼此分离。显式分支 ref 仍可用于开发测试，但不代表正式发布契约。
 
 执行任务时，`applies_to` 先产生保守的文件候选集。Catalog `description` 为本地
 索引提供简短激活摘要；只有任务意图也符合 Applicability，Codex 才读取候选规范
@@ -138,7 +144,7 @@ flowchart LR
 ```mermaid
 flowchart LR
     Specs["EngineeringSpecifications<br/>可复用规范正文"]
-    Workflow["EngineeringWorkflow<br/>发现、锁定、物化、路由"]
+    Workflow["RepoFoundry<br/>发现、锁定、物化、路由"]
     Project["消费项目<br/>架构与领域规则"]
     Context["适用于任务的 Codex 上下文"]
 
@@ -148,7 +154,7 @@ flowchart LR
 ```
 
 - EngineeringSpecifications 负责可复用规范正文、版本、依赖、作用域和摘要。
-- EngineeringWorkflow 负责发现、Git 解析、锁定、本地物化和路由。
+- RepoFoundry 负责发现、Git 解析、锁定、本地物化和路由。
 - 消费项目负责自身架构、领域词汇、框架选择、目录约定和组件模式。
 
 一条项目规则只有在被多个仓库复用，并且能够脱离原代码库独立治理后，才适合进入

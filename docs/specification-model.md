@@ -93,12 +93,13 @@ vendor-neutral database schema guidance.
 
 ## Selection and task-time reading are separate
 
-EngineeringWorkflow performs selection when it initializes or updates a
+RepoFoundry performs selection when it initializes or updates a
 project. Codex performs task-time reading from the already locked local set.
 
 ```mermaid
 flowchart LR
-    Catalog["Remote catalog"] --> Select["Select<br/>required + detected + explicit"]
+    Version["Fixed Catalog version"] --> Catalog["Immutable release tag + commit"]
+    Catalog --> Select["Select<br/>required + detected + explicit"]
     Select --> Closure["Resolve requires closure"]
     Closure --> Lock["Lock Git commit + SHA-256"]
     Lock --> Local["Materialize local copies"]
@@ -118,8 +119,15 @@ Selection has three sources:
 Dependency closure is added after the initial selection. The current Catalog
 contract limits automatic detection to filenames and extensions. That is enough
 for language discovery. Framework and database specifications should remain
-explicit until the Catalog and EngineeringWorkflow introduce a reviewed,
+explicit until the Catalog and RepoFoundry introduce a reviewed,
 deterministic dependency-evidence contract.
+
+Production selection starts from a fixed Catalog SemVer. RepoFoundry resolves
+`MAJOR.MINOR.PATCH` through `refs/tags/vMAJOR.MINOR.PATCH`, verifies the tagged
+Catalog declares the same version, and then locks the full commit and digests.
+This separates a human-reviewable release identity from the immutable content
+proof. An explicit branch ref remains useful for development testing but is not
+a released contract.
 
 At task time, `applies_to` scopes produce a conservative file candidate set.
 The Catalog description provides a compact activation summary for the local
@@ -154,7 +162,7 @@ task.
 ```mermaid
 flowchart LR
     Specs["EngineeringSpecifications<br/>reusable normative content"]
-    Workflow["EngineeringWorkflow<br/>discovery, locking, materialization, routing"]
+    Workflow["RepoFoundry<br/>discovery, locking, materialization, routing"]
     Project["Consuming project<br/>architecture and domain rules"]
     Context["Applicable Codex context"]
 
@@ -165,7 +173,7 @@ flowchart LR
 
 - EngineeringSpecifications owns reusable normative content, versions,
   dependencies, scopes, and content digests.
-- EngineeringWorkflow owns discovery, Git resolution, locking, local
+- RepoFoundry owns discovery, Git resolution, locking, local
   materialization, and routing.
 - A consuming project owns its architecture, domain vocabulary, framework
   choices, directory conventions, and component patterns.

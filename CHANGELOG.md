@@ -6,6 +6,16 @@ All notable Catalog and normative specification changes are recorded here.
 
 ### Added
 
+- Approved ESP-0008 and documented immutable `vMAJOR.MINOR.PATCH` Catalog
+  releases, release validation, fixed-version consumption, and explicit
+  upgrades.
+- Added `scripts/check_release.py` to verify Catalog SemVer, Changelog release
+  identity, and published tag content.
+
+## [1.2.0] - 2026-08-02
+
+### Added
+
 - Added `GO-MODULE-001` to require reproducible, no-diff module and committed
   vendor state across the declared module inventory.
 - Added `GO-GENERATE-001` to require authoritative inputs, reproducible

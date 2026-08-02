@@ -54,7 +54,7 @@ scopes, and migration paths.
 ## Status metadata will become mechanical through a Proposal
 
 The current Catalog schema has no maturity field. Until a coordinated Catalog
-and EngineeringWorkflow change is approved:
+and RepoFoundry change is approved:
 
 - a document may display `**Status**: Development`, `Stable`, or `Deprecated`
   immediately after its title;

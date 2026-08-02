@@ -3,14 +3,14 @@
 [English](README.md) | [简体中文](README.zh-CN.md)
 
 EngineeringSpecifications 是可复用工程规范的版本化事实源，由
-[EngineeringWorkflow](https://github.com/XiaoWeiKIN/EngineeringWorkflow)
+[RepoFoundry AI](https://github.com/XiaoWeiKIN/RepoFoundryAI)
 按需发现、拉取、锁定并安装到项目本地。规范治理与消费工具分属两个仓库。
 
 ## 仓库模型
 
 ```mermaid
 flowchart LR
-    S["EngineeringSpecifications<br/>规范正文 + Catalog"] -->|"Git ref"| W["EngineeringWorkflow 解析器"]
+    S["EngineeringSpecifications<br/>规范正文 + Catalog"] -->|"Git ref"| W["RepoFoundry 解析器"]
     W -->|"解析后的 commit + SHA-256"| L["项目 Lock"]
     W -->|"精确本地副本"| M["docs/agent-guides/managed"]
     P["项目自有规范"] --> M
@@ -101,7 +101,7 @@ Catalog 面向多个工程层级的可复用规则：
 源文件、SHA-256、依赖、适用文件范围、供 Agent 使用的激活摘要，以及可选的
 确定性检测规则。
 
-EngineeringWorkflow 先组合必选、检测到和项目显式配置的规范，再解析依赖闭包。
+RepoFoundry 先组合必选、检测到和项目显式配置的规范，再解析依赖闭包。
 这组规范只锁定和物化一次。必选表示规范始终在本地可用；执行任务时，文件作用域
 先产生候选集，再由 Catalog description 和 Applicability 决定 Codex 阅读哪些全文。
 
@@ -125,13 +125,21 @@ EngineeringWorkflow 先组合必选、检测到和项目显式配置的规范，
 python3 -B scripts/check.py
 ```
 
-只服务单个项目的约束通常应保留在项目仓库，并由 EngineeringWorkflow manifest
+Catalog 发布还必须遵循 [RELEASING.md](RELEASING.md)，包括发布检查与不可变 tag
+发布。
+
+只服务单个项目的约束通常应保留在项目仓库，并由 RepoFoundry manifest
 引用。只有规则确实可复用、且适合按稳定规范治理时，才放入本仓库。
 
 ## 版本
 
-Catalog 与单项规范遵循语义化版本。Git tag 可以标识发布版本；消费方既可以跟随
-分支，也可以指定 tag，但其 lock 始终记录不可变的实际 commit。
+Catalog 与单项规范遵循语义化版本。每个生产 Catalog 版本都以不可变的
+`vMAJOR.MINOR.PATCH` tag 发布，且 tag 版本必须与 `catalog_version` 完全一致。
+RepoFoundry 选择固定版本，再把解析后的完整 commit 与内容摘要写入项目 lock。
+`main` 等分支只作为显式开发通道，不是生产发布身份。
+
+版本边界、准备、打 tag、验证、消费方升级与恢复契约见
+[发布流程](RELEASING.md)。
 
 已发布变更见 [CHANGELOG.md](CHANGELOG.md)。
 
