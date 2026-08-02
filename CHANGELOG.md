@@ -6,11 +6,19 @@ All notable Catalog and normative specification changes are recorded here.
 
 ### Added
 
+- Approved ESP-0009 to make deterministic detection advisory and require an
+  explicit project choice before installing optional Specifications.
 - Approved ESP-0008 and documented immutable `vMAJOR.MINOR.PATCH` Catalog
   releases, release validation, fixed-version consumption, and explicit
   upgrades.
 - Added `scripts/check_release.py` to verify Catalog SemVer, Changelog release
   identity, and published tag content.
+
+### Changed
+
+- Clarified the selection model: required Specifications remain automatic,
+  detected optional Specifications are recommendations, explicit project IDs
+  determine optional installation, and dependencies remain automatic.
 
 ## [1.2.0] - 2026-08-02
 

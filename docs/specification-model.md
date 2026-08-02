@@ -18,7 +18,7 @@ in `catalog.json` are currently published.
 | Layer | Responsibility | Typical selection |
 | --- | --- | --- |
 | `core/` | Rules every implementation repository must carry, such as semantic operations and external-data boundaries | Required selection; task activation remains conditional |
-| `languages/` | Language idioms, APIs, errors, concurrency, resources, and language-specific testing practices | Repository detection |
+| `languages/` | Language idioms, APIs, errors, concurrency, resources, and language-specific testing practices | Explicit selection aided by repository detection |
 | `frameworks/` | Framework or major-library contracts, such as Go Gin/GORM or Java Spring/Netty | Explicit selection; deterministic dependency detection may be added later |
 | `databases/` | Vendor-neutral schema design and database-specific behavior for systems such as MySQL or ClickHouse | Explicit selection or deterministic repository evidence |
 | `testing/` | Cross-language test contracts plus focused unit, integration, contract, and end-to-end guidance | Explicit selection and test-file scopes |
@@ -95,11 +95,19 @@ vendor-neutral database schema guidance.
 
 RepoFoundry performs selection when it initializes or updates a
 project. Codex performs task-time reading from the already locked local set.
+The installation boundary implements
+[ESP-0009](../proposals/0009_explicit-spec-selection.md): detection recommends,
+while the consuming project selects optional IDs.
 
 ```mermaid
 flowchart LR
     Version["Fixed Catalog version"] --> Catalog["Immutable release tag + commit"]
-    Catalog --> Select["Select<br/>required + detected + explicit"]
+    Catalog --> Required["Select required"]
+    Catalog --> Detect["Detect optional candidates"]
+    Detect --> Recommend["Recommend stable IDs"]
+    Catalog --> Explicit["User selects optional IDs"]
+    Required --> Select["Configured direct set"]
+    Explicit --> Select
     Select --> Closure["Resolve requires closure"]
     Closure --> Lock["Lock Git commit + SHA-256"]
     Lock --> Local["Materialize local copies"]
@@ -109,18 +117,20 @@ flowchart LR
     Activate --> Codex["Codex task context"]
 ```
 
-Selection has three sources:
+Selection separates one mandatory source from one project-owned source:
 
 - **Required** specifications are selected and materialized for every
   implementation repository. Required does not mean always read.
-- **Detected** specifications use deterministic repository evidence.
-- **Explicit** specifications are declared by the consuming project.
+- **Explicit** optional specifications are declared by the consuming project.
+- **Detected** specifications use deterministic repository evidence only to
+  recommend optional IDs. Detection never authorizes installation.
 
-Dependency closure is added after the initial selection. The current Catalog
-contract limits automatic detection to filenames and extensions. That is enough
-for language discovery. Framework and database specifications should remain
-explicit until the Catalog and RepoFoundry introduce a reviewed,
-deterministic dependency-evidence contract.
+Dependency closure is added after direct selection. The current Catalog
+contract limits detection to filenames and extensions. That is enough to
+recommend language guidance but not to decide project adoption. Framework and
+database specifications should remain explicit; future deterministic evidence
+may improve their recommendations without taking selection authority from the
+project.
 
 Production selection starts from a fixed Catalog SemVer. RepoFoundry resolves
 `MAJOR.MINOR.PATCH` through `refs/tags/vMAJOR.MINOR.PATCH`, verifies the tagged
@@ -134,8 +144,10 @@ The Catalog description provides a compact activation summary for the local
 index. Codex reads a candidate's full text only when the task also matches its
 Applicability section.
 
-For example, a Go source change selects Go as a candidate. A public API rename
-activates Semantic Naming; an HTTP request parser activates Data Boundaries;
+For example, Go repository evidence recommends the Go Specification; the
+project explicitly adopts it. A Go source change then makes it a task
+candidate. A public API rename activates Semantic Naming; an HTTP request
+parser activates Data Boundaries;
 an internal arithmetic change may activate only the relevant Go requirements.
 A Gin handler can additionally activate HTTP, Gin, and project Handler
 guidance. Project-owned architecture and component rules join the same route
@@ -147,7 +159,7 @@ The following examples use future IDs to demonstrate composition:
 
 | Project or task | Applicable set |
 | --- | --- |
-| Go command-line service | Core installed; Go detected; task intent activates the needed subset |
+| Go command-line service | Core installed; Go recommended and explicitly selected; task intent activates the needed subset |
 | Gin service backed by MySQL | Core + Go + HTTP + Gin + schema design + MySQL + testing candidates |
 | Java Netty service writing ClickHouse | Core + Java + Netty + schema design + ClickHouse + testing candidates |
 | Python library without persistence | Core + Python + testing candidates; no database specification |
@@ -192,8 +204,9 @@ Before adding a specification:
 4. Define deterministic `applies_to` scopes.
 5. Write the Catalog description as a compact `Load when ...` activation
    summary and make the Applicability section decisive.
-6. Add detection only when filenames or extensions provide reliable evidence;
-   otherwise require explicit project selection.
+6. Add detection only when filenames or extensions provide reliable
+   recommendation evidence; every optional Specification still requires
+   explicit project selection.
 7. Keep project names, private paths, internal frameworks, and domain-only
    terminology in the consuming project.
 

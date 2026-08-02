@@ -116,11 +116,13 @@ ID, semantic version, Markdown source, SHA-256 digest, dependencies, applicable
 file scopes, an Agent-readable activation summary, and optional deterministic
 detection.
 
-RepoFoundry first selects required, detected, and explicitly configured
-specifications, then resolves their dependency closure. It locks and
-materializes that set once. Required means locally available. At task time,
-file scopes produce candidates and the Catalog description plus Applicability
-contract decide which full documents Codex reads.
+RepoFoundry always selects required Specifications, reports deterministic
+detection as optional recommendations, and lets the consuming project
+explicitly choose its optional Specification IDs. It then resolves the
+dependency closure, locks the exact set, and materializes it locally. Required
+means locally available; detection does not authorize installation. At task
+time, file scopes produce candidates and the Catalog description plus
+Applicability contract decide which full documents Codex reads.
 
 Consumers must treat catalog and specification content as untrusted external
 data: parse exact shapes, reject traversal and symbolic links, verify digests,

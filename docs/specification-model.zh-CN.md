@@ -15,7 +15,7 @@ Catalog 会沿独立的工程维度扩展。下面的分类定义未来规范的
 | 层级 | 职责 | 典型选择方式 |
 | --- | --- | --- |
 | `core/` | 每个实现型仓库都必须携带的规则，例如语义操作和外部数据边界 | 必选安装；任务激活仍按需判断 |
-| `languages/` | 语言惯用法、API、错误、并发、资源和语言特有测试实践 | 仓库检测 |
+| `languages/` | 语言惯用法、API、错误、并发、资源和语言特有测试实践 | 仓库检测辅助下的显式选择 |
 | `frameworks/` | 框架或重要库契约，例如 Go Gin/GORM、Java Spring/Netty | 显式选择；未来可增加确定性的依赖检测 |
 | `databases/` | 与厂商无关的 Schema 设计，以及 MySQL、ClickHouse 等数据库特有行为 | 显式选择或确定性仓库证据 |
 | `testing/` | 跨语言测试契约，以及单元、集成、契约和端到端测试规范 | 显式选择与测试文件作用域 |
@@ -87,11 +87,19 @@ flowchart TB
 
 RepoFoundry 在初始化或更新项目时选择规范。Codex 执行任务时，从已经锁定
 的本地规范集合中按需读取。
+安装边界落实
+[ESP-0009](../proposals/0009_explicit-spec-selection.md)：检测负责推荐，消费项目
+负责选择可选 ID。
 
 ```mermaid
 flowchart LR
     Version["固定 Catalog 版本"] --> Catalog["不可变发布 tag + commit"]
-    Catalog --> Select["选择<br/>必选 + 检测 + 显式"]
+    Catalog --> Required["选择必选规范"]
+    Catalog --> Detect["检测可选候选"]
+    Detect --> Recommend["推荐稳定 ID"]
+    Catalog --> Explicit["用户选择可选 ID"]
+    Required --> Select["项目直接配置集合"]
+    Explicit --> Select
     Select --> Closure["计算 requires 闭包"]
     Closure --> Lock["锁定 Git commit + SHA-256"]
     Lock --> Local["物化本地副本"]
@@ -101,15 +109,15 @@ flowchart LR
     Activate --> Codex["Codex 任务上下文"]
 ```
 
-规范选择有三个来源：
+规范选择区分一个强制来源和一个由项目持有的来源：
 
 - **必选规范**进入所有实现型仓库并物化为本地副本。必选不代表每个任务都阅读全文。
-- **检测规范**依赖确定性的仓库证据。
 - **显式规范**由消费项目声明。
+- **检测规范**只使用确定性仓库证据推荐可选 ID，检测结果本身不授权安装。
 
-完成初始选择后，解析器再补齐依赖闭包。当前 Catalog 契约只允许通过文件名和扩展名
-自动检测。这足以识别编程语言。框架和数据库规范应暂时保持显式选择，直到 Catalog
-与 RepoFoundry 引入经过评审的确定性依赖证据契约。
+完成直接选择后，解析器再补齐依赖闭包。当前 Catalog 契约只允许通过文件名和扩展名
+检测。这足以推荐语言规范，但不足以替项目决定采用。框架和数据库规范应保持显式
+选择；未来确定性证据可以改善推荐，但不能拿走项目的选择权。
 
 生产选择从固定的 Catalog 语义版本开始。RepoFoundry 通过
 `refs/tags/vMAJOR.MINOR.PATCH` 解析 `MAJOR.MINOR.PATCH`，验证 tag 中的 Catalog
@@ -120,7 +128,8 @@ flowchart LR
 索引提供简短激活摘要；只有任务意图也符合 Applicability，Codex 才读取候选规范
 全文。
 
-例如，修改 Go 文件会让 Go 规范成为候选。重命名公共 API 会激活 Semantic Naming；
+例如，Go 仓库证据会推荐 Go 规范，由项目显式采用；随后修改 Go 文件才会让它成为
+任务候选。重命名公共 API 会激活 Semantic Naming；
 解析 HTTP Request 会激活 Data Boundaries；只修改内部算术逻辑时，可能只需读取
 相关 Go 要求。Gin Handler 还可以激活 HTTP、Gin 和项目 Handler 规则。项目自有
 架构与组件规则进入同一路由，无需复制到本仓库。
@@ -131,7 +140,7 @@ flowchart LR
 
 | 项目或任务 | 适用规范集合 |
 | --- | --- |
-| Go 命令行服务 | 安装 Core，检测 Go，再按任务意图激活需要的子集 |
+| Go 命令行服务 | 安装 Core，检测并推荐 Go，由项目显式选择，再按任务意图激活需要的子集 |
 | 使用 MySQL 的 Gin 服务 | Core + Go + HTTP + Gin + Schema 设计 + MySQL + 测试候选集 |
 | 写入 ClickHouse 的 Java Netty 服务 | Core + Java + Netty + Schema 设计 + ClickHouse + 测试候选集 |
 | 不使用持久化的 Python 库 | Core + Python + 测试候选集；没有数据库规范 |
@@ -169,7 +178,8 @@ flowchart LR
 3. 找出可复用的上游契约并写入 `requires`。
 4. 定义确定性的 `applies_to` 作用域。
 5. 把 Catalog `description` 写成简短的“何时加载”摘要，并让 Applicability 作最终判断。
-6. 只有文件名或扩展名能够提供可靠证据时才增加 detection；否则要求项目显式选择。
+6. 只有文件名或扩展名能够提供可靠推荐证据时才增加 detection；所有可选规范仍由
+   项目显式选择。
 7. 项目名称、私有路径、内部框架和领域专属术语留在消费项目。
 
 先通过[治理模型](../governance/README.md)判断变更是否需要 Engineering
