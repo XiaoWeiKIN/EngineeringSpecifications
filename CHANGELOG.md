@@ -6,6 +6,32 @@ All notable Catalog and normative specification changes are recorded here.
 
 ### Added
 
+- Approved ESP-0010 to adapt task-time activation to Codex with one generated
+  Router Skill, a mandatory AGENTS route, trusted Hook gating, and an explicit
+  activation evidence handoff while keeping normative Specs Agent-neutral.
+- Approved ESP-0009 to make deterministic detection advisory and require an
+  explicit project choice before installing optional Specifications.
+- Approved ESP-0008 and documented immutable `vMAJOR.MINOR.PATCH` Catalog
+  releases, release validation, fixed-version consumption, and explicit
+  upgrades.
+- Added `scripts/check_release.py` to verify Catalog SemVer, Changelog release
+  identity, and published tag content.
+
+### Changed
+
+- Advanced Catalog to `1.3.0` and `core/semantic-naming` to `1.1.0`.
+  `SEM-VERB-001` now requires idempotent, equivalence-preserving `Normalize`
+  operations; gives `Extract` a narrow selection contract; and prohibits both
+  verbs from hiding parsing, validation, defaulting, enrichment, computation,
+  I/O, mutation, or material side effects.
+- Clarified the selection model: required Specifications remain automatic,
+  detected optional Specifications are recommendations, explicit project IDs
+  determine optional installation, and dependencies remain automatic.
+
+## [1.2.0] - 2026-08-02
+
+### Added
+
 - Added `GO-MODULE-001` to require reproducible, no-diff module and committed
   vendor state across the declared module inventory.
 - Added `GO-GENERATE-001` to require authoritative inputs, reproducible
@@ -29,11 +55,6 @@ All notable Catalog and normative specification changes are recorded here.
 
 ### Changed
 
-- Advanced Catalog to `1.3.0` and `core/semantic-naming` to `1.1.0`.
-  `SEM-VERB-001` now requires idempotent, equivalence-preserving `Normalize`
-  operations; gives `Extract` a narrow selection contract; and prohibits both
-  verbs from hiding parsing, validation, defaulting, enrichment, computation,
-  I/O, mutation, or material side effects.
 - Advanced Catalog to `1.2.0` and `languages/go` to `0.4.0`. The Go
   Specification now routes module metadata and committed vendor state, adds
   single-method interface and canonical method naming to `GO-NAME-002`,

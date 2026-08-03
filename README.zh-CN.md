@@ -3,18 +3,20 @@
 [English](README.md) | [简体中文](README.zh-CN.md)
 
 EngineeringSpecifications 是可复用工程规范的版本化事实源，由
-[EngineeringWorkflow](https://github.com/XiaoWeiKIN/EngineeringWorkflow)
+[RepoFoundry AI](https://github.com/XiaoWeiKIN/RepoFoundryAI)
 按需发现、拉取、锁定并安装到项目本地。规范治理与消费工具分属两个仓库。
 
 ## 仓库模型
 
 ```mermaid
 flowchart LR
-    S["EngineeringSpecifications<br/>规范正文 + Catalog"] -->|"Git ref"| W["EngineeringWorkflow 解析器"]
+    S["EngineeringSpecifications<br/>规范正文 + Catalog"] -->|"Git ref"| W["RepoFoundry 解析器"]
     W -->|"解析后的 commit + SHA-256"| L["项目 Lock"]
     W -->|"精确本地副本"| M["docs/agent-guides/managed"]
-    P["项目自有规范"] --> M
-    M --> A["AGENTS.md 路由"]
+    M --> R["$engineering-specs<br/>项目 Router Skill"]
+    P["项目自有规范"] --> R
+    A["AGENTS.md + 可信 Hooks"] --> R
+    R --> C["任务专属 Agent Context"]
 ```
 
 这个边界带来两个直接结果：
@@ -101,9 +103,15 @@ Catalog 面向多个工程层级的可复用规则：
 源文件、SHA-256、依赖、适用文件范围、供 Agent 使用的激活摘要，以及可选的
 确定性检测规则。
 
-EngineeringWorkflow 先组合必选、检测到和项目显式配置的规范，再解析依赖闭包。
-这组规范只锁定和物化一次。必选表示规范始终在本地可用；执行任务时，文件作用域
-先产生候选集，再由 Catalog description 和 Applicability 决定 Codex 阅读哪些全文。
+RepoFoundry 始终选择必选规范，把确定性检测结果展示为可选推荐，并由消费项目显式
+选择要安装的可选 Spec ID；随后解析依赖闭包、锁定精确集合并物化到本地。必选表示
+规范始终在本地可用，检测结果本身不授权安装；执行任务时，文件作用域先产生候选集，
+再由 Catalog description 和 Applicability 决定 Codex 阅读哪些全文。对 Codex
+Harness，RepoFoundry 只生成一个项目级 `$engineering-specs` Router Skill，不会为
+每份规范各建一个 Skill。根 AGENTS 路由要求任务必须进入该工作流；可信项目 Hooks
+记录当前 Turn 的决定、拦截未激活写入、注入已激活的本地正文并审计交接。信任和
+运行时适配属于消费端职责，规范正文保持 Agent 中立。详见
+[ESP-0010](proposals/0010_task-activation-router.md)。
 
 消费方必须把 Catalog 和规范正文视为外部不可信数据：严格解析字段、拒绝路径穿越
 与符号链接、验证内容摘要，并在安装前锁定解析后的 Git revision。
@@ -125,13 +133,21 @@ EngineeringWorkflow 先组合必选、检测到和项目显式配置的规范，
 python3 -B scripts/check.py
 ```
 
-只服务单个项目的约束通常应保留在项目仓库，并由 EngineeringWorkflow manifest
+Catalog 发布还必须遵循 [RELEASING.md](RELEASING.md)，包括发布检查与不可变 tag
+发布。
+
+只服务单个项目的约束通常应保留在项目仓库，并由 RepoFoundry manifest
 引用。只有规则确实可复用、且适合按稳定规范治理时，才放入本仓库。
 
 ## 版本
 
-Catalog 与单项规范遵循语义化版本。Git tag 可以标识发布版本；消费方既可以跟随
-分支，也可以指定 tag，但其 lock 始终记录不可变的实际 commit。
+Catalog 与单项规范遵循语义化版本。每个生产 Catalog 版本都以不可变的
+`vMAJOR.MINOR.PATCH` tag 发布，且 tag 版本必须与 `catalog_version` 完全一致。
+RepoFoundry 选择固定版本，再把解析后的完整 commit 与内容摘要写入项目 lock。
+`main` 等分支只作为显式开发通道，不是生产发布身份。
+
+版本边界、准备、打 tag、验证、消费方升级与恢复契约见
+[发布流程](RELEASING.md)。
 
 已发布变更见 [CHANGELOG.md](CHANGELOG.md)。
 

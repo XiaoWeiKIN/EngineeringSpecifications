@@ -13,7 +13,7 @@ conformance, and which checks protect the repository.
 | Normative language | How strong is this requirement? | BCP 14 keywords in `specification/README.md` |
 | Proposal process | Why should a significant change exist? | Non-normative Engineering Specification Proposals under `proposals/` |
 | Maturity | What compatibility promise does this document carry? | `Development`, `Stable`, and `Deprecated` lifecycle |
-| Versioning | Which released contract did a project consume? | Catalog and per-Spec SemVer, Git revision, and SHA-256 |
+| Versioning | Which released contract did a project consume? | Catalog and per-Spec SemVer, immutable `vX.Y.Z` Catalog tag, resolved Git commit, and SHA-256 |
 | Compliance | Which implementation satisfies which requirement? | Stable requirement IDs and evidence-backed matrices |
 | Quality gates | Can the repository prove structural integrity? | One canonical `scripts/check.py` entrypoint |
 
@@ -55,7 +55,7 @@ before every enforcement mechanism:
 - Compliance data remains empty until specifications publish stable requirement
   IDs and implementation repositories provide reviewable evidence.
 - A future machine-readable Catalog maturity field or dependency-package
-  detector requires a coordinated Proposal and EngineeringWorkflow change.
+  detector requires a coordinated Proposal and RepoFoundry change.
 
 This sequencing preserves compatibility with the current Catalog consumer
 while making the target governance explicit.
@@ -74,6 +74,11 @@ significant changes move from intent to normative integration.
 
 [Compliance](../compliance/README.md) defines the evidence contract for future
 implementation matrices.
+
+[Release Process](../RELEASING.md) defines the production Catalog identity,
+merge-then-tag sequence, release validation, immutable-tag rule, and explicit
+consumer upgrade. A branch is a development source; it does not identify a
+production contract.
 
 ## OpenTelemetry is prior art, not a copied governance scale
 

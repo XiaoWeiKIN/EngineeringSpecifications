@@ -15,7 +15,7 @@ Catalog 会沿独立的工程维度扩展。下面的分类定义未来规范的
 | 层级 | 职责 | 典型选择方式 |
 | --- | --- | --- |
 | `core/` | 每个实现型仓库都必须携带的规则，例如语义操作和外部数据边界 | 必选安装；任务激活仍按需判断 |
-| `languages/` | 语言惯用法、API、错误、并发、资源和语言特有测试实践 | 仓库检测 |
+| `languages/` | 语言惯用法、API、错误、并发、资源和语言特有测试实践 | 仓库检测辅助下的显式选择 |
 | `frameworks/` | 框架或重要库契约，例如 Go Gin/GORM、Java Spring/Netty | 显式选择；未来可增加确定性的依赖检测 |
 | `databases/` | 与厂商无关的 Schema 设计，以及 MySQL、ClickHouse 等数据库特有行为 | 显式选择或确定性仓库证据 |
 | `testing/` | 跨语言测试契约，以及单元、集成、契约和端到端测试规范 | 显式选择与测试文件作用域 |
@@ -85,12 +85,21 @@ flowchart TB
 
 ## 选择规范与任务时读取是两个阶段
 
-EngineeringWorkflow 在初始化或更新项目时选择规范。Codex 执行任务时，从已经锁定
+RepoFoundry 在初始化或更新项目时选择规范。Codex 执行任务时，从已经锁定
 的本地规范集合中按需读取。
+安装边界落实
+[ESP-0009](../proposals/0009_explicit-spec-selection.md)：检测负责推荐，消费项目
+负责选择可选 ID。
 
 ```mermaid
 flowchart LR
-    Catalog["远程 Catalog"] --> Select["选择<br/>必选 + 检测 + 显式"]
+    Version["固定 Catalog 版本"] --> Catalog["不可变发布 tag + commit"]
+    Catalog --> Required["选择必选规范"]
+    Catalog --> Detect["检测可选候选"]
+    Detect --> Recommend["推荐稳定 ID"]
+    Catalog --> Explicit["用户选择可选 ID"]
+    Required --> Select["项目直接配置集合"]
+    Explicit --> Select
     Select --> Closure["计算 requires 闭包"]
     Closure --> Lock["锁定 Git commit + SHA-256"]
     Lock --> Local["物化本地副本"]
@@ -100,21 +109,27 @@ flowchart LR
     Activate --> Codex["Codex 任务上下文"]
 ```
 
-规范选择有三个来源：
+规范选择区分一个强制来源和一个由项目持有的来源：
 
 - **必选规范**进入所有实现型仓库并物化为本地副本。必选不代表每个任务都阅读全文。
-- **检测规范**依赖确定性的仓库证据。
 - **显式规范**由消费项目声明。
+- **检测规范**只使用确定性仓库证据推荐可选 ID，检测结果本身不授权安装。
 
-完成初始选择后，解析器再补齐依赖闭包。当前 Catalog 契约只允许通过文件名和扩展名
-自动检测。这足以识别编程语言。框架和数据库规范应暂时保持显式选择，直到 Catalog
-与 EngineeringWorkflow 引入经过评审的确定性依赖证据契约。
+完成直接选择后，解析器再补齐依赖闭包。当前 Catalog 契约只允许通过文件名和扩展名
+检测。这足以推荐语言规范，但不足以替项目决定采用。框架和数据库规范应保持显式
+选择；未来确定性证据可以改善推荐，但不能拿走项目的选择权。
+
+生产选择从固定的 Catalog 语义版本开始。RepoFoundry 通过
+`refs/tags/vMAJOR.MINOR.PATCH` 解析 `MAJOR.MINOR.PATCH`，验证 tag 中的 Catalog
+声明了完全相同的版本，再锁定完整 commit 与摘要。这样，人类可评审的发布身份与
+不可变内容证据彼此分离。显式分支 ref 仍可用于开发测试，但不代表正式发布契约。
 
 执行任务时，`applies_to` 先产生保守的文件候选集。Catalog `description` 为本地
 索引提供简短激活摘要；只有任务意图也符合 Applicability，Codex 才读取候选规范
 全文。
 
-例如，修改 Go 文件会让 Go 规范成为候选。重命名公共 API 会激活 Semantic Naming；
+例如，Go 仓库证据会推荐 Go 规范，由项目显式采用；随后修改 Go 文件才会让它成为
+任务候选。重命名公共 API 会激活 Semantic Naming；
 解析 HTTP Request 会激活 Data Boundaries；只修改内部算术逻辑时，可能只需读取
 相关 Go 要求。Gin Handler 还可以激活 HTTP、Gin 和项目 Handler 规则。项目自有
 架构与组件规则进入同一路由，无需复制到本仓库。
@@ -125,7 +140,7 @@ flowchart LR
 
 | 项目或任务 | 适用规范集合 |
 | --- | --- |
-| Go 命令行服务 | 安装 Core，检测 Go，再按任务意图激活需要的子集 |
+| Go 命令行服务 | 安装 Core，检测并推荐 Go，由项目显式选择，再按任务意图激活需要的子集 |
 | 使用 MySQL 的 Gin 服务 | Core + Go + HTTP + Gin + Schema 设计 + MySQL + 测试候选集 |
 | 写入 ClickHouse 的 Java Netty 服务 | Core + Java + Netty + Schema 设计 + ClickHouse + 测试候选集 |
 | 不使用持久化的 Python 库 | Core + Python + 测试候选集；没有数据库规范 |
@@ -133,12 +148,46 @@ flowchart LR
 解析器只安装一次依赖闭包。任务路由器先按文件作用域过滤，再判断任务激活。这个
 两阶段路由让 Core 契约始终在本地可用，同时避免每个任务都注入全部 Core 文档。
 
+## 用一个 Router Skill 适配 Codex
+
+[ESP-0010](../proposals/0010_task-activation-router.md) 定义 Codex 消费端适配，
+但不改变 Agent 中立的 Catalog。RepoFoundry 在项目中生成一个名为
+`$engineering-specs` 的 Skill，不会把每份规范分别包装成 Skill。
+
+```mermaid
+flowchart LR
+    Prompt["任务 Prompt"] --> Route["$engineering-specs"]
+    Index["已锁定索引<br/>作用域 + 用途"] --> Route
+    Project["项目自有规范"] --> Route
+    Route --> Decision["当前 Turn 决定<br/>规范 ID 或显式 none"]
+    Decision --> Gate["可信 Hook 门禁"]
+    Local["摘要已验证的本地 Markdown"] --> Gate
+    Gate --> Context["任务专属 Developer Context"]
+    Context --> Work["实现或评审"]
+    Work --> Audit["变更路径 + 证据交接"]
+```
+
+这个适配层保留三个阶段：
+
+1. 项目选择决定哪些规范在本地可用；
+2. `applies_to` 根据计划修改的文件产生保守候选集；
+3. Router 读取候选摘要与 Applicability，记录按任务意图得出的激活决定。
+
+根 `AGENTS.md` 要求实现和评审先进入这个 Skill。在受信任的 Codex 项目中，
+生命周期 Hooks 会把路由要求加入 Prompt 与 Subagent Context，在没有当前激活决定
+时拒绝写入，在第一次写入前注入已激活的本地规范，并在结束时检查变更路径覆盖和
+Agent 交接。确实没有适用规范时可以显式选择 `none`，但必须列出计划路径并说明原因。
+
+这是有明确边界的消费端保证：项目 Hooks 只在受信任项目中加载，非托管命令 Hook
+还需要单独审查和信任。其他 Agent 可以用自己的运行时实现同一激活回执与证据契约；
+EngineeringSpecifications 不会把 Codex Skill 或 Hook 文件写进规范正文。
+
 ## 三个仓库边界保持明确
 
 ```mermaid
 flowchart LR
     Specs["EngineeringSpecifications<br/>可复用规范正文"]
-    Workflow["EngineeringWorkflow<br/>发现、锁定、物化、路由"]
+    Workflow["RepoFoundry<br/>发现、锁定、物化、路由"]
     Project["消费项目<br/>架构与领域规则"]
     Context["适用于任务的 Codex 上下文"]
 
@@ -148,7 +197,7 @@ flowchart LR
 ```
 
 - EngineeringSpecifications 负责可复用规范正文、版本、依赖、作用域和摘要。
-- EngineeringWorkflow 负责发现、Git 解析、锁定、本地物化和路由。
+- RepoFoundry 负责发现、Git 解析、锁定、本地物化、生成 Agent 适配层和路由。
 - 消费项目负责自身架构、领域词汇、框架选择、目录约定和组件模式。
 
 一条项目规则只有在被多个仓库复用，并且能够脱离原代码库独立治理后，才适合进入
@@ -163,7 +212,8 @@ flowchart LR
 3. 找出可复用的上游契约并写入 `requires`。
 4. 定义确定性的 `applies_to` 作用域。
 5. 把 Catalog `description` 写成简短的“何时加载”摘要，并让 Applicability 作最终判断。
-6. 只有文件名或扩展名能够提供可靠证据时才增加 detection；否则要求项目显式选择。
+6. 只有文件名或扩展名能够提供可靠推荐证据时才增加 detection；所有可选规范仍由
+   项目显式选择。
 7. 项目名称、私有路径、内部框架和领域专属术语留在消费项目。
 
 先通过[治理模型](../governance/README.md)判断变更是否需要 Engineering
