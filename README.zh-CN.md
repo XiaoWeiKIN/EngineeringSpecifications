@@ -13,8 +13,10 @@ flowchart LR
     S["EngineeringSpecifications<br/>规范正文 + Catalog"] -->|"Git ref"| W["RepoFoundry 解析器"]
     W -->|"解析后的 commit + SHA-256"| L["项目 Lock"]
     W -->|"精确本地副本"| M["docs/agent-guides/managed"]
-    P["项目自有规范"] --> M
-    M --> A["AGENTS.md 路由"]
+    M --> R["$engineering-specs<br/>项目 Router Skill"]
+    P["项目自有规范"] --> R
+    A["AGENTS.md + 可信 Hooks"] --> R
+    R --> C["任务专属 Agent Context"]
 ```
 
 这个边界带来两个直接结果：
@@ -104,7 +106,12 @@ Catalog 面向多个工程层级的可复用规则：
 RepoFoundry 始终选择必选规范，把确定性检测结果展示为可选推荐，并由消费项目显式
 选择要安装的可选 Spec ID；随后解析依赖闭包、锁定精确集合并物化到本地。必选表示
 规范始终在本地可用，检测结果本身不授权安装；执行任务时，文件作用域先产生候选集，
-再由 Catalog description 和 Applicability 决定 Codex 阅读哪些全文。
+再由 Catalog description 和 Applicability 决定 Codex 阅读哪些全文。对 Codex
+Harness，RepoFoundry 只生成一个项目级 `$engineering-specs` Router Skill，不会为
+每份规范各建一个 Skill。根 AGENTS 路由要求任务必须进入该工作流；可信项目 Hooks
+记录当前 Turn 的决定、拦截未激活写入、注入已激活的本地正文并审计交接。信任和
+运行时适配属于消费端职责，规范正文保持 Agent 中立。详见
+[ESP-0010](proposals/0010_task-activation-router.md)。
 
 消费方必须把 Catalog 和规范正文视为外部不可信数据：严格解析字段、拒绝路径穿越
 与符号链接、验证内容摘要，并在安装前锁定解析后的 Git revision。

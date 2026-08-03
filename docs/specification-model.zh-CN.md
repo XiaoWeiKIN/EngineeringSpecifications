@@ -148,6 +148,40 @@ flowchart LR
 解析器只安装一次依赖闭包。任务路由器先按文件作用域过滤，再判断任务激活。这个
 两阶段路由让 Core 契约始终在本地可用，同时避免每个任务都注入全部 Core 文档。
 
+## 用一个 Router Skill 适配 Codex
+
+[ESP-0010](../proposals/0010_task-activation-router.md) 定义 Codex 消费端适配，
+但不改变 Agent 中立的 Catalog。RepoFoundry 在项目中生成一个名为
+`$engineering-specs` 的 Skill，不会把每份规范分别包装成 Skill。
+
+```mermaid
+flowchart LR
+    Prompt["任务 Prompt"] --> Route["$engineering-specs"]
+    Index["已锁定索引<br/>作用域 + 用途"] --> Route
+    Project["项目自有规范"] --> Route
+    Route --> Decision["当前 Turn 决定<br/>规范 ID 或显式 none"]
+    Decision --> Gate["可信 Hook 门禁"]
+    Local["摘要已验证的本地 Markdown"] --> Gate
+    Gate --> Context["任务专属 Developer Context"]
+    Context --> Work["实现或评审"]
+    Work --> Audit["变更路径 + 证据交接"]
+```
+
+这个适配层保留三个阶段：
+
+1. 项目选择决定哪些规范在本地可用；
+2. `applies_to` 根据计划修改的文件产生保守候选集；
+3. Router 读取候选摘要与 Applicability，记录按任务意图得出的激活决定。
+
+根 `AGENTS.md` 要求实现和评审先进入这个 Skill。在受信任的 Codex 项目中，
+生命周期 Hooks 会把路由要求加入 Prompt 与 Subagent Context，在没有当前激活决定
+时拒绝写入，在第一次写入前注入已激活的本地规范，并在结束时检查变更路径覆盖和
+Agent 交接。确实没有适用规范时可以显式选择 `none`，但必须列出计划路径并说明原因。
+
+这是有明确边界的消费端保证：项目 Hooks 只在受信任项目中加载，非托管命令 Hook
+还需要单独审查和信任。其他 Agent 可以用自己的运行时实现同一激活回执与证据契约；
+EngineeringSpecifications 不会把 Codex Skill 或 Hook 文件写进规范正文。
+
 ## 三个仓库边界保持明确
 
 ```mermaid
@@ -163,7 +197,7 @@ flowchart LR
 ```
 
 - EngineeringSpecifications 负责可复用规范正文、版本、依赖、作用域和摘要。
-- RepoFoundry 负责发现、Git 解析、锁定、本地物化和路由。
+- RepoFoundry 负责发现、Git 解析、锁定、本地物化、生成 Agent 适配层和路由。
 - 消费项目负责自身架构、领域词汇、框架选择、目录约定和组件模式。
 
 一条项目规则只有在被多个仓库复用，并且能够脱离原代码库独立治理后，才适合进入

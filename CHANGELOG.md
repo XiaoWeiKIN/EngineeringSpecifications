@@ -6,6 +6,9 @@ All notable Catalog and normative specification changes are recorded here.
 
 ### Added
 
+- Approved ESP-0010 to adapt task-time activation to Codex with one generated
+  Router Skill, a mandatory AGENTS route, trusted Hook gating, and an explicit
+  activation evidence handoff while keeping normative Specs Agent-neutral.
 - Approved ESP-0009 to make deterministic detection advisory and require an
   explicit project choice before installing optional Specifications.
 - Approved ESP-0008 and documented immutable `vMAJOR.MINOR.PATCH` Catalog
