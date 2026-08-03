@@ -15,8 +15,10 @@ flowchart LR
     S["EngineeringSpecifications<br/>normative Markdown + catalog"] -->|"Git ref"| W["RepoFoundry resolver"]
     W -->|"resolved commit + SHA-256"| L["Project lock"]
     W -->|"exact local copies"| M["docs/agent-guides/managed"]
-    P["Project-owned specifications"] --> M
-    M --> A["AGENTS.md routing"]
+    M --> R["$engineering-specs<br/>project Router Skill"]
+    P["Project-owned specifications"] --> R
+    A["AGENTS.md + trusted Hooks"] --> R
+    R --> C["Task-specific Agent context"]
 ```
 
 The separation has two practical effects:
@@ -122,7 +124,14 @@ explicitly choose its optional Specification IDs. It then resolves the
 dependency closure, locks the exact set, and materializes it locally. Required
 means locally available; detection does not authorize installation. At task
 time, file scopes produce candidates and the Catalog description plus
-Applicability contract decide which full documents Codex reads.
+Applicability contract decide which full documents Codex reads. For a Codex
+Harness, RepoFoundry generates one project-local `$engineering-specs` Router
+Skill rather than one Skill per Specification. The root AGENTS route makes the
+workflow mandatory; trusted project Hooks record the turn decision, gate
+writes, inject activated local content, and audit the handoff. The trust and
+runtime adapter remain consumer concerns, so normative Specifications stay
+Agent-neutral. See
+[ESP-0010](proposals/0010_task-activation-router.md).
 
 Consumers must treat catalog and specification content as untrusted external
 data: parse exact shapes, reject traversal and symbolic links, verify digests,

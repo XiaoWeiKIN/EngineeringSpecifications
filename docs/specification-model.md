@@ -169,6 +169,46 @@ file scope and then task activation. This two-stage route keeps broad Core
 contracts locally available without injecting every Core document into every
 task.
 
+## One Router Skill adapts the model to Codex
+
+[ESP-0010](../proposals/0010_task-activation-router.md) defines the Codex
+consumer adapter without changing the Agent-neutral Catalog. RepoFoundry
+generates one repository Skill named `$engineering-specs`; it does not turn
+each Specification into a Skill.
+
+```mermaid
+flowchart LR
+    Prompt["Task prompt"] --> Route["$engineering-specs"]
+    Index["Locked index<br/>scope + purpose"] --> Route
+    Project["Project-owned Specs"] --> Route
+    Route --> Decision["Turn decision<br/>IDs or explicit none"]
+    Decision --> Gate["Trusted Hook gate"]
+    Local["Digest-verified local Markdown"] --> Gate
+    Gate --> Context["Task-specific developer context"]
+    Context --> Work["Implementation or review"]
+    Work --> Audit["Changed paths + evidence handoff"]
+```
+
+The adapter preserves the three stages:
+
+1. project selection determines what is locally available;
+2. `applies_to` determines conservative candidates for planned files;
+3. the Router reads candidate descriptions and Applicability sections, then
+   records the task-intent activation decision.
+
+The root `AGENTS.md` routes implementation and review through the Skill. In a
+trusted Codex project, lifecycle Hooks add the route to prompt and subagent
+context, deny writes without a current decision, inject activated local
+content before the first write, and audit changed-path coverage plus the Agent
+handoff. An explicit no-Spec decision remains valid when it names the planned
+paths and explains why no installed contract governs the task.
+
+This is a consumer guarantee with a precise boundary. Project Hooks load only
+for trusted projects and non-managed commands require Hook review. Other
+Agents may implement the same activation receipt and evidence contract through
+their own runtime. EngineeringSpecifications does not embed Codex Skill or
+Hook files in normative documents.
+
 ## Repository ownership stays explicit
 
 ```mermaid
@@ -186,7 +226,7 @@ flowchart LR
 - EngineeringSpecifications owns reusable normative content, versions,
   dependencies, scopes, and content digests.
 - RepoFoundry owns discovery, Git resolution, locking, local
-  materialization, and routing.
+  materialization, generated Agent adapters, and routing.
 - A consuming project owns its architecture, domain vocabulary, framework
   choices, directory conventions, and component patterns.
 
