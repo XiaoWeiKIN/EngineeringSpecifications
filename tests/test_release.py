@@ -17,18 +17,45 @@ MODULE_SPEC = importlib.util.spec_from_file_location(
 assert MODULE_SPEC is not None and MODULE_SPEC.loader is not None
 RELEASE = importlib.util.module_from_spec(MODULE_SPEC)
 MODULE_SPEC.loader.exec_module(RELEASE)
+CURRENT_VERSION = RELEASE.check.load_catalog(ROOT)["catalog_version"]
+
+
+def write_release_fixture(repository: Path) -> None:
+    subprocess.run(
+        ["git", "init", "-b", "main"],
+        cwd=repository,
+        check=True,
+        capture_output=True,
+    )
+    (repository / "catalog.json").write_bytes(
+        (ROOT / "catalog.json").read_bytes()
+    )
+    for item in RELEASE.check.load_catalog(ROOT)["specs"]:
+        relative = item["path"]
+        target = repository / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes((ROOT / relative).read_bytes())
+    (repository / "CHANGELOG.md").write_text(
+        (
+            "# Changelog\n\n"
+            f"## [{CURRENT_VERSION}] - 2026-08-03\n"
+        ),
+        encoding="utf-8",
+    )
 
 
 class ReleaseCheckTestCase(unittest.TestCase):
-    def test_repository_release_is_ready(self) -> None:
-        version, commit = RELEASE.validate_release(
-            ROOT,
-            "1.2.0",
-            require_tag=False,
-        )
-        self.assertEqual(version, "1.2.0")
-        if commit is not None:
-            self.assertRegex(commit, r"^[0-9a-f]{40}$")
+    def test_prepared_release_is_ready_before_tag_publication(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            repository = Path(temporary)
+            write_release_fixture(repository)
+            version, commit = RELEASE.validate_release(
+                repository,
+                CURRENT_VERSION,
+                require_tag=False,
+            )
+            self.assertEqual(version, CURRENT_VERSION)
+            self.assertIsNone(commit)
 
     def test_release_rejects_invalid_version(self) -> None:
         with self.assertRaisesRegex(ValueError, "MAJOR.MINOR.PATCH"):
@@ -41,28 +68,11 @@ class ReleaseCheckTestCase(unittest.TestCase):
     def test_release_requires_published_tag_when_requested(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             repository = Path(temporary)
-            subprocess.run(
-                ["git", "init", "-b", "main"],
-                cwd=repository,
-                check=True,
-                capture_output=True,
-            )
-            (repository / "catalog.json").write_bytes(
-                (ROOT / "catalog.json").read_bytes()
-            )
-            for item in RELEASE.check.load_catalog(ROOT)["specs"]:
-                relative = item["path"]
-                target = repository / relative
-                target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_bytes((ROOT / relative).read_bytes())
-            (repository / "CHANGELOG.md").write_text(
-                "# Changelog\n\n## [1.2.0] - 2026-08-02\n",
-                encoding="utf-8",
-            )
+            write_release_fixture(repository)
             with self.assertRaisesRegex(ValueError, "missing release tag"):
                 RELEASE.validate_release(
                     repository,
-                    "1.2.0",
+                    CURRENT_VERSION,
                     require_tag=True,
                 )
 
