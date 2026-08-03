@@ -1,19 +1,19 @@
 {
   "catalog_id": "io.github.xiaoweikin.engineering-specifications",
-  "catalog_version": "1.2.0",
+  "catalog_version": "1.3.0",
   "schema_version": 1,
   "specs": [
     {
       "applies_to": [
         "**/*"
       ],
-      "description": "Load when changing shared names, semantic verbs, cross-surface mappings, units, states, or naming compatibility",
+      "description": "Load when changing shared names, semantic verbs such as Normalize or Extract, cross-surface mappings, units, states, or naming compatibility",
       "id": "core/semantic-naming",
       "path": "specification/core/semantic-naming.md",
       "required": true,
       "requires": [],
-      "sha256": "85acf330819952e5c1994a3c3dde776847c8e309e8ecb523f638f4d80db6993b",
-      "version": "1.0.0"
+      "sha256": "dfdf0dcf4348892d2a2cbbc5563c3b8fa6f80838e563e9db473ce44ca05e1af3",
+      "version": "1.1.0"
     },
     {
       "applies_to": [
