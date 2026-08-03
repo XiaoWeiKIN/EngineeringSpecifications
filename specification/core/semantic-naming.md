@@ -69,9 +69,13 @@ When this Specification is activated, the implementing or reviewing agent:
   language API, wire schema, database, metric system, or user-facing document.
 - A **semantic value** is a representation whose type or constructor result
   preserves facts established while interpreting weaker input.
-- **Normalization** converts equivalent valid values to a documented form.
+- **Normalization** idempotently converts an accepted value to a documented
+  equivalent form under an explicit equivalence relation.
   **Canonicalization** selects the one stable representation required by a
   contract.
+- **Extraction** returns an existing embedded value or view from a containing
+  value. The surrounding API identifies the extracted subject, its source, and
+  its cardinality.
 - An **owning surface** is the schema, protocol, storage contract, public API,
   or project domain that controls a spelling and its compatibility promise.
 
@@ -107,8 +111,9 @@ matches the stated contract:
 | `Decode` / `Unmarshal` | Recover structure from an encoding or wire representation |
 | `Encode` / `Marshal` | Produce an encoding or wire representation |
 | `Validate` | Check constraints without changing the input or returning a stronger representation |
-| `Normalize` | Produce a documented equivalent representation, preferably idempotently |
+| `Normalize` | Produce a documented equivalent representation idempotently under an explicit equivalence relation |
 | `Canonicalize` | Select the single stable representation required by a contract |
+| `Extract` | Return an existing embedded value or view from a containing value |
 | `Convert` / `Map` / `To...` | Change representations without implying parsing or validation |
 | `Load` | Read from a local or persistent source |
 | `Fetch` | Retrieve from a remote source with remote failure modes |
@@ -117,6 +122,23 @@ matches the stated contract:
 | `Resolve` | Turn an indirect reference into its target |
 | `Plan` | Produce operations that have not yet been executed |
 | `Execute` | Run a command, query, or previously constructed plan |
+
+An operation named `Normalize...` **MUST** document the accepted input, the
+equivalence relation it preserves, and the output form. Applying it again to
+its own output **MUST** produce the same result. `Normalize` **MUST NOT** hide
+parsing of invalid input, validation-only behavior, default injection,
+enrichment, aggregation, local or remote I/O, or material side effects.
+
+An operation named `Extract...` **MUST** make the extracted subject, containing
+source, and result cardinality clear through its name, owning type, parameters,
+and return type. `Extract` **MUST NOT** be a catch-all name for parsing,
+normalization, computation, enrichment, loading, fetching, removal, mutation,
+or material side effects.
+
+When one atomic operation necessarily combines semantic stages, its public
+contract **MUST** expose the primary observable behavior or use an explicit
+composed name. An implementation **MUST NOT** select `Normalize`, `Extract`, or
+another generic verb merely because that verb describes one internal step.
 
 A function named `Parse...` **MUST NOT** return only a Boolean. A function named
 `Validate...` **MUST NOT** mutate its input unless mutation is part of an
@@ -212,10 +234,24 @@ Validate(command) -> unchanged command plus success or error
 Execute(command) -> side effects or execution error
 ```
 
+The following names keep normalization and extraction narrow:
+
+```text
+NormalizeLineEndings(text) -> equivalent text with documented line endings
+ExtractPayload(envelope) -> the payload already contained by the envelope
+ParseAndNormalizeURL(raw) -> a parsed URL in the documented normalized form
+```
+
 ## Rejected patterns
 
 - `ParseConfig(value) bool` violates `SEM-VERB-001` because it discards the
   parsed representation.
+- `NormalizeConfig(config)` violates `SEM-VERB-001` when it also injects
+  defaults, parses durations, validates fields, or mutates shared state without
+  exposing those contracts.
+- `ExtractData(source)` violates `SEM-VERB-001` when it performs a remote query,
+  computes an aggregate, enriches the result, or leaves the extracted subject
+  and cardinality ambiguous.
 - Deriving a published JSON field from a renamed implementation field violates
   `SEM-SURFACE-001`.
 - Naming an untyped duration `timeout` violates `SEM-TYPE-001` when callers
@@ -255,6 +291,16 @@ Compatibility or migration: none | <old-to-new contract>
 ```
 
 ## Compatibility and migration
+
+Version `1.1.0` preserves every Requirement ID and strengthens
+`SEM-VERB-001`. It makes the existing `Normalize` contract explicitly
+idempotent, prohibits hidden secondary behavior, and adds the cross-language
+`Extract` contract. Consumers updating from `1.0.0` should review declarations
+and call sites containing `Normalize` or `Extract`; rename or split operations
+whose primary observable behavior is parsing, validation, defaulting,
+computation, I/O, mutation, or another more precise semantic verb. Fixed
+external and protocol-owned names remain governed by the documented exception
+and adapter contract.
 
 Version `1.0.0` separates data-shape parsing into
 [`core/data-boundaries`](data-boundaries.md). Existing names and mappings do

@@ -65,7 +65,7 @@ class CatalogTestCase(unittest.TestCase):
             catalog["catalog_id"],
             "io.github.xiaoweikin.engineering-specifications",
         )
-        self.assertEqual(catalog["catalog_version"], "1.2.0")
+        self.assertEqual(catalog["catalog_version"], "1.3.0")
         self.assertEqual(len(catalog["specs"]), 3)
         self.assertEqual(
             {item["id"] for item in catalog["specs"]},
@@ -83,6 +83,24 @@ class CatalogTestCase(unittest.TestCase):
             )
         go_spec = next(
             item for item in catalog["specs"] if item["id"] == "languages/go"
+        )
+        semantic_naming = next(
+            item
+            for item in catalog["specs"]
+            if item["id"] == "core/semantic-naming"
+        )
+        self.assertEqual(semantic_naming["version"], "1.1.0")
+        self.assertIn("Normalize or Extract", semantic_naming["description"])
+        semantic_naming_text = (
+            ROOT / "specification/core/semantic-naming.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "its own output **MUST** produce the same result",
+            semantic_naming_text,
+        )
+        self.assertIn(
+            "`Extract` **MUST NOT** be a catch-all name",
+            semantic_naming_text,
         )
         self.assertEqual(go_spec["version"], "0.4.0")
         self.assertIn("**/go.sum", go_spec["applies_to"])
