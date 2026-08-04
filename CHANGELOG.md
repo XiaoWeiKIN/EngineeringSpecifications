@@ -4,6 +4,8 @@ All notable Catalog and normative specification changes are recorded here.
 
 ## Unreleased
 
+## [1.3.0] - 2026-08-04
+
 ### Added
 
 - Approved ESP-0010 to adapt task-time activation to Codex with one generated
