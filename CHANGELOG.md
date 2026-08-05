@@ -4,6 +4,37 @@ All notable Catalog and normative specification changes are recorded here.
 
 ## Unreleased
 
+## [1.5.0] - 2026-08-05
+
+### Added
+
+- Approved the Requirement-level context activation ESP and added compact
+  `Activation` plus exact `Context dependencies` metadata to all 32 published
+  Requirement blocks.
+- Added canonical validation for Requirement activation length, 8 KiB block
+  budgets, exact reference coverage, Catalog-scoped dependency edges, and
+  acyclic Requirement context closure.
+- Added Development `languages/go/functional-options` version `0.1.1` to
+  constrain when functional options fit, keep required inputs explicit, define
+  target and extension ownership, make application and validation
+  deterministic, preserve exported compatibility, and require composition
+  tests.
+- Added Development `languages/go/factory-delegation` version `0.1.1` for
+  capability-specific named delegates, extensible factory surfaces, immutable
+  construction, explicit unsupported behavior, and capability-matrix evidence.
+
+### Changed
+
+- Advanced the Catalog to `1.5.0`; advanced `core/semantic-naming` to `1.1.1`,
+  `core/data-boundaries` to `0.1.1`, `languages/go` to `0.4.1`, and both narrow
+  Go pattern Specifications to `0.1.1`. These patch revisions add routing
+  metadata without changing existing Requirement behavior.
+- Defined two-stage Spec/Requirement routing, exact digest-verified context
+  capsules, explicit whole-Spec fallback, bounded card/capsule budgets, and
+  context-epoch rehydration for RepoFoundry consumers.
+- Kept file-extension detection owned by `languages/go`; a Go file alone does
+  not recommend the narrower functional-options or factory-delegation pattern.
+
 ## [1.3.0] - 2026-08-04
 
 ### Added

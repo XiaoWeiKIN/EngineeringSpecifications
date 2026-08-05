@@ -12,8 +12,8 @@ EngineeringSpecifications 是可复用工程规范的版本化事实源，由
 flowchart LR
     S["EngineeringSpecifications<br/>规范正文 + Catalog"] -->|"Git ref"| W["RepoFoundry 解析器"]
     W -->|"解析后的 commit + SHA-256"| L["项目 Lock"]
-    W -->|"精确本地副本"| M["docs/agent-guides/managed"]
-    M --> R["$engineering-specs<br/>项目 Router Skill"]
+    W -->|"精确本地副本 + 派生索引"| M["docs/agent-guides/managed"]
+    M --> R["$engineering-specs<br/>先 Spec 后 Requirement 路由"]
     P["项目自有规范"] --> R
     A["AGENTS.md + 可信 Hooks"] --> R
     R --> C["任务专属 Agent Context"]
@@ -95,7 +95,11 @@ Catalog 面向多个工程层级的可复用规则：
   任务中激活；
 - `core/data-boundaries`，所有项目安装，在外部数据、信任转换、解析或副作用门禁
   任务中激活；
-- `languages/go`。
+- `languages/go`；
+- `languages/go/functional-options`，显式选择，在 Go 函数式选项 API 的设计、
+  校验、组合或迁移任务中激活；
+- `languages/go/factory-delegation`，显式选择，在使用命名函数委托构建可选能力
+  工厂的任务中激活。
 
 ## Catalog 契约
 
@@ -105,13 +109,16 @@ Catalog 面向多个工程层级的可复用规则：
 
 RepoFoundry 始终选择必选规范，把确定性检测结果展示为可选推荐，并由消费项目显式
 选择要安装的可选 Spec ID；随后解析依赖闭包、锁定精确集合并物化到本地。必选表示
-规范始终在本地可用，检测结果本身不授权安装；执行任务时，文件作用域先产生候选集，
-再由 Catalog description 和 Applicability 决定 Codex 阅读哪些全文。对 Codex
-Harness，RepoFoundry 只生成一个项目级 `$engineering-specs` Router Skill，不会为
-每份规范各建一个 Skill。根 AGENTS 路由要求任务必须进入该工作流；可信项目 Hooks
-记录当前 Turn 的决定、拦截未激活写入、注入已激活的本地正文并审计交接。信任和
-运行时适配属于消费端职责，规范正文保持 Agent 中立。详见
-[ESP-0010](proposals/0010_task-activation-router.md)。
+规范始终在本地可用，检测结果本身不授权安装。执行任务时，文件作用域先产生 Spec
+候选，Catalog description 与 Applicability 再判断哪些 Spec 适用；Router 随后只
+暴露有界的 Requirement 激活卡，解析精确 Requirement 依赖，并从选中块、解释框架
+和对应 Verification 行编译摘要已验证的上下文胶囊。规范性文字不做摘要或截断；旧
+文档显式回退到 whole-Spec 模式。对 Codex Harness，RepoFoundry 只生成一个项目级
+`$engineering-specs` Router Skill，不会为每份规范或 Requirement 各建一个 Skill。
+根 AGENTS 路由要求任务必须进入该工作流；可信项目 Hooks 记录当前 Turn 的决定、
+拦截未激活写入、注入精确胶囊并审计交接。信任和运行时适配属于消费端职责，规范正文
+保持 Agent 中立。详见 [ESP-0010](proposals/0010_task-activation-router.md) 和已批准的
+[Requirement 级上下文提案](proposals/0000_requirement-level-context-activation.zh-CN.md)。
 
 消费方必须把 Catalog 和规范正文视为外部不可信数据：严格解析字段、拒绝路径穿越
 与符号链接、验证内容摘要，并在安装前锁定解析后的 Git revision。

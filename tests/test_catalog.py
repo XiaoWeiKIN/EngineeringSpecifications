@@ -16,11 +16,17 @@ CHECK = importlib.util.module_from_spec(MODULE_SPEC)
 MODULE_SPEC.loader.exec_module(CHECK)
 
 
-def catalog_spec(spec_id: str, path: str) -> dict[str, object]:
+def catalog_spec(
+    spec_id: str,
+    path: str,
+    *,
+    requires: tuple[str, ...] = (),
+) -> dict[str, object]:
     return {
         "id": spec_id,
         "path": path,
         "required": True,
+        "requires": list(requires),
     }
 
 
@@ -31,8 +37,18 @@ def contract_document(
     evidence: bool = True,
     verification_id: str = "TEST-RULE-001",
     selection: str = "Required",
+    activation: str | None = "Load when testing the Requirement contract.",
+    context_dependencies: str = "None",
+    requirement_text: str = (
+        "The implementation **MUST** preserve the behavior."
+    ),
 ) -> str:
     evidence_text = "\n**Evidence:** Reviewed artifact.\n" if evidence else "\n"
+    activation_text = (
+        f"**Activation:** {activation}\n\n"
+        if activation is not None
+        else ""
+    )
     return (
         "# Test Specification\n\n"
         "> **Status:** Development\n>\n"
@@ -45,7 +61,9 @@ def contract_document(
         "## Agent workflow\n\n1. Apply the contract.\n\n"
         "## Requirements\n\n"
         f"{heading}\n\n"
-        "The implementation **MUST** preserve the behavior.\n\n"
+        f"{activation_text}"
+        f"**Context dependencies:** {context_dependencies}\n\n"
+        f"{requirement_text}\n\n"
         "**Rationale (non-normative):** Prevent drift.\n\n"
         "**Enforcement (review):** Review the behavior.\n"
         f"{evidence_text}\n"
@@ -65,14 +83,16 @@ class CatalogTestCase(unittest.TestCase):
             catalog["catalog_id"],
             "io.github.xiaoweikin.engineering-specifications",
         )
-        self.assertEqual(catalog["catalog_version"], "1.3.0")
-        self.assertEqual(len(catalog["specs"]), 3)
+        self.assertEqual(catalog["catalog_version"], "1.5.0")
+        self.assertEqual(len(catalog["specs"]), 5)
         self.assertEqual(
             {item["id"] for item in catalog["specs"]},
             {
                 "core/semantic-naming",
                 "core/data-boundaries",
                 "languages/go",
+                "languages/go/factory-delegation",
+                "languages/go/functional-options",
             },
         )
         for item in catalog["specs"]:
@@ -84,12 +104,22 @@ class CatalogTestCase(unittest.TestCase):
         go_spec = next(
             item for item in catalog["specs"] if item["id"] == "languages/go"
         )
+        functional_options_spec = next(
+            item
+            for item in catalog["specs"]
+            if item["id"] == "languages/go/functional-options"
+        )
+        factory_delegation_spec = next(
+            item
+            for item in catalog["specs"]
+            if item["id"] == "languages/go/factory-delegation"
+        )
         semantic_naming = next(
             item
             for item in catalog["specs"]
             if item["id"] == "core/semantic-naming"
         )
-        self.assertEqual(semantic_naming["version"], "1.1.0")
+        self.assertEqual(semantic_naming["version"], "1.1.1")
         self.assertIn("Normalize or Extract", semantic_naming["description"])
         semantic_naming_text = (
             ROOT / "specification/core/semantic-naming.md"
@@ -102,9 +132,18 @@ class CatalogTestCase(unittest.TestCase):
             "`Extract` **MUST NOT** be a catch-all name",
             semantic_naming_text,
         )
-        self.assertEqual(go_spec["version"], "0.4.0")
+        self.assertEqual(go_spec["version"], "0.4.1")
         self.assertIn("**/go.sum", go_spec["applies_to"])
         self.assertIn("**/vendor/modules.txt", go_spec["applies_to"])
+        self.assertEqual(functional_options_spec["version"], "0.1.1")
+        self.assertEqual(functional_options_spec["requires"], ["languages/go"])
+        self.assertNotIn("detection", functional_options_spec)
+        self.assertEqual(factory_delegation_spec["version"], "0.1.1")
+        self.assertEqual(
+            factory_delegation_spec["requires"],
+            ["languages/go/functional-options"],
+        )
+        self.assertNotIn("detection", factory_delegation_spec)
         self.assertEqual(
             CHECK.check_requirement_ids(ROOT, catalog),
             (
@@ -117,12 +156,23 @@ class CatalogTestCase(unittest.TestCase):
                 "GO-BOUNDARY-001",
                 "GO-COMPAT-001",
                 "GO-ERROR-001",
+                "GO-FACTORY-ABSENCE-001",
+                "GO-FACTORY-CONSTRUCT-001",
+                "GO-FACTORY-DELEGATE-001",
+                "GO-FACTORY-SURFACE-001",
+                "GO-FACTORY-TEST-001",
                 "GO-FORMAT-001",
                 "GO-GENERATE-001",
                 "GO-LIFECYCLE-001",
                 "GO-MODULE-001",
                 "GO-NAME-001",
                 "GO-NAME-002",
+                "GO-OPTION-APPLY-001",
+                "GO-OPTION-COMPAT-001",
+                "GO-OPTION-TEST-001",
+                "GO-OPTION-TYPE-001",
+                "GO-OPTION-USE-001",
+                "GO-OPTION-VALIDATE-001",
                 "GO-TEST-001",
                 "SEM-COMPAT-001",
                 "SEM-NAME-001",
@@ -255,6 +305,195 @@ class CatalogTestCase(unittest.TestCase):
             ):
                 CHECK.check_requirement_ids(root, catalog)
 
+    def test_requirement_contract_requires_activation_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "specification/core/missing-activation.md"
+            path.parent.mkdir(parents=True)
+            path.write_text(
+                contract_document("core/missing-activation", activation=None),
+                encoding="utf-8",
+            )
+            catalog = {
+                "specs": [
+                    catalog_spec(
+                        "core/missing-activation",
+                        "specification/core/missing-activation.md",
+                    )
+                ]
+            }
+            with self.assertRaisesRegex(ValueError, "requires.*Activation"):
+                CHECK.check_requirement_ids(root, catalog)
+
+    def test_requirement_contract_rejects_oversized_activation(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "specification/core/long-activation.md"
+            path.parent.mkdir(parents=True)
+            path.write_text(
+                contract_document(
+                    "core/long-activation",
+                    activation="Load when " + ("x" * 181),
+                ),
+                encoding="utf-8",
+            )
+            catalog = {
+                "specs": [
+                    catalog_spec(
+                        "core/long-activation",
+                        "specification/core/long-activation.md",
+                    )
+                ]
+            }
+            with self.assertRaisesRegex(ValueError, "Activation exceeds"):
+                CHECK.check_requirement_ids(root, catalog)
+
+    def test_requirement_contract_rejects_wildcard_reference(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "specification/core/wildcard.md"
+            path.parent.mkdir(parents=True)
+            path.write_text(
+                contract_document(
+                    "core/wildcard",
+                    requirement_text=(
+                        "The implementation **MUST** satisfy `TEST-OTHER-*`."
+                    ),
+                ),
+                encoding="utf-8",
+            )
+            catalog = {
+                "specs": [
+                    catalog_spec(
+                        "core/wildcard",
+                        "specification/core/wildcard.md",
+                    )
+                ]
+            }
+            with self.assertRaisesRegex(ValueError, "wildcard Requirement"):
+                CHECK.check_requirement_ids(root, catalog)
+
+    def test_requirement_reference_must_be_a_context_dependency(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "specification/core/missing-context.md"
+            path.parent.mkdir(parents=True)
+            path.write_text(
+                contract_document(
+                    "core/missing-context",
+                    requirement_text=(
+                        "The implementation **MUST** satisfy "
+                        "`TEST-OTHER-001`."
+                    ),
+                ),
+                encoding="utf-8",
+            )
+            catalog = {
+                "specs": [
+                    catalog_spec(
+                        "core/missing-context",
+                        "specification/core/missing-context.md",
+                    )
+                ]
+            }
+            with self.assertRaisesRegex(ValueError, "missing from Context"):
+                CHECK.check_requirement_ids(root, catalog)
+
+    def test_requirement_dependency_must_follow_catalog_closure(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            first = root / "specification/core/first.md"
+            second = root / "specification/core/second.md"
+            first.parent.mkdir(parents=True)
+            first.write_text(
+                contract_document(
+                    "core/first",
+                    heading="### TEST-FIRST-001 — First behavior",
+                    verification_id="TEST-FIRST-001",
+                    context_dependencies="`TEST-SECOND-001`",
+                ),
+                encoding="utf-8",
+            )
+            second.write_text(
+                contract_document(
+                    "core/second",
+                    heading="### TEST-SECOND-001 — Second behavior",
+                    verification_id="TEST-SECOND-001",
+                ),
+                encoding="utf-8",
+            )
+            catalog = {
+                "specs": [
+                    catalog_spec("core/first", "specification/core/first.md"),
+                    catalog_spec(
+                        "core/second",
+                        "specification/core/second.md",
+                    ),
+                ]
+            }
+            with self.assertRaisesRegex(ValueError, "outside.*closure"):
+                CHECK.check_requirement_ids(root, catalog)
+
+    def test_requirement_dependency_graph_must_be_acyclic(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "specification/core/cycle.md"
+            path.parent.mkdir(parents=True)
+            document = contract_document(
+                "core/cycle",
+                heading="### TEST-FIRST-001 — First behavior",
+                verification_id="TEST-FIRST-001",
+                context_dependencies="`TEST-SECOND-001`",
+            )
+            second_block = (
+                "### TEST-SECOND-001 — Second behavior\n\n"
+                "**Activation:** Load when testing the second behavior.\n\n"
+                "**Context dependencies:** `TEST-FIRST-001`\n\n"
+                "The implementation **MUST** preserve the second behavior.\n\n"
+                "**Rationale (non-normative):** Prevent drift.\n\n"
+                "**Enforcement (review):** Review the behavior.\n\n"
+                "**Evidence:** Reviewed artifact.\n\n"
+            )
+            document = document.replace(
+                "## Verification\n\n",
+                second_block + "## Verification\n\n",
+            ).replace(
+                "| `TEST-FIRST-001` | Reviewed behavior |",
+                "| `TEST-FIRST-001` | Reviewed behavior |\n"
+                "| `TEST-SECOND-001` | Reviewed behavior |",
+            )
+            path.write_text(document, encoding="utf-8")
+            catalog = {
+                "specs": [
+                    catalog_spec("core/cycle", "specification/core/cycle.md")
+                ]
+            }
+            with self.assertRaisesRegex(ValueError, "dependency cycle"):
+                CHECK.check_requirement_ids(root, catalog)
+
+    def test_requirement_block_has_a_byte_budget(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "specification/core/oversized.md"
+            path.parent.mkdir(parents=True)
+            path.write_text(
+                contract_document(
+                    "core/oversized",
+                    requirement_text="x" * CHECK.MAX_REQUIREMENT_BLOCK_BYTES,
+                ),
+                encoding="utf-8",
+            )
+            catalog = {
+                "specs": [
+                    catalog_spec(
+                        "core/oversized",
+                        "specification/core/oversized.md",
+                    )
+                ]
+            }
+            with self.assertRaisesRegex(ValueError, "block is .* bytes"):
+                CHECK.check_requirement_ids(root, catalog)
+
     def test_requirement_contract_rejects_catalog_id_drift(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -283,6 +522,8 @@ class CatalogTestCase(unittest.TestCase):
             "## Agent workflow",
             "## Requirements",
             "### AREA-TOPIC-001",
+            "**Activation:** Load when ",
+            "**Context dependencies:** None",
             "**Enforcement (mechanical | review | hybrid):**",
             "**Evidence:**",
             "## Approved patterns",

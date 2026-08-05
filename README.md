@@ -14,8 +14,8 @@ fetches, locks, and materializes those specifications in a project.
 flowchart LR
     S["EngineeringSpecifications<br/>normative Markdown + catalog"] -->|"Git ref"| W["RepoFoundry resolver"]
     W -->|"resolved commit + SHA-256"| L["Project lock"]
-    W -->|"exact local copies"| M["docs/agent-guides/managed"]
-    M --> R["$engineering-specs<br/>project Router Skill"]
+    W -->|"exact local copies + derived index"| M["docs/agent-guides/managed"]
+    M --> R["$engineering-specs<br/>Spec then Requirement routing"]
     P["Project-owned specifications"] --> R
     A["AGENTS.md + trusted Hooks"] --> R
     R --> C["Task-specific Agent context"]
@@ -109,7 +109,11 @@ The current catalog contains:
   mappings, units, states, and naming compatibility;
 - `core/data-boundaries`, installed everywhere and activated for external data,
   trust transitions, parsing, and effect gating;
-- `languages/go`.
+- `languages/go`;
+- `languages/go/functional-options`, explicitly selected and activated for Go
+  functional-option API design, validation, composition, and migration;
+- `languages/go/factory-delegation`, explicitly selected and activated for
+  optional capability factories built from named function delegates.
 
 ## Catalog contract
 
@@ -123,15 +127,20 @@ detection as optional recommendations, and lets the consuming project
 explicitly choose its optional Specification IDs. It then resolves the
 dependency closure, locks the exact set, and materializes it locally. Required
 means locally available; detection does not authorize installation. At task
-time, file scopes produce candidates and the Catalog description plus
-Applicability contract decide which full documents Codex reads. For a Codex
-Harness, RepoFoundry generates one project-local `$engineering-specs` Router
-Skill rather than one Skill per Specification. The root AGENTS route makes the
-workflow mandatory; trusted project Hooks record the turn decision, gate
-writes, inject activated local content, and audit the handoff. The trust and
-runtime adapter remain consumer concerns, so normative Specifications stay
-Agent-neutral. See
-[ESP-0010](proposals/0010_task-activation-router.md).
+time, file scopes produce Spec candidates and the Catalog description plus
+Applicability contract decide which Specs apply. The Router then exposes
+bounded Requirement activation cards, resolves exact Requirement dependencies,
+and compiles a digest-verified context capsule from selected blocks, their
+interpretation frames, and matching Verification rows. It never summarizes or
+truncates normative text; legacy documents use an explicit whole-Spec
+fallback. For a Codex Harness, RepoFoundry generates one project-local
+`$engineering-specs` Router Skill rather than one Skill per Specification or
+Requirement. The root AGENTS route makes the workflow mandatory; trusted
+project Hooks record the turn decision, gate writes, inject the exact capsule,
+and audit the handoff. The trust and runtime adapter remain consumer concerns,
+so normative Specifications stay Agent-neutral. See
+[ESP-0010](proposals/0010_task-activation-router.md) and the approved
+[Requirement-level context proposal](proposals/0000_requirement-level-context-activation.md).
 
 Consumers must treat catalog and specification content as untrusted external
 data: parse exact shapes, reject traversal and symbolic links, verify digests,

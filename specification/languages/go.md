@@ -74,6 +74,10 @@ When this Specification is activated, the implementing or reviewing agent:
 
 ### GO-FORMAT-001 — Standard tools own mechanical formatting
 
+**Activation:** Load when changing hand-written Go source formatting or import organization.
+
+**Context dependencies:** None
+
 Hand-written Go source **MUST** be accepted by `gofmt`. Repositories **SHOULD**
 use a deterministic import organizer when they require import grouping beyond
 `gofmt`.
@@ -87,6 +91,10 @@ changed Go files.
 **Evidence:** A clean formatter check for the reviewed revision.
 
 ### GO-MODULE-001 — Module dependency state is reproducible
+
+**Activation:** Load when changing Go modules, workspaces, checksums, replacements, dependencies, or committed vendor state.
+
+**Context dependencies:** None
 
 Every checked-in Go module **MUST** have `go.mod` and `go.sum` state that is
 canonical for the repository's declared Go toolchain. Dependency changes
@@ -111,6 +119,10 @@ toolchain, normalization command, and clean result.
 
 ### GO-GENERATE-001 — Committed generated artifacts are reproducible
 
+**Activation:** Load when changing a Go generator input, command, toolchain, or committed generated artifact.
+
+**Context dependencies:** None
+
 When a Go package or module commits generated artifacts, the repository
 **MUST** identify their authoritative inputs and a reproducible generation
 command. CI **MUST** regenerate those artifacts with the declared toolchain and
@@ -133,6 +145,10 @@ inputs, command, tool versions, generated paths, and clean result.
 
 ### GO-NAME-001 — Identifiers follow Go casing and context
 
+**Activation:** Load when naming or renaming Go identifiers, receivers, initialisms, or scoped variables.
+
+**Context dependencies:** `SEM-NAME-001`
+
 Go identifiers **SHOULD** use `MixedCaps` or `mixedCaps` rather than underscores,
 except where generated code, tests, cgo, or an external contract requires
 another form. Initialisms **SHOULD** keep consistent case within an identifier:
@@ -153,6 +169,10 @@ context.
 **Evidence:** Passing naming checks plus reviewed declarations and call sites.
 
 ### GO-NAME-002 — Package and API names read naturally at call sites
+
+**Activation:** Load when naming Go packages, exported APIs, constructors, accessors, interfaces, methods, or predicates.
+
+**Context dependencies:** `GO-NAME-001`, `SEM-NAME-001`
 
 Package names **SHOULD** be short, lowercase, and meaningful when combined with
 their exported identifiers. They **SHOULD NOT** repeat information already
@@ -188,6 +208,10 @@ failure, and predicate behavior.
 
 ### GO-API-001 — APIs expose the smallest stable behavior
 
+**Activation:** Load when designing Go contexts, interfaces, concrete returns, semantic types, or exported behavior boundaries.
+
+**Context dependencies:** `SEM-TYPE-001`
+
 Operations that can block, perform I/O, or be cancelled **MUST** accept
 `context.Context` as their first parameter unless a required interface fixes
 the signature. Request-scoped contexts **MUST NOT** be stored in long-lived
@@ -212,6 +236,11 @@ and semantic types.
 consumer contract.
 
 ### GO-BOUNDARY-001 — Go boundaries produce domain-safe values
+
+**Activation:** Load when mapping requests, configuration, environment, storage, or tool results into Go domain values.
+
+**Context dependencies:** `DATA-SHAPE-001`, `DATA-PARSE-001`,
+`DATA-EFFECT-001`, `DATA-ERROR-001`, `DATA-NORMALIZE-001`
 
 Decoded requests, configuration, environment variables, storage rows, and tool
 results **MUST** be treated as untrusted shapes. Boundary code **MUST** parse or
@@ -239,6 +268,10 @@ unknown, boundary, and cross-field-invalid inputs.
 
 ### GO-ERROR-001 — Errors preserve identity and ownership
 
+**Activation:** Load when returning, wrapping, translating, logging, or exposing inspectable Go errors.
+
+**Context dependencies:** `DATA-ERROR-001`
+
 Expected failures **MUST** return errors rather than panic. An error
 **MUST** be wrapped with `%w` when callers need to inspect its cause, and typed
 or sentinel error behavior **MUST** remain stable across layers that promise
@@ -260,6 +293,10 @@ ownership prevents duplicate signals and leaking implementation details.
 single emitted operational signal.
 
 ### GO-LIFECYCLE-001 — Goroutines and resources have observable owners
+
+**Activation:** Load when starting goroutines, acquiring resources, sharing mutable state, or defining shutdown and race coverage.
+
+**Context dependencies:** None
 
 Every started goroutine **MUST** have a bounded lifetime, cancellation or
 shutdown path, and defined error strategy. Acquired resources **MUST** be
@@ -286,6 +323,10 @@ the scope and reason for any omitted path.
 
 ### GO-COMPAT-001 — Exported Go contracts migrate deliberately
 
+**Activation:** Load when changing exported identifiers, method sets, errors, serialization tags, enums, or generated Go APIs.
+
+**Context dependencies:** `SEM-COMPAT-001`
+
 Exported identifiers, method sets, documented error identity, serialization
 tags, and external enum values **MUST** be treated as compatibility contracts
 once published.
@@ -304,6 +345,10 @@ compatibility fixtures, schema checks, and migration review.
 versioned removal plan.
 
 ### GO-TEST-001 — Tests verify contracts and failure boundaries
+
+**Activation:** Load when adding or reviewing Go tests, validation commands, failure coverage, or build and platform matrices.
+
+**Context dependencies:** None
 
 Go tests **MUST** cover the failure modes introduced or changed by an
 implementation. Table-driven tests **SHOULD** be used when multiple inputs
@@ -427,6 +472,10 @@ Compatibility or migration: none | <preserved API and removal condition>
 ```
 
 ## Compatibility and migration
+
+Version `0.4.1` adds non-normative Requirement activation summaries and exact
+context-dependency metadata. It does not change the behavioral meaning of any
+`GO-*` Requirement ID preserved by `0.4.0`.
 
 Version `0.4.0` preserves every existing `GO-*` Requirement ID, adds
 `GO-MODULE-001` and `GO-GENERATE-001`, and strengthens `GO-NAME-002`,

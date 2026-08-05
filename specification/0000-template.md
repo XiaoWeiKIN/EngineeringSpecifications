@@ -74,6 +74,10 @@ uppercase prefix followed by a topic and number, such as `DATA-PARSE-001` or
 
 ### AREA-TOPIC-001 — Requirement title
 
+**Activation:** Load when changing the observable behavior governed by this Requirement.
+
+**Context dependencies:** None
+
 [The implementation or agent] **MUST** [state one observable behavior].
 
 **Rationale (non-normative):** Explain why the requirement exists and which
@@ -93,6 +97,16 @@ missing checks are not evidence.
 Repeat this subsection only for requirements that need an independent stable
 ID. Use `SHOULD` for strong defaults with legitimate exceptions and `MAY` for
 optional behavior.
+
+Keep `Activation` and `Context dependencies` immediately after every
+Requirement heading. `Activation` is one non-normative routing paragraph that
+starts with `Load when ` and contains at most 180 Unicode code points.
+`Context dependencies` is either `None` or a comma-separated list of exact
+backticked Requirement IDs. It may reference this Specification or its
+transitive Catalog dependencies; never use prefixes or wildcards. Declare
+every Requirement ID referenced inside the block. Keep the complete
+Requirement block, including its routing metadata, rationale, enforcement, and
+evidence, within 8 KiB of UTF-8 source.
 
 ## Approved patterns
 

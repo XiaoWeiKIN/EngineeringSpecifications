@@ -83,6 +83,10 @@ When this Specification is activated, the implementing or reviewing agent:
 
 ### SEM-NAME-001 — Names describe observable contracts
 
+**Activation:** Load when choosing or reviewing a shared or public name for observable behavior.
+
+**Context dependencies:** None
+
 Shared and public names **MUST** describe behavior that callers can observe. A
 reviewer must be able to determine the operation's result cardinality, failure
 behavior, and material side effects from its name, type, and surrounding API.
@@ -101,6 +105,10 @@ alone cannot prove a violation.
 the observable contract and reuses the repository's existing vocabulary.
 
 ### SEM-VERB-001 — Semantic verbs keep stable meanings
+
+**Activation:** Load when naming or changing parse, decode, validate, normalize, extract, load, fetch, resolve, plan, or execute behavior.
+
+**Context dependencies:** `SEM-NAME-001`
 
 An API **MUST** use the following verbs only when its observable behavior
 matches the stated contract:
@@ -156,6 +164,10 @@ effects appropriate to the selected verb.
 
 ### SEM-SURFACE-001 — Cross-surface mappings stay explicit
 
+**Activation:** Load when one concept maps across code, wire, storage, metrics, protocols, or documentation.
+
+**Context dependencies:** `SEM-NAME-001`
+
 When one concept appears on multiple surfaces, the implementation **MUST**
 declare each externally visible spelling and **MUST** test the mappings between
 them. It **MUST NOT** mechanically derive a wire, storage, metric, or protocol
@@ -179,6 +191,10 @@ external spelling.
 
 ### SEM-TYPE-001 — Types and names expose semantic distinctions
 
+**Activation:** Load when identifiers, units, states, time concepts, or external enum values could be confused.
+
+**Context dependencies:** `SEM-NAME-001`
+
 Public contracts **MUST** distinguish incompatible identifiers, units, states,
 and time concepts through types or unambiguous names. Raw numeric values
 **MUST** identify their unit when the type does not.
@@ -197,6 +213,10 @@ ambiguous unit names.
 conversion, unknown values, and incompatible states.
 
 ### SEM-COMPAT-001 — Stable names change through migration
+
+**Activation:** Load when renaming a published API, schema, storage, configuration, telemetry, or other external name.
+
+**Context dependencies:** `SEM-NAME-001`, `SEM-SURFACE-001`
 
 A published external name **MUST NOT** be changed solely for stylistic
 consistency. A necessary rename **MUST** define the old-to-new mapping, read and
@@ -291,6 +311,10 @@ Compatibility or migration: none | <old-to-new contract>
 ```
 
 ## Compatibility and migration
+
+Version `1.1.1` adds non-normative Requirement activation summaries and exact
+context-dependency metadata. It does not change the behavioral meaning of any
+`SEM-*` Requirement ID introduced or preserved by `1.1.0`.
 
 Version `1.1.0` preserves every Requirement ID and strengthens
 `SEM-VERB-001`. It makes the existing `Normalize` contract explicitly

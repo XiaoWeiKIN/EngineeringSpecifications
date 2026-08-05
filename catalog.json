@@ -1,6 +1,6 @@
 {
   "catalog_id": "io.github.xiaoweikin.engineering-specifications",
-  "catalog_version": "1.3.0",
+  "catalog_version": "1.5.0",
   "schema_version": 1,
   "specs": [
     {
@@ -12,8 +12,8 @@
       "path": "specification/core/semantic-naming.md",
       "required": true,
       "requires": [],
-      "sha256": "dfdf0dcf4348892d2a2cbbc5563c3b8fa6f80838e563e9db473ce44ca05e1af3",
-      "version": "1.1.0"
+      "sha256": "29b6e5e19edaa3d87457a8418a4d020f563348c7d0fe6f7d3ab24a4c702c9e11",
+      "version": "1.1.1"
     },
     {
       "applies_to": [
@@ -26,8 +26,8 @@
       "requires": [
         "core/semantic-naming"
       ],
-      "sha256": "74a345f6f848b66d3f2fac69e3b758780113de5c6a69c6bc92057cf48559ce0f",
-      "version": "0.1.0"
+      "sha256": "644ffec3b6a1dbdb3e05797f665a9282e90397ca587850902c737cc2f2b9b5c2",
+      "version": "0.1.1"
     },
     {
       "applies_to": [
@@ -54,8 +54,36 @@
         "core/semantic-naming",
         "core/data-boundaries"
       ],
-      "sha256": "da320823a0dc3f09c449a635328b3c397b5af3fbdfe6dcb8b6ae367aecc6f820",
-      "version": "0.4.0"
+      "sha256": "1d6a82e7380425b65983531f80a43442e35d831a2b65cb7ebc17918c1c0ee68b",
+      "version": "0.4.1"
+    },
+    {
+      "applies_to": [
+        "**/*.go"
+      ],
+      "description": "Load when designing, changing, or reviewing Go functional-option APIs, including defaults, application order, conflicts, validation, or migration",
+      "id": "languages/go/functional-options",
+      "path": "specification/languages/go/functional-options.md",
+      "required": false,
+      "requires": [
+        "languages/go"
+      ],
+      "sha256": "3e1133f9e0624a0f0ea230721e7cca070163fe1cf39122e61734621014a81282",
+      "version": "0.1.1"
+    },
+    {
+      "applies_to": [
+        "**/*.go"
+      ],
+      "description": "Load when building or evolving Go capability factories from optional named delegates, including absence, interface evolution, concurrency, or lifecycle",
+      "id": "languages/go/factory-delegation",
+      "path": "specification/languages/go/factory-delegation.md",
+      "required": false,
+      "requires": [
+        "languages/go/functional-options"
+      ],
+      "sha256": "ca9480ebbf25f184ce2a6a80106ca3dfa65ca2e13c610f46036d6d8b0b5f7e84",
+      "version": "0.1.1"
     }
   ]
 }
