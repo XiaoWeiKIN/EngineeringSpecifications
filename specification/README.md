@@ -20,16 +20,18 @@ Current documents without an explicit status are Development. See the
 expectations. Development requirements remain normative within a pinned
 version; the status permits a later version to change incompatibly.
 
-`core/semantic-naming`, `core/data-boundaries`, and `languages/go` publish
-stable Requirement IDs.
+`core/semantic-naming`, `core/data-boundaries`, `languages/go`,
+`languages/go/functional-options`, and `languages/go/factory-delegation`
+publish stable Requirement IDs.
 
 ## Authoring
 
 Start new normative documents from the
 [Formal Specification Template](0000-template.md). The template is optimized
 for Harness Engineering: it connects task applicability, stable Requirement
-IDs, enforcement classes, verification mechanisms, implementation evidence,
-and an Agent handoff.
+IDs, bounded activation cards, exact context dependencies, enforcement
+classes, verification mechanisms, implementation evidence, and an Agent
+handoff.
 
 The template is an authoring resource, not a published specification. A
 document becomes published only after it has its own path and stable Catalog
@@ -39,7 +41,10 @@ detection evidence, and digest.
 Selection and task activation are separate. Required means the Specification
 is installed and locally available. `applies_to` produces file candidates; the
 Catalog description and the document's Applicability section determine whether
-the full text enters a task's context.
+the Specification applies. Requirement activation summaries then select exact
+IDs, code resolves their declared dependency closure, and the consumer compiles
+an exact bounded context capsule. Whole-Spec reading is an explicit fallback
+for legacy, migration, or repository-wide audit work.
 
 ## Core
 
@@ -49,6 +54,8 @@ the full text enters a task's context.
 ## Languages
 
 - [Go implementation](languages/go.md)
+- [Go functional options](languages/go/functional-options.md)
+- [Go capability factory delegation](languages/go/factory-delegation.md)
 
 The Markdown files are the normative sources. `catalog.json` supplies stable
 IDs, versions, dependencies, scopes, detection evidence, and content digests

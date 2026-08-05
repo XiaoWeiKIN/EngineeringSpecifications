@@ -22,13 +22,16 @@ Wording and document paths may evolve without changing an ID's meaning. A
 semantic change creates a new requirement ID or follows an explicitly
 documented compatibility transition.
 
-`core/semantic-naming`, `core/data-boundaries`, and `languages/go` publish
-Requirement IDs. No implementation matrix should claim coverage for a
+`core/semantic-naming`, `core/data-boundaries`, `languages/go`,
+`languages/go/functional-options`, and `languages/go/factory-delegation`
+publish Requirement IDs. No implementation matrix should claim coverage for a
 requirement that lacks a published stable ID.
 
 New documents use the
 [Formal Specification Template](../specification/0000-template.md) to connect
-each load-bearing Requirement ID to enforcement and expected evidence.
+each load-bearing Requirement ID to bounded activation metadata, exact context
+dependencies, enforcement, and expected evidence. Routing metadata identifies
+what enters a task context; it does not weaken or replace normative wording.
 
 ## Evidence carries more weight than a status symbol
 

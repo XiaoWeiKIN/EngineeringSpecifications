@@ -40,6 +40,8 @@ flowchart TB
     Naming["core/semantic-naming"]
     Boundary["core/data-boundaries"]
     Go["languages/go"]
+    GoOptions["languages/go/functional-options"]
+    GoFactory["languages/go/factory-delegation"]
     Java["languages/java"]
     HTTP["protocols/http-api"]
     Gin["frameworks/go/gin"]
@@ -54,6 +56,8 @@ flowchart TB
     Naming --> Boundary
     Naming --> Go
     Boundary --> Go
+    Go --> GoOptions
+    GoOptions --> GoFactory
     Naming --> Java
     Boundary --> Java
     Naming --> Schema
@@ -113,8 +117,11 @@ flowchart LR
     Lock --> Local["Materialize local copies"]
     Local --> Scope["File candidates<br/>applies_to"]
     Project["Project-owned specifications"] --> Scope
-    Scope --> Activate["Task activation<br/>description + Applicability"]
-    Activate --> Codex["Codex task context"]
+    Scope --> Activate["Spec activation<br/>description + Applicability"]
+    Activate --> Cards["Requirement cards"]
+    Cards --> Requirements["Direct IDs + dependency closure"]
+    Requirements --> Capsule["Exact bounded context capsule"]
+    Capsule --> Codex["Agent task context"]
 ```
 
 Selection separates one mandatory source from one project-owned source:
@@ -140,9 +147,18 @@ proof. An explicit branch ref remains useful for development testing but is not
 a released contract.
 
 At task time, `applies_to` scopes produce a conservative file candidate set.
-The Catalog description provides a compact activation summary for the local
-index. Codex reads a candidate's full text only when the task also matches its
-Applicability section.
+The Catalog description provides a compact Spec activation summary for the
+local index. A candidate becomes applicable only when task intent also matches
+its Applicability section. The Router then exposes bounded Requirement cards,
+records the smallest complete direct ID set with task-specific reasons, and
+resolves the exact Requirement dependency closure in code.
+
+The consumer compiles a digest-verified context capsule from each represented
+Spec's interpretation frame, the exact selected Requirement blocks, and their
+matching Verification rows. It does not summarize or truncate normative text.
+Explicit supporting sections may be added when the task needs them. Legacy
+documents without valid Requirement routing metadata, migrations, and
+repository-wide audits use a recorded whole-Spec fallback.
 
 For example, Go repository evidence recommends the Go Specification; the
 project explicitly adopts it. A Go source change then makes it a task
@@ -164,44 +180,56 @@ The following examples use future IDs to demonstrate composition:
 | Java Netty service writing ClickHouse | Core + Java + Netty + schema design + ClickHouse + testing candidates |
 | Python library without persistence | Core + Python + testing candidates; no database specification |
 
-The resolver installs the dependency closure once. The task router filters by
-file scope and then task activation. This two-stage route keeps broad Core
-contracts locally available without injecting every Core document into every
-task.
+The resolver installs the Spec dependency closure once. The task router then
+filters by file scope, decides Spec applicability, and selects exact
+Requirements. This progressive route keeps broad Core contracts locally
+available without injecting every Core document or every Requirement into
+every task.
 
 ## One Router Skill adapts the model to Codex
 
 [ESP-0010](../proposals/0010_task-activation-router.md) defines the Codex
-consumer adapter without changing the Agent-neutral Catalog. RepoFoundry
-generates one repository Skill named `$engineering-specs`; it does not turn
-each Specification into a Skill.
+consumer adapter without changing the Agent-neutral Catalog. The approved
+[Requirement-level context proposal](../proposals/0000_requirement-level-context-activation.md)
+narrows that same Router from applicable Specs to exact Requirement capsules.
+RepoFoundry generates one repository Skill named `$engineering-specs`; it does
+not turn each Specification or Requirement into a Skill.
 
 ```mermaid
 flowchart LR
     Prompt["Task prompt"] --> Route["$engineering-specs"]
-    Index["Locked index<br/>scope + purpose"] --> Route
+    Index["Locked indexes<br/>Spec + Requirement cards"] --> Route
     Project["Project-owned Specs"] --> Route
-    Route --> Decision["Turn decision<br/>IDs or explicit none"]
+    Route --> Decision["Turn decision<br/>Specs + direct Requirement IDs"]
     Decision --> Gate["Trusted Hook gate"]
-    Local["Digest-verified local Markdown"] --> Gate
-    Gate --> Context["Task-specific developer context"]
+    Local["Digest-verified local Markdown"] --> Compiler["Exact context compiler"]
+    Decision --> Compiler
+    Compiler --> Gate
+    Gate --> Context["Bounded task context capsule"]
     Context --> Work["Implementation or review"]
     Work --> Audit["Changed paths + evidence handoff"]
 ```
 
-The adapter preserves the three stages:
+The adapter preserves five stages:
 
 1. project selection determines what is locally available;
 2. `applies_to` determines conservative candidates for planned files;
 3. the Router reads candidate descriptions and Applicability sections, then
-   records the task-intent activation decision.
+   records applicable Spec IDs;
+4. bounded cards select direct Requirement IDs and code resolves their exact
+   dependency closure;
+5. the compiler emits one digest-verified capsule and a protocol-v2 receipt
+   records direct/resolved IDs, sources, context epoch, digest, bytes, budget,
+   and mode.
 
 The root `AGENTS.md` routes implementation and review through the Skill. In a
 trusted Codex project, lifecycle Hooks add the route to prompt and subagent
-context, deny writes without a current decision, inject activated local
-content before the first write, and audit changed-path coverage plus the Agent
-handoff. An explicit no-Spec decision remains valid when it names the planned
-paths and explains why no installed contract governs the task.
+context, deny writes without a current decision, inject the exact local capsule
+before the first write, and audit changed-path coverage plus the Agent handoff.
+Compaction resume, fork, and subagent epochs must rehydrate the same verified
+capsule before mutation. An explicit no-Spec decision remains valid when it
+names the planned paths and explains why no installed contract governs the
+task.
 
 This is a consumer guarantee with a precise boundary. Project Hooks load only
 for trusted projects and non-managed commands require Hook review. Other
@@ -244,10 +272,12 @@ Before adding a specification:
 4. Define deterministic `applies_to` scopes.
 5. Write the Catalog description as a compact `Load when ...` activation
    summary and make the Applicability section decisive.
-6. Add detection only when filenames or extensions provide reliable
+6. Give every Requirement a bounded `Activation` paragraph and exact,
+   acyclic `Context dependencies`; keep each complete block within 8 KiB.
+7. Add detection only when filenames or extensions provide reliable
    recommendation evidence; every optional Specification still requires
    explicit project selection.
-7. Keep project names, private paths, internal frameworks, and domain-only
+8. Keep project names, private paths, internal frameworks, and domain-only
    terminology in the consuming project.
 
 Read the [Governance Model](../governance/README.md) to determine whether the
@@ -261,7 +291,11 @@ The current release publishes:
 
 - `core/semantic-naming`, required for implementation repositories;
 - `core/data-boundaries`, required for implementation repositories;
-- `languages/go`.
+- `languages/go`;
+- `languages/go/functional-options`, explicitly selected for functional-option
+  API work and dependent on `languages/go`;
+- `languages/go/factory-delegation`, explicitly selected for optional
+  capability factories and dependent on `languages/go/functional-options`.
 
 See the [Specification Index](../specification/README.md) for the current
 normative documents and [catalog.json](../catalog.json) for the machine-readable

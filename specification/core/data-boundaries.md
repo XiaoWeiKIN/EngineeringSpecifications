@@ -81,6 +81,10 @@ When this Specification is activated, the implementing or reviewing agent:
 
 ### DATA-SHAPE-001 — Decoding produces an untrusted shape
 
+**Activation:** Load when decoding external bytes, tokens, rows, fields, configuration, or tool results.
+
+**Context dependencies:** None
+
 Boundary code **MUST** decode external bytes, tokens, rows, fields, or tool
 results into an explicitly untrusted transport or source shape. Decoding
 success **MUST NOT** be treated as proof of domain validity.
@@ -101,6 +105,10 @@ decoding does not invoke core logic directly.
 unknown, and structurally valid but semantically invalid inputs.
 
 ### DATA-PARSE-001 — Parsing returns a domain-safe value
+
+**Activation:** Load when converting an untrusted boundary shape into a domain value or validating a type with no safe zero value.
+
+**Context dependencies:** `DATA-SHAPE-001`
 
 Boundary code **MUST** parse or explicitly convert an untrusted shape into a
 domain-safe value before core logic consumes it. Successful parsing **MUST**
@@ -123,6 +131,10 @@ success value used by core logic.
 
 ### DATA-EFFECT-001 — Rejected input cannot trigger effects
 
+**Activation:** Load when invalid or partially parsed input could reach writes, messages, commands, or other effects.
+
+**Context dependencies:** `DATA-PARSE-001`
+
 Core logic and boundary effects **MUST NOT** run until every required boundary
 parse succeeds. Partial parsing **MUST NOT** leave an externally observable
 mutation unless the protocol defines a reviewed transactional or compensating
@@ -140,6 +152,10 @@ untouched.
 the protocol's documented compensation behavior.
 
 ### DATA-ERROR-001 — Boundary errors are actionable and secret-safe
+
+**Activation:** Load when defining, translating, logging, or returning errors for rejected external input.
+
+**Context dependencies:** `DATA-PARSE-001`
 
 A rejected input **MUST** produce an error that identifies the affected field,
 path, or contract and the violated expectation. The error **MUST NOT** expose
@@ -162,6 +178,10 @@ translation ownership.
 invalid, and secret-bearing inputs.
 
 ### DATA-NORMALIZE-001 — Protocol-owned values preserve their contract
+
+**Activation:** Load when trimming, case-folding, normalizing, decoding, reordering, or canonicalizing protocol-owned values.
+
+**Context dependencies:** `SEM-VERB-001`
 
 Boundary code **MUST NOT** trim, case-fold, Unicode-normalize, reorder, decode,
 or otherwise transform credentials, signatures, tokens, password material, or
@@ -254,6 +274,10 @@ Exceptions: none | <upstream contract and remaining local checks>
 ```
 
 ## Compatibility and migration
+
+Version `0.1.1` adds non-normative Requirement activation summaries and exact
+context-dependency metadata. It does not change the behavioral meaning of any
+`DATA-*` Requirement ID.
 
 Version `0.1.0` extracts the cross-language behavior previously published as
 `SEM-BOUNDARY-001` in `core/semantic-naming` version `0.2.0`. Consumers should

@@ -38,7 +38,17 @@ ENFORCEMENT_RE = re.compile(
 VERIFICATION_ROW_RE = re.compile(
     r"^\| `([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+-[0-9]{3})` \| \S.*\|$"
 )
+REQUIREMENT_ID_TOKEN_RE = re.compile(
+    r"`([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+-[0-9]{3})`"
+)
+REQUIREMENT_WILDCARD_TOKEN_RE = re.compile(
+    r"`([A-Z][A-Z0-9]*(?:-[A-Z0-9*]+)+)`"
+)
 MAX_ACTIVATION_SUMMARY_LENGTH = 180
+MAX_REQUIREMENT_ACTIVATION_LENGTH = 180
+MAX_REQUIREMENT_BLOCK_BYTES = 8 * 1024
+REQUIREMENT_ACTIVATION_PREFIX = "**Activation:** "
+REQUIREMENT_DEPENDENCIES_PREFIX = "**Context dependencies:** "
 
 
 def expect_object(value: object, label: str) -> dict[str, object]:
@@ -323,14 +333,128 @@ def expected_selection(spec: dict[str, object]) -> str:
     return "Explicit"
 
 
+def parse_requirement_metadata(
+    block_lines: list[str],
+    relative: str,
+    requirement_id: str,
+) -> tuple[str, tuple[str, ...], int]:
+    """Parse the two ordered routing paragraphs after a Requirement heading."""
+    label = f"{relative}: {requirement_id}"
+    if len(block_lines) < 6 or block_lines[1] != "":
+        raise ValueError(
+            f"{label} requires Activation metadata immediately after "
+            "the heading"
+        )
+
+    cursor = 2
+    if not block_lines[cursor].startswith(REQUIREMENT_ACTIVATION_PREFIX):
+        raise ValueError(
+            f"{label} requires exactly one Activation metadata marker "
+            "immediately after the heading"
+        )
+    activation_parts = [
+        block_lines[cursor][len(REQUIREMENT_ACTIVATION_PREFIX) :].strip()
+    ]
+    cursor += 1
+    while cursor < len(block_lines) and block_lines[cursor] != "":
+        activation_parts.append(block_lines[cursor].strip())
+        cursor += 1
+    activation = " ".join(part for part in activation_parts if part)
+    if not activation.startswith("Load when "):
+        raise ValueError(
+            f"{label} Activation must start with 'Load when '"
+        )
+    if len(activation) > MAX_REQUIREMENT_ACTIVATION_LENGTH:
+        raise ValueError(
+            f"{label} Activation exceeds "
+            f"{MAX_REQUIREMENT_ACTIVATION_LENGTH} Unicode code points"
+        )
+    if cursor >= len(block_lines) or block_lines[cursor] != "":
+        raise ValueError(f"{label} Activation must be one Markdown paragraph")
+
+    cursor += 1
+    if (
+        cursor >= len(block_lines)
+        or not block_lines[cursor].startswith(
+            REQUIREMENT_DEPENDENCIES_PREFIX
+        )
+    ):
+        raise ValueError(
+            f"{label} requires exactly one Context dependencies metadata "
+            "marker after Activation"
+        )
+    dependency_parts = [
+        block_lines[cursor][len(REQUIREMENT_DEPENDENCIES_PREFIX) :].strip()
+    ]
+    cursor += 1
+    while cursor < len(block_lines) and block_lines[cursor] != "":
+        dependency_parts.append(block_lines[cursor].strip())
+        cursor += 1
+    dependency_text = " ".join(
+        part for part in dependency_parts if part
+    )
+    if dependency_text == "None":
+        dependencies: tuple[str, ...] = ()
+    else:
+        values = [item.strip() for item in dependency_text.split(",")]
+        dependencies = tuple(
+            match.group(1)
+            for item in values
+            if (match := REQUIREMENT_ID_TOKEN_RE.fullmatch(item)) is not None
+        )
+        if len(dependencies) != len(values) or not values:
+            raise ValueError(
+                f"{label} Context dependencies must be None or a "
+                "comma-separated list of exact backticked Requirement IDs"
+            )
+        if len(dependencies) != len(set(dependencies)):
+            raise ValueError(
+                f"{label} Context dependencies contain duplicate IDs"
+            )
+
+    block = "\n".join(block_lines)
+    if block.count(REQUIREMENT_ACTIVATION_PREFIX) != 1:
+        raise ValueError(
+            f"{label} requires exactly one Activation metadata marker"
+        )
+    if block.count(REQUIREMENT_DEPENDENCIES_PREFIX) != 1:
+        raise ValueError(
+            f"{label} requires exactly one Context dependencies metadata "
+            "marker"
+        )
+    return activation, dependencies, cursor
+
+
+def transitive_spec_dependencies(
+    spec_id: str,
+    dependencies: dict[str, tuple[str, ...]],
+) -> set[str]:
+    closure: set[str] = set()
+    pending = list(dependencies.get(spec_id, ()))
+    while pending:
+        dependency = pending.pop()
+        if dependency in closure:
+            continue
+        closure.add(dependency)
+        pending.extend(dependencies.get(dependency, ()))
+    return closure
+
+
 def check_requirement_ids(
     root: Path,
     catalog: dict[str, object],
 ) -> tuple[str, ...]:
     seen: dict[str, str] = {}
+    owners: dict[str, str] = {}
+    context_edges: dict[str, tuple[str, ...]] = {}
+    referenced_ids: dict[str, set[str]] = {}
+    spec_dependencies: dict[str, tuple[str, ...]] = {}
     for raw_spec in catalog["specs"]:
         spec = expect_object(raw_spec, "catalog.spec")
         spec_id = expect_string(spec["id"], "catalog.spec.id")
+        spec_dependencies[spec_id] = tuple(
+            str(value) for value in spec.get("requires", [])
+        )
         relative = safe_relative(spec["path"], f"{spec_id}.path")
         path = root / relative
         content = path.read_text(encoding="utf-8")
@@ -411,6 +535,44 @@ def check_requirement_ids(
                 else len(requirement_lines)
             )
             block = "\n".join(requirement_lines[start:end])
+            block_bytes = len(block.encode("utf-8"))
+            if block_bytes > MAX_REQUIREMENT_BLOCK_BYTES:
+                raise ValueError(
+                    f"{relative}: {requirement_id} block is {block_bytes} "
+                    f"bytes; maximum is {MAX_REQUIREMENT_BLOCK_BYTES}"
+                )
+            block_lines = requirement_lines[start:end]
+            _, dependencies, metadata_end = parse_requirement_metadata(
+                block_lines,
+                relative,
+                requirement_id,
+            )
+            if requirement_id in dependencies:
+                raise ValueError(
+                    f"{relative}: {requirement_id} cannot depend on itself"
+                )
+            body = "\n".join(block_lines[metadata_end:])
+            wildcard_tokens = sorted(
+                {
+                    token
+                    for token in REQUIREMENT_WILDCARD_TOKEN_RE.findall(body)
+                    if "*" in token
+                }
+            )
+            if wildcard_tokens:
+                raise ValueError(
+                    f"{relative}: {requirement_id} contains wildcard "
+                    "Requirement references: " + ", ".join(wildcard_tokens)
+                )
+            references = set(REQUIREMENT_ID_TOKEN_RE.findall(body))
+            references.discard(requirement_id)
+            missing_context = sorted(references - set(dependencies))
+            if missing_context:
+                raise ValueError(
+                    f"{relative}: {requirement_id} references IDs missing "
+                    "from Context dependencies: "
+                    + ", ".join(missing_context)
+                )
             markers = {
                 "Rationale": block.count("**Rationale (non-normative):**"),
                 "Evidence": block.count("**Evidence:**"),
@@ -434,6 +596,9 @@ def check_requirement_ids(
                     f"already declared in {previous}"
                 )
             seen[requirement_id] = relative
+            owners[requirement_id] = spec_id
+            context_edges[requirement_id] = dependencies
+            referenced_ids[requirement_id] = references
             local_ids.append(requirement_id)
 
         verification_ids: list[str] = []
@@ -468,6 +633,55 @@ def check_requirement_ids(
                 f"{relative}: Verification coverage mismatch: "
                 + "; ".join(details)
             )
+
+    for requirement_id, dependencies in sorted(context_edges.items()):
+        unknown = sorted(set(dependencies) - set(owners))
+        if unknown:
+            raise ValueError(
+                f"{seen[requirement_id]}: {requirement_id} has unknown "
+                "Context dependencies: " + ", ".join(unknown)
+            )
+        source_spec = owners[requirement_id]
+        allowed_specs = {
+            source_spec,
+            *transitive_spec_dependencies(source_spec, spec_dependencies),
+        }
+        disallowed = sorted(
+            dependency
+            for dependency in dependencies
+            if owners[dependency] not in allowed_specs
+        )
+        if disallowed:
+            raise ValueError(
+                f"{seen[requirement_id]}: {requirement_id} has Context "
+                "dependencies outside its Catalog dependency closure: "
+                + ", ".join(disallowed)
+            )
+        unknown_references = sorted(referenced_ids[requirement_id] - set(owners))
+        if unknown_references:
+            raise ValueError(
+                f"{seen[requirement_id]}: {requirement_id} references "
+                "unknown Requirement IDs: " + ", ".join(unknown_references)
+            )
+
+    visiting: list[str] = []
+    visited: set[str] = set()
+
+    def visit(requirement_id: str) -> None:
+        if requirement_id in visiting:
+            cycle_start = visiting.index(requirement_id)
+            cycle = " -> ".join((*visiting[cycle_start:], requirement_id))
+            raise ValueError(f"Requirement context dependency cycle: {cycle}")
+        if requirement_id in visited:
+            return
+        visiting.append(requirement_id)
+        for dependency in context_edges[requirement_id]:
+            visit(dependency)
+        visiting.pop()
+        visited.add(requirement_id)
+
+    for requirement_id in sorted(context_edges):
+        visit(requirement_id)
     return tuple(sorted(seen))
 
 

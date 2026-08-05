@@ -35,6 +35,8 @@ flowchart TB
     Naming["core/semantic-naming"]
     Boundary["core/data-boundaries"]
     Go["languages/go"]
+    GoOptions["languages/go/functional-options"]
+    GoFactory["languages/go/factory-delegation"]
     Java["languages/java"]
     HTTP["protocols/http-api"]
     Gin["frameworks/go/gin"]
@@ -49,6 +51,8 @@ flowchart TB
     Naming --> Boundary
     Naming --> Go
     Boundary --> Go
+    Go --> GoOptions
+    GoOptions --> GoFactory
     Naming --> Java
     Boundary --> Java
     Naming --> Schema
@@ -105,8 +109,11 @@ flowchart LR
     Lock --> Local["物化本地副本"]
     Local --> Scope["文件候选集<br/>applies_to"]
     Project["项目自有规范"] --> Scope
-    Scope --> Activate["任务激活<br/>description + Applicability"]
-    Activate --> Codex["Codex 任务上下文"]
+    Scope --> Activate["Spec 激活<br/>description + Applicability"]
+    Activate --> Cards["Requirement 激活卡"]
+    Cards --> Requirements["直接 ID + 依赖闭包"]
+    Requirements --> Capsule["精确有界上下文胶囊"]
+    Capsule --> Codex["Agent 任务上下文"]
 ```
 
 规范选择区分一个强制来源和一个由项目持有的来源：
@@ -125,8 +132,14 @@ flowchart LR
 不可变内容证据彼此分离。显式分支 ref 仍可用于开发测试，但不代表正式发布契约。
 
 执行任务时，`applies_to` 先产生保守的文件候选集。Catalog `description` 为本地
-索引提供简短激活摘要；只有任务意图也符合 Applicability，Codex 才读取候选规范
-全文。
+索引提供简短的 Spec 激活摘要；只有任务意图也符合 Applicability，候选 Spec 才算
+适用。Router 随后暴露有界的 Requirement 激活卡，为最小且完整的直接 ID 集合记录
+任务原因，并由代码解析精确 Requirement 依赖闭包。
+
+消费端从每份相关 Spec 的解释框架、选中 Requirement 块和对应 Verification 行编译
+摘要已验证的上下文胶囊。规范性文字不做摘要或截断；任务需要时可以显式加入支持
+章节。缺少有效 Requirement 路由元数据的旧文档、迁移和仓库级审计使用有记录的
+whole-Spec 回退。
 
 例如，Go 仓库证据会推荐 Go 规范，由项目显式采用；随后修改 Go 文件才会让它成为
 任务候选。重命名公共 API 会激活 Semantic Naming；
@@ -145,38 +158,48 @@ flowchart LR
 | 写入 ClickHouse 的 Java Netty 服务 | Core + Java + Netty + Schema 设计 + ClickHouse + 测试候选集 |
 | 不使用持久化的 Python 库 | Core + Python + 测试候选集；没有数据库规范 |
 
-解析器只安装一次依赖闭包。任务路由器先按文件作用域过滤，再判断任务激活。这个
-两阶段路由让 Core 契约始终在本地可用，同时避免每个任务都注入全部 Core 文档。
+解析器只安装一次 Spec 依赖闭包。任务 Router 再按文件作用域过滤、判断 Spec
+适用性并选择精确 Requirement。这个渐进路由让 Core 契约始终在本地可用，同时避免
+每个任务都注入全部 Core 文档或全部 Requirement。
 
 ## 用一个 Router Skill 适配 Codex
 
 [ESP-0010](../proposals/0010_task-activation-router.md) 定义 Codex 消费端适配，
-但不改变 Agent 中立的 Catalog。RepoFoundry 在项目中生成一个名为
-`$engineering-specs` 的 Skill，不会把每份规范分别包装成 Skill。
+但不改变 Agent 中立的 Catalog。已批准的
+[Requirement 级上下文提案](../proposals/0000_requirement-level-context-activation.zh-CN.md)
+让同一个 Router 从适用 Spec 继续收敛到精确 Requirement 胶囊。RepoFoundry 在项目
+中生成一个名为 `$engineering-specs` 的 Skill，不会把每份规范或 Requirement
+分别包装成 Skill。
 
 ```mermaid
 flowchart LR
     Prompt["任务 Prompt"] --> Route["$engineering-specs"]
-    Index["已锁定索引<br/>作用域 + 用途"] --> Route
+    Index["已锁定索引<br/>Spec + Requirement 激活卡"] --> Route
     Project["项目自有规范"] --> Route
-    Route --> Decision["当前 Turn 决定<br/>规范 ID 或显式 none"]
+    Route --> Decision["当前 Turn 决定<br/>Spec + 直接 Requirement ID"]
     Decision --> Gate["可信 Hook 门禁"]
-    Local["摘要已验证的本地 Markdown"] --> Gate
-    Gate --> Context["任务专属 Developer Context"]
+    Local["摘要已验证的本地 Markdown"] --> Compiler["精确上下文编译器"]
+    Decision --> Compiler
+    Compiler --> Gate
+    Gate --> Context["有界任务上下文胶囊"]
     Context --> Work["实现或评审"]
     Work --> Audit["变更路径 + 证据交接"]
 ```
 
-这个适配层保留三个阶段：
+这个适配层保留五个阶段：
 
 1. 项目选择决定哪些规范在本地可用；
 2. `applies_to` 根据计划修改的文件产生保守候选集；
-3. Router 读取候选摘要与 Applicability，记录按任务意图得出的激活决定。
+3. Router 读取候选摘要与 Applicability，记录适用 Spec ID；
+4. 有界激活卡选择直接 Requirement ID，代码解析精确依赖闭包；
+5. 编译器输出一个摘要已验证的胶囊，protocol-v2 回执记录直接/解析 ID、来源、上下文
+   epoch、摘要、字节数、预算和模式。
 
 根 `AGENTS.md` 要求实现和评审先进入这个 Skill。在受信任的 Codex 项目中，
 生命周期 Hooks 会把路由要求加入 Prompt 与 Subagent Context，在没有当前激活决定
-时拒绝写入，在第一次写入前注入已激活的本地规范，并在结束时检查变更路径覆盖和
-Agent 交接。确实没有适用规范时可以显式选择 `none`，但必须列出计划路径并说明原因。
+时拒绝写入，在第一次写入前注入精确本地胶囊，并在结束时检查变更路径覆盖和 Agent
+交接。对话压缩恢复、fork 和 subagent epoch 在修改前必须重建同一个已验证胶囊。
+确实没有适用规范时可以显式选择 `none`，但必须列出计划路径并说明原因。
 
 这是有明确边界的消费端保证：项目 Hooks 只在受信任项目中加载，非托管命令 Hook
 还需要单独审查和信任。其他 Agent 可以用自己的运行时实现同一激活回执与证据契约；
@@ -212,9 +235,11 @@ flowchart LR
 3. 找出可复用的上游契约并写入 `requires`。
 4. 定义确定性的 `applies_to` 作用域。
 5. 把 Catalog `description` 写成简短的“何时加载”摘要，并让 Applicability 作最终判断。
-6. 只有文件名或扩展名能够提供可靠推荐证据时才增加 detection；所有可选规范仍由
+6. 为每个 Requirement 编写有界的 `Activation` 段落与精确、无环的
+   `Context dependencies`，完整块不得超过 8 KiB。
+7. 只有文件名或扩展名能够提供可靠推荐证据时才增加 detection；所有可选规范仍由
    项目显式选择。
-7. 项目名称、私有路径、内部框架和领域专属术语留在消费项目。
+8. 项目名称、私有路径、内部框架和领域专属术语留在消费项目。
 
 先通过[治理模型](../governance/README.md)判断变更是否需要 Engineering
 Specification Proposal，以及它承载什么成熟度承诺。版本、摘要、Changelog
@@ -226,7 +251,11 @@ Specification Proposal，以及它承载什么成熟度承诺。版本、摘要�
 
 - `core/semantic-naming`，实现型仓库必选；
 - `core/data-boundaries`，实现型仓库必选；
-- `languages/go`。
+- `languages/go`；
+- `languages/go/functional-options`，面向函数式选项 API 工作显式选择，并依赖
+  `languages/go`；
+- `languages/go/factory-delegation`，面向可选能力工厂显式选择，并依赖
+  `languages/go/functional-options`。
 
 当前规范正文见[规范索引](../specification/README.md)，机器事实源见
 [catalog.json](../catalog.json)。

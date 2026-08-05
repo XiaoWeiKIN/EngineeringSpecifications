@@ -50,8 +50,9 @@ before every enforcement mechanism:
 - Published documents carry explicit Development maturity markers. Their
   pinned requirements are normative while future Development revisions may
   change incompatibly.
-- Requirement metadata, enforcement class, and Verification coverage are
-  mechanically checked before publication.
+- Requirement activation metadata, exact context dependencies, dependency
+  acyclicity and scope, block byte budgets, enforcement class, and
+  Verification coverage are mechanically checked before publication.
 - Compliance data remains empty until specifications publish stable requirement
   IDs and implementation repositories provide reviewable evidence.
 - A future machine-readable Catalog maturity field or dependency-package
