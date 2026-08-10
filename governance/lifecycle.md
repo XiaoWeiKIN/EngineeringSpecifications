@@ -2,6 +2,9 @@
 
 Maturity communicates the compatibility promise of a specification document.
 Version numbers identify revisions. The two dimensions evolve independently.
+Requirement-level Automated enforcement is a third independent dimension: it
+limits machine action and follows the
+[Automated Enforcement Lifecycle](enforcement-lifecycle.md).
 
 ## Development allows learning
 
@@ -12,7 +15,8 @@ and review every update.
 BCP 14 requirements remain normative within the pinned Development version.
 Development describes the compatibility promise of future revisions; it does
 not downgrade `MUST` to advice or prevent a repository from enforcing the
-current version mechanically.
+current version mechanically. Development also does not promote an automated
+finding beyond its published Advisory, Warning, or Blocking level.
 
 New documents start in Development. The `0.1.0` specifications created before
 this lifecycle was documented are also treated as Development.

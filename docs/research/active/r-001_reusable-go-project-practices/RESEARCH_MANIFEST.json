@@ -2,6 +2,13 @@
   "documents": [
     {
       "base": "package",
+      "bytes": 1366,
+      "path": "notes/README.md",
+      "role": "entrypoint",
+      "sha256": "97ebdf8071faf14afafed95c023bc496a901e1ef814393097336c16b4f5fd8c1"
+    },
+    {
+      "base": "package",
       "bytes": 16599,
       "path": "notes/cross-project-go-naming.md",
       "role": "topic",
@@ -15,6 +22,14 @@
       "role": "topic",
       "sha256": "60332836e0c151474bd9c5f407cd7e875bbd3501cfa31768a82a6435ae7d37cf",
       "topic_id": "RT-003"
+    },
+    {
+      "base": "package",
+      "bytes": 13868,
+      "path": "notes/go-performance-optimization.md",
+      "role": "topic",
+      "sha256": "2831c15d979f69918fd5a5791ce48a0d650ec649ffd13863b14960eef64b843d",
+      "topic_id": "RT-005"
     },
     {
       "base": "package",
@@ -41,13 +56,32 @@
     },
     {
       "base": "package",
+      "bytes": 2253,
+      "path": "rounds/rr-002_go-performance-optimization.md",
+      "role": "round",
+      "sha256": "fcfe184f4f0e3d4d89bdf84490cde816231baef204eaffd943b3b20fdb3c0284"
+    },
+    {
+      "base": "package",
       "bytes": 6098,
       "path": "snapshots/synthesis-v001.md",
       "role": "snapshot",
       "sha256": "b5730f22bb00a3cd72c9f9974a74ca762dd37c82b2c125cbd37b9f1594c9234f"
+    },
+    {
+      "base": "package",
+      "bytes": 9019,
+      "path": "snapshots/synthesis-v002.md",
+      "role": "snapshot",
+      "sha256": "7b17a3fce230aebb6381200399d182245791ba54d39264590404d827acfae47d"
     }
   ],
-  "entrypoints": [],
+  "entrypoints": [
+    {
+      "base": "package",
+      "path": "notes/README.md"
+    }
+  ],
   "mode": "managed",
   "payload_sha256": "",
   "research_id": "R-001",

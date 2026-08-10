@@ -1,18 +1,20 @@
 # Specification Governance
 
-EngineeringSpecifications adapts six governance mechanisms proven useful in
+EngineeringSpecifications adapts seven governance mechanisms proven useful in
 the OpenTelemetry specification repository. Each mechanism answers a different
 question: what a requirement means, how a significant change is proposed, how
-stable a document is, how releases are identified, how implementations report
-conformance, and which checks protect the repository.
+stable a document is, what automated findings may do, how releases are
+identified, how implementations report conformance, and which checks protect
+the repository.
 
-## Six independent contracts keep governance clear
+## Seven independent contracts keep governance clear
 
 | Contract | Question answered | Repository mechanism |
 | --- | --- | --- |
 | Normative language | How strong is this requirement? | BCP 14 keywords in `specification/README.md` |
 | Proposal process | Why should a significant change exist? | Non-normative Engineering Specification Proposals under `proposals/` |
 | Maturity | What compatibility promise does this document carry? | `Development`, `Stable`, and `Deprecated` lifecycle |
+| Automated enforcement | What may a machine finding do now? | Requirement-level `Advisory`, `Warning`, and `Blocking` lifecycle |
 | Versioning | Which released contract did a project consume? | Catalog and per-Spec SemVer, immutable `vX.Y.Z` Catalog tag, resolved Git commit, and SHA-256 |
 | Compliance | Which implementation satisfies which requirement? | Stable requirement IDs and evidence-backed matrices |
 | Quality gates | Can the repository prove structural integrity? | One canonical `scripts/check.py` entrypoint |
@@ -26,13 +28,15 @@ conforms to every requirement.
 flowchart LR
     Problem["Accepted engineering problem"] --> Proposal["ESP<br/>non-normative intent"]
     Proposal -->|"approved"| Integration["Specification change"]
-    Integration --> Release["Catalog release<br/>SemVer + Git + SHA-256"]
+    Integration --> Enforcement["Automated enforcement<br/>Advisory by default"]
+    Enforcement --> Release["Catalog release<br/>SemVer + Git + SHA-256"]
     Release --> Consumer["Locked project copy"]
     Consumer --> Evidence["Implementation evidence"]
     Evidence --> Matrix["Compliance matrix"]
 
     Language["BCP 14 requirement strength"] --> Integration
     Maturity["Document maturity"] --> Integration
+    Observation["Promotion evidence"] --> Enforcement
     Quality["Canonical quality gates"] --> Proposal
     Quality --> Integration
     Quality --> Release
@@ -51,8 +55,12 @@ before every enforcement mechanism:
   pinned requirements are normative while future Development revisions may
   change incompatibly.
 - Requirement activation metadata, exact context dependencies, dependency
-  acyclicity and scope, block byte budgets, enforcement class, and
-  Verification coverage are mechanically checked before publication.
+  acyclicity and scope, block byte budgets, enforcement class, automated
+  enforcement level, and Verification coverage are mechanically checked before
+  publication.
+- Existing Requirements begin at Advisory. Warning and Blocking promotions
+  require versioned observation evidence and remain independent from BCP 14
+  strength and document maturity.
 - Compliance data remains empty until specifications publish stable requirement
   IDs and implementation repositories provide reviewable evidence.
 - A future machine-readable Catalog maturity field or dependency-package
@@ -69,6 +77,10 @@ and verifiable.
 
 [Specification Lifecycle](lifecycle.md) defines compatibility expectations for
 Development, Stable, and Deprecated documents.
+
+[Automated Enforcement Lifecycle](enforcement-lifecycle.md) defines Advisory,
+Warning, and Blocking machine action, promotion evidence, temporary overrides,
+and Requirement-level observations.
 
 [Engineering Specification Proposals](../proposals/README.md) define how
 significant changes move from intent to normative integration.

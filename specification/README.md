@@ -20,9 +20,16 @@ Current documents without an explicit status are Development. See the
 expectations. Development requirements remain normative within a pinned
 version; the status permits a later version to change incompatibly.
 
+Every formal Requirement also declares `Automated enforcement: Advisory`,
+`Warning`, or `Blocking`. This level controls machine action and remains
+independent from BCP 14 strength, maturity, and the mechanical, review, or
+hybrid enforcement class. New Requirements start at Advisory. See the
+[Automated Enforcement Lifecycle](../governance/enforcement-lifecycle.md) for
+promotion evidence, override, and observation contracts.
+
 `core/semantic-naming`, `core/data-boundaries`, `languages/go`,
-`languages/go/functional-options`, and `languages/go/factory-delegation`
-publish stable Requirement IDs.
+`languages/go/performance`, `languages/go/functional-options`, and
+`languages/go/factory-delegation` publish stable Requirement IDs.
 
 ## Authoring
 
@@ -30,8 +37,8 @@ Start new normative documents from the
 [Formal Specification Template](0000-template.md). The template is optimized
 for Harness Engineering: it connects task applicability, stable Requirement
 IDs, bounded activation cards, exact context dependencies, enforcement
-classes, verification mechanisms, implementation evidence, and an Agent
-handoff.
+classes, automated enforcement levels, verification mechanisms,
+implementation evidence, and an Agent handoff.
 
 The template is an authoring resource, not a published specification. A
 document becomes published only after it has its own path and stable Catalog
@@ -54,6 +61,7 @@ for legacy, migration, or repository-wide audit work.
 ## Languages
 
 - [Go implementation](languages/go.md)
+- [Go performance engineering](languages/go/performance.md)
 - [Go functional options](languages/go/functional-options.md)
 - [Go capability factory delegation](languages/go/factory-delegation.md)
 
@@ -67,4 +75,5 @@ language, framework, database, testing, and protocol specifications compose
 without turning planned categories into published contracts.
 
 The [Governance Model](../governance/README.md) defines the Proposal, maturity,
-versioning, compliance, and quality contracts used to evolve this index.
+automated enforcement, versioning, compliance, and quality contracts used to
+evolve this index.

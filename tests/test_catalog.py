@@ -39,6 +39,7 @@ def contract_document(
     selection: str = "Required",
     activation: str | None = "Load when testing the Requirement contract.",
     context_dependencies: str = "None",
+    automated_enforcement: str | None = "Advisory",
     requirement_text: str = (
         "The implementation **MUST** preserve the behavior."
     ),
@@ -47,6 +48,11 @@ def contract_document(
     activation_text = (
         f"**Activation:** {activation}\n\n"
         if activation is not None
+        else ""
+    )
+    automated_enforcement_text = (
+        f"**Automated enforcement:** {automated_enforcement}\n\n"
+        if automated_enforcement is not None
         else ""
     )
     return (
@@ -63,6 +69,7 @@ def contract_document(
         f"{heading}\n\n"
         f"{activation_text}"
         f"**Context dependencies:** {context_dependencies}\n\n"
+        f"{automated_enforcement_text}"
         f"{requirement_text}\n\n"
         "**Rationale (non-normative):** Prevent drift.\n\n"
         "**Enforcement (review):** Review the behavior.\n"
@@ -83,8 +90,8 @@ class CatalogTestCase(unittest.TestCase):
             catalog["catalog_id"],
             "io.github.xiaoweikin.engineering-specifications",
         )
-        self.assertEqual(catalog["catalog_version"], "1.5.0")
-        self.assertEqual(len(catalog["specs"]), 5)
+        self.assertEqual(catalog["catalog_version"], "1.6.0")
+        self.assertEqual(len(catalog["specs"]), 6)
         self.assertEqual(
             {item["id"] for item in catalog["specs"]},
             {
@@ -93,6 +100,7 @@ class CatalogTestCase(unittest.TestCase):
                 "languages/go",
                 "languages/go/factory-delegation",
                 "languages/go/functional-options",
+                "languages/go/performance",
             },
         )
         for item in catalog["specs"]:
@@ -114,12 +122,23 @@ class CatalogTestCase(unittest.TestCase):
             for item in catalog["specs"]
             if item["id"] == "languages/go/factory-delegation"
         )
+        performance_spec = next(
+            item
+            for item in catalog["specs"]
+            if item["id"] == "languages/go/performance"
+        )
         semantic_naming = next(
             item
             for item in catalog["specs"]
             if item["id"] == "core/semantic-naming"
         )
-        self.assertEqual(semantic_naming["version"], "1.1.1")
+        data_boundaries = next(
+            item
+            for item in catalog["specs"]
+            if item["id"] == "core/data-boundaries"
+        )
+        self.assertEqual(semantic_naming["version"], "1.2.0")
+        self.assertEqual(data_boundaries["version"], "0.2.0")
         self.assertIn("Normalize or Extract", semantic_naming["description"])
         semantic_naming_text = (
             ROOT / "specification/core/semantic-naming.md"
@@ -132,18 +151,38 @@ class CatalogTestCase(unittest.TestCase):
             "`Extract` **MUST NOT** be a catch-all name",
             semantic_naming_text,
         )
-        self.assertEqual(go_spec["version"], "0.4.1")
+        self.assertEqual(go_spec["version"], "0.5.0")
         self.assertIn("**/go.sum", go_spec["applies_to"])
         self.assertIn("**/vendor/modules.txt", go_spec["applies_to"])
-        self.assertEqual(functional_options_spec["version"], "0.1.1")
+        self.assertEqual(functional_options_spec["version"], "0.2.0")
         self.assertEqual(functional_options_spec["requires"], ["languages/go"])
         self.assertNotIn("detection", functional_options_spec)
-        self.assertEqual(factory_delegation_spec["version"], "0.1.1")
+        self.assertEqual(factory_delegation_spec["version"], "0.2.0")
         self.assertEqual(
             factory_delegation_spec["requires"],
             ["languages/go/functional-options"],
         )
         self.assertNotIn("detection", factory_delegation_spec)
+        self.assertEqual(performance_spec["version"], "0.1.0")
+        self.assertEqual(performance_spec["requires"], ["languages/go"])
+        self.assertIn("**/*.s", performance_spec["applies_to"])
+        self.assertNotIn("detection", performance_spec)
+        advisory_markers = 0
+        for item in catalog["specs"]:
+            source = (ROOT / item["path"]).read_text(encoding="utf-8")
+            requirement_count = sum(
+                1
+                for line in source.splitlines()
+                if CHECK.REQUIREMENT_HEADING_RE.fullmatch(line) is not None
+            )
+            marker_count = source.count(
+                "**Automated enforcement:** Advisory"
+            )
+            self.assertEqual(marker_count, requirement_count)
+            self.assertNotIn("**Automated enforcement:** Warning", source)
+            self.assertNotIn("**Automated enforcement:** Blocking", source)
+            advisory_markers += marker_count
+        self.assertEqual(advisory_markers, 37)
         self.assertEqual(
             CHECK.check_requirement_ids(ROOT, catalog),
             (
@@ -173,6 +212,11 @@ class CatalogTestCase(unittest.TestCase):
                 "GO-OPTION-TYPE-001",
                 "GO-OPTION-USE-001",
                 "GO-OPTION-VALIDATE-001",
+                "GO-PERF-CHANGE-001",
+                "GO-PERF-DIAGNOSE-001",
+                "GO-PERF-LOWLEVEL-001",
+                "GO-PERF-TARGET-001",
+                "GO-PERF-VERIFY-001",
                 "GO-TEST-001",
                 "SEM-COMPAT-001",
                 "SEM-NAME-001",
@@ -348,6 +392,174 @@ class CatalogTestCase(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Activation exceeds"):
                 CHECK.check_requirement_ids(root, catalog)
 
+    def test_requirement_contract_requires_automated_enforcement(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "specification/core/missing-enforcement-level.md"
+            path.parent.mkdir(parents=True)
+            path.write_text(
+                contract_document(
+                    "core/missing-enforcement-level",
+                    automated_enforcement=None,
+                ),
+                encoding="utf-8",
+            )
+            catalog = {
+                "specs": [
+                    catalog_spec(
+                        "core/missing-enforcement-level",
+                        "specification/core/missing-enforcement-level.md",
+                    )
+                ]
+            }
+            with self.assertRaisesRegex(
+                ValueError,
+                "requires.*Automated enforcement",
+            ):
+                CHECK.check_requirement_ids(root, catalog)
+
+    def test_requirement_contract_rejects_unknown_enforcement_level(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "specification/core/unknown-enforcement-level.md"
+            path.parent.mkdir(parents=True)
+            path.write_text(
+                contract_document(
+                    "core/unknown-enforcement-level",
+                    automated_enforcement="Enforced",
+                ),
+                encoding="utf-8",
+            )
+            catalog = {
+                "specs": [
+                    catalog_spec(
+                        "core/unknown-enforcement-level",
+                        "specification/core/unknown-enforcement-level.md",
+                    )
+                ]
+            }
+            with self.assertRaisesRegex(
+                ValueError,
+                "must be one of",
+            ):
+                CHECK.check_requirement_ids(root, catalog)
+
+    def test_requirement_contract_rejects_duplicate_enforcement_level(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "specification/core/duplicate-enforcement-level.md"
+            path.parent.mkdir(parents=True)
+            document = contract_document("core/duplicate-enforcement-level")
+            document = document.replace(
+                "**Evidence:** Reviewed artifact.\n",
+                "**Evidence:** Reviewed artifact.\n\n"
+                "**Automated enforcement:** Advisory\n",
+                1,
+            )
+            path.write_text(document, encoding="utf-8")
+            catalog = {
+                "specs": [
+                    catalog_spec(
+                        "core/duplicate-enforcement-level",
+                        "specification/core/duplicate-enforcement-level.md",
+                    )
+                ]
+            }
+            with self.assertRaisesRegex(
+                ValueError,
+                "exactly one Automated enforcement",
+            ):
+                CHECK.check_requirement_ids(root, catalog)
+
+    def test_blocking_requires_a_must_obligation(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "specification/core/ineligible-blocking.md"
+            path.parent.mkdir(parents=True)
+            path.write_text(
+                contract_document(
+                    "core/ineligible-blocking",
+                    automated_enforcement="Blocking",
+                    requirement_text=(
+                        "The implementation **SHOULD** preserve the behavior."
+                    ),
+                ),
+                encoding="utf-8",
+            )
+            catalog = {
+                "specs": [
+                    catalog_spec(
+                        "core/ineligible-blocking",
+                        "specification/core/ineligible-blocking.md",
+                    )
+                ]
+            }
+            with self.assertRaisesRegex(
+                ValueError,
+                "cannot use Blocking without",
+            ):
+                CHECK.check_requirement_ids(root, catalog)
+
+    def test_warning_requires_a_required_or_recommended_obligation(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "specification/core/ineligible-warning.md"
+            path.parent.mkdir(parents=True)
+            path.write_text(
+                contract_document(
+                    "core/ineligible-warning",
+                    automated_enforcement="Warning",
+                    requirement_text=(
+                        "The implementation **MAY** preserve the behavior."
+                    ),
+                ),
+                encoding="utf-8",
+            )
+            catalog = {
+                "specs": [
+                    catalog_spec(
+                        "core/ineligible-warning",
+                        "specification/core/ineligible-warning.md",
+                    )
+                ]
+            }
+            with self.assertRaisesRegex(
+                ValueError,
+                "cannot use Warning without",
+            ):
+                CHECK.check_requirement_ids(root, catalog)
+
+    def test_blocking_accepts_a_must_obligation(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = root / "specification/core/eligible-blocking.md"
+            path.parent.mkdir(parents=True)
+            path.write_text(
+                contract_document(
+                    "core/eligible-blocking",
+                    automated_enforcement="Blocking",
+                ),
+                encoding="utf-8",
+            )
+            catalog = {
+                "specs": [
+                    catalog_spec(
+                        "core/eligible-blocking",
+                        "specification/core/eligible-blocking.md",
+                    )
+                ]
+            }
+            self.assertEqual(
+                CHECK.check_requirement_ids(root, catalog),
+                ("TEST-RULE-001",),
+            )
+
     def test_requirement_contract_rejects_wildcard_reference(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -449,6 +661,7 @@ class CatalogTestCase(unittest.TestCase):
                 "### TEST-SECOND-001 — Second behavior\n\n"
                 "**Activation:** Load when testing the second behavior.\n\n"
                 "**Context dependencies:** `TEST-FIRST-001`\n\n"
+                "**Automated enforcement:** Advisory\n\n"
                 "The implementation **MUST** preserve the second behavior.\n\n"
                 "**Rationale (non-normative):** Prevent drift.\n\n"
                 "**Enforcement (review):** Review the behavior.\n\n"
@@ -524,6 +737,7 @@ class CatalogTestCase(unittest.TestCase):
             "### AREA-TOPIC-001",
             "**Activation:** Load when ",
             "**Context dependencies:** None",
+            "**Automated enforcement:** Advisory",
             "**Enforcement (mechanical | review | hybrid):**",
             "**Evidence:**",
             "## Approved patterns",

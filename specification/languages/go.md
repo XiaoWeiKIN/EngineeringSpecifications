@@ -78,6 +78,8 @@ When this Specification is activated, the implementing or reviewing agent:
 
 **Context dependencies:** None
 
+**Automated enforcement:** Advisory
+
 Hand-written Go source **MUST** be accepted by `gofmt`. Repositories **SHOULD**
 use a deterministic import organizer when they require import grouping beyond
 `gofmt`.
@@ -95,6 +97,8 @@ changed Go files.
 **Activation:** Load when changing Go modules, workspaces, checksums, replacements, dependencies, or committed vendor state.
 
 **Context dependencies:** None
+
+**Automated enforcement:** Advisory
 
 Every checked-in Go module **MUST** have `go.mod` and `go.sum` state that is
 canonical for the repository's declared Go toolchain. Dependency changes
@@ -123,6 +127,8 @@ toolchain, normalization command, and clean result.
 
 **Context dependencies:** None
 
+**Automated enforcement:** Advisory
+
 When a Go package or module commits generated artifacts, the repository
 **MUST** identify their authoritative inputs and a reproducible generation
 command. CI **MUST** regenerate those artifacts with the declared toolchain and
@@ -149,6 +155,8 @@ inputs, command, tool versions, generated paths, and clean result.
 
 **Context dependencies:** `SEM-NAME-001`
 
+**Automated enforcement:** Advisory
+
 Go identifiers **SHOULD** use `MixedCaps` or `mixedCaps` rather than underscores,
 except where generated code, tests, cgo, or an external contract requires
 another form. Initialisms **SHOULD** keep consistent case within an identifier:
@@ -173,6 +181,8 @@ context.
 **Activation:** Load when naming Go packages, exported APIs, constructors, accessors, interfaces, methods, or predicates.
 
 **Context dependencies:** `GO-NAME-001`, `SEM-NAME-001`
+
+**Automated enforcement:** Advisory
 
 Package names **SHOULD** be short, lowercase, and meaningful when combined with
 their exported identifiers. They **SHOULD NOT** repeat information already
@@ -212,6 +222,8 @@ failure, and predicate behavior.
 
 **Context dependencies:** `SEM-TYPE-001`
 
+**Automated enforcement:** Advisory
+
 Operations that can block, perform I/O, or be cancelled **MUST** accept
 `context.Context` as their first parameter unless a required interface fixes
 the signature. Request-scoped contexts **MUST NOT** be stored in long-lived
@@ -241,6 +253,8 @@ consumer contract.
 
 **Context dependencies:** `DATA-SHAPE-001`, `DATA-PARSE-001`,
 `DATA-EFFECT-001`, `DATA-ERROR-001`, `DATA-NORMALIZE-001`
+
+**Automated enforcement:** Advisory
 
 Decoded requests, configuration, environment variables, storage rows, and tool
 results **MUST** be treated as untrusted shapes. Boundary code **MUST** parse or
@@ -272,6 +286,8 @@ unknown, boundary, and cross-field-invalid inputs.
 
 **Context dependencies:** `DATA-ERROR-001`
 
+**Automated enforcement:** Advisory
+
 Expected failures **MUST** return errors rather than panic. An error
 **MUST** be wrapped with `%w` when callers need to inspect its cause, and typed
 or sentinel error behavior **MUST** remain stable across layers that promise
@@ -297,6 +313,8 @@ single emitted operational signal.
 **Activation:** Load when starting goroutines, acquiring resources, sharing mutable state, or defining shutdown and race coverage.
 
 **Context dependencies:** None
+
+**Automated enforcement:** Advisory
 
 Every started goroutine **MUST** have a bounded lifetime, cancellation or
 shutdown path, and defined error strategy. Acquired resources **MUST** be
@@ -327,6 +345,8 @@ the scope and reason for any omitted path.
 
 **Context dependencies:** `SEM-COMPAT-001`
 
+**Automated enforcement:** Advisory
+
 Exported identifiers, method sets, documented error identity, serialization
 tags, and external enum values **MUST** be treated as compatibility contracts
 once published.
@@ -349,6 +369,8 @@ versioned removal plan.
 **Activation:** Load when adding or reviewing Go tests, validation commands, failure coverage, or build and platform matrices.
 
 **Context dependencies:** None
+
+**Automated enforcement:** Advisory
 
 Go tests **MUST** cover the failure modes introduced or changed by an
 implementation. Table-driven tests **SHOULD** be used when multiple inputs
@@ -472,6 +494,13 @@ Compatibility or migration: none | <preserved API and removal condition>
 ```
 
 ## Compatibility and migration
+
+Version `0.5.0` adds the Requirement-level Automated enforcement contract and
+sets every existing `GO-*` Requirement to `Advisory`. It preserves normative
+behavior, IDs, activation, context dependencies, enforcement classes, and
+Verification rows. Automated Warning or Blocking requires separate promotion
+evidence under the
+[Automated Enforcement Lifecycle](../../governance/enforcement-lifecycle.md).
 
 Version `0.4.1` adds non-normative Requirement activation summaries and exact
 context-dependency metadata. It does not change the behavioral meaning of any

@@ -35,6 +35,10 @@ SELECTION_RE = re.compile(
 ENFORCEMENT_RE = re.compile(
     r"\*\*Enforcement \((mechanical|review|hybrid)\):\*\*"
 )
+BLOCKING_OBLIGATION_RE = re.compile(r"\*\*MUST(?: NOT)?\*\*")
+WARNING_OBLIGATION_RE = re.compile(
+    r"\*\*(?:MUST(?: NOT)?|SHOULD(?: NOT)?)\*\*"
+)
 VERIFICATION_ROW_RE = re.compile(
     r"^\| `([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+-[0-9]{3})` \| \S.*\|$"
 )
@@ -49,6 +53,8 @@ MAX_REQUIREMENT_ACTIVATION_LENGTH = 180
 MAX_REQUIREMENT_BLOCK_BYTES = 8 * 1024
 REQUIREMENT_ACTIVATION_PREFIX = "**Activation:** "
 REQUIREMENT_DEPENDENCIES_PREFIX = "**Context dependencies:** "
+REQUIREMENT_AUTOMATED_ENFORCEMENT_PREFIX = "**Automated enforcement:** "
+AUTOMATED_ENFORCEMENT_LEVELS = {"Advisory", "Warning", "Blocking"}
 
 
 def expect_object(value: object, label: str) -> dict[str, object]:
@@ -337,8 +343,8 @@ def parse_requirement_metadata(
     block_lines: list[str],
     relative: str,
     requirement_id: str,
-) -> tuple[str, tuple[str, ...], int]:
-    """Parse the two ordered routing paragraphs after a Requirement heading."""
+) -> tuple[str, tuple[str, ...], str, int]:
+    """Parse ordered routing and automated-enforcement metadata."""
     label = f"{relative}: {requirement_id}"
     if len(block_lines) < 6 or block_lines[1] != "":
         raise ValueError(
@@ -412,6 +418,42 @@ def parse_requirement_metadata(
                 f"{label} Context dependencies contain duplicate IDs"
             )
 
+    if cursor >= len(block_lines) or block_lines[cursor] != "":
+        raise ValueError(
+            f"{label} Context dependencies must be one Markdown paragraph"
+        )
+    cursor += 1
+    if (
+        cursor >= len(block_lines)
+        or not block_lines[cursor].startswith(
+            REQUIREMENT_AUTOMATED_ENFORCEMENT_PREFIX
+        )
+    ):
+        raise ValueError(
+            f"{label} requires exactly one Automated enforcement metadata "
+            "marker after Context dependencies"
+        )
+    automated_enforcement = block_lines[cursor][
+        len(REQUIREMENT_AUTOMATED_ENFORCEMENT_PREFIX) :
+    ].strip()
+    if automated_enforcement not in AUTOMATED_ENFORCEMENT_LEVELS:
+        allowed = ", ".join(sorted(AUTOMATED_ENFORCEMENT_LEVELS))
+        raise ValueError(
+            f"{label} Automated enforcement must be one of: {allowed}"
+        )
+    if block_lines[cursor] != (
+        REQUIREMENT_AUTOMATED_ENFORCEMENT_PREFIX + automated_enforcement
+    ):
+        raise ValueError(
+            f"{label} Automated enforcement must be one scalar line"
+        )
+    cursor += 1
+    if cursor >= len(block_lines) or block_lines[cursor] != "":
+        raise ValueError(
+            f"{label} Automated enforcement must be followed by one blank "
+            "line"
+        )
+
     block = "\n".join(block_lines)
     if block.count(REQUIREMENT_ACTIVATION_PREFIX) != 1:
         raise ValueError(
@@ -422,7 +464,12 @@ def parse_requirement_metadata(
             f"{label} requires exactly one Context dependencies metadata "
             "marker"
         )
-    return activation, dependencies, cursor
+    if block.count(REQUIREMENT_AUTOMATED_ENFORCEMENT_PREFIX) != 1:
+        raise ValueError(
+            f"{label} requires exactly one Automated enforcement metadata "
+            "marker"
+        )
+    return activation, dependencies, automated_enforcement, cursor
 
 
 def transitive_spec_dependencies(
@@ -542,7 +589,12 @@ def check_requirement_ids(
                     f"bytes; maximum is {MAX_REQUIREMENT_BLOCK_BYTES}"
                 )
             block_lines = requirement_lines[start:end]
-            _, dependencies, metadata_end = parse_requirement_metadata(
+            (
+                _,
+                dependencies,
+                automated_enforcement,
+                metadata_end,
+            ) = parse_requirement_metadata(
                 block_lines,
                 relative,
                 requirement_id,
@@ -552,6 +604,23 @@ def check_requirement_ids(
                     f"{relative}: {requirement_id} cannot depend on itself"
                 )
             body = "\n".join(block_lines[metadata_end:])
+            if (
+                automated_enforcement == "Blocking"
+                and BLOCKING_OBLIGATION_RE.search(body) is None
+            ):
+                raise ValueError(
+                    f"{relative}: {requirement_id} cannot use Blocking "
+                    "without a MUST or MUST NOT obligation"
+                )
+            if (
+                automated_enforcement == "Warning"
+                and WARNING_OBLIGATION_RE.search(body) is None
+            ):
+                raise ValueError(
+                    f"{relative}: {requirement_id} cannot use Warning "
+                    "without a MUST, MUST NOT, SHOULD, or SHOULD NOT "
+                    "obligation"
+                )
             wildcard_tokens = sorted(
                 {
                     token

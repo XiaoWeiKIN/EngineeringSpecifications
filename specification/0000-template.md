@@ -78,6 +78,8 @@ uppercase prefix followed by a topic and number, such as `DATA-PARSE-001` or
 
 **Context dependencies:** None
 
+**Automated enforcement:** Advisory
+
 [The implementation or agent] **MUST** [state one observable behavior].
 
 **Rationale (non-normative):** Explain why the requirement exists and which
@@ -98,15 +100,24 @@ Repeat this subsection only for requirements that need an independent stable
 ID. Use `SHOULD` for strong defaults with legitimate exceptions and `MAY` for
 optional behavior.
 
-Keep `Activation` and `Context dependencies` immediately after every
-Requirement heading. `Activation` is one non-normative routing paragraph that
-starts with `Load when ` and contains at most 180 Unicode code points.
-`Context dependencies` is either `None` or a comma-separated list of exact
-backticked Requirement IDs. It may reference this Specification or its
-transitive Catalog dependencies; never use prefixes or wildcards. Declare
-every Requirement ID referenced inside the block. Keep the complete
-Requirement block, including its routing metadata, rationale, enforcement, and
-evidence, within 8 KiB of UTF-8 source.
+Keep `Activation`, `Context dependencies`, and `Automated enforcement` in that
+order immediately after every Requirement heading. `Activation` is one
+non-normative routing paragraph that starts with `Load when ` and contains at
+most 180 Unicode code points. `Context dependencies` is either `None` or a
+comma-separated list of exact backticked Requirement IDs. It may reference this
+Specification or its transitive Catalog dependencies; never use prefixes or
+wildcards. Declare every Requirement ID referenced inside the block.
+
+New Requirements start with `Automated enforcement: Advisory`. Promotion to
+`Warning` or `Blocking` follows the
+[Automated Enforcement Lifecycle](../governance/enforcement-lifecycle.md),
+requires versioned observation evidence, and does not change BCP 14 strength or
+document maturity. Only a confirmed `MUST` or `MUST NOT` obligation can cause
+an automated block.
+
+Keep the complete Requirement block, including its routing metadata, automated
+enforcement level, rationale, enforcement class, and evidence, within 8 KiB of
+UTF-8 source.
 
 ## Approved patterns
 

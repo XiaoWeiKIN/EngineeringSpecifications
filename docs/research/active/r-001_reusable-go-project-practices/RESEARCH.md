@@ -8,11 +8,11 @@ research_type: comparative
 synthesis: SYNTHESIS.md
 manifest: RESEARCH_MANIFEST.json
 created: 2026-07-30
-updated: 2026-07-30
+updated: 2026-08-10
 owner: "Unassigned"
 author: "Codex"
-current_round: RR-001
-synthesis_revision: "1"
+current_round: RR-002
+synthesis_revision: "2"
 approved_by: ""
 approved_at: ""
 approval_ref: ""
@@ -31,20 +31,21 @@ permission to conclude or archive the Research.
 | Field | Value |
 |---|---|
 | Date | 2026-07-30 |
-| Last Updated | 2026-07-30 |
+| Last Updated | 2026-08-10 |
 | Research Type | Comparative |
 | Research Owner | Unassigned |
 | Author | Codex |
 | Lifecycle | active |
 | Maturity | review_ready |
-| Current Round | RR-001 |
-| Synthesis Revision | v1 |
+| Current Round | RR-002 |
+| Synthesis Revision | v2 |
 | Approval | Pending |
 
 ## Purpose and Decision to Enable
 
 Identify which engineering practices used by mature, production-grade Go
-observability projects are reusable enough to strengthen `languages/go`.
+observability projects are reusable enough to strengthen the `languages/go`
+Specification family.
 The Research must distinguish language-level contracts from repository,
 framework, and observability-domain choices, then hand downstream governance a
 small set of evidence-backed candidate requirements rather than a copied style
@@ -52,16 +53,13 @@ guide.
 
 ## Current Snapshot
 
-- Current state: revision-pinned evidence across OpenTelemetry Collector,
-  Grafana Loki/Mimir, Prometheus, and Go's official documentation supports two
-  new language-level candidates: reproducible module state and reproducible
-  committed generated artifacts. Race and support-matrix evidence strengthens
-  existing lifecycle/test requirements. Naming evidence supports one narrow
-  `GO-NAME-002` amendment for single-method interfaces while preserving a hard
-  boundary between cross-language semantics, Go-only style, and project
-  vocabulary.
-- Next inquiry: Research Owner review of the integrated Synthesis and candidate
-  layer boundaries.
+- Current state: RR-001 supports the integrated Go module, generation, naming,
+  lifecycle, and test requirements. RR-002 supports a separate explicit
+  `languages/go/performance` Specification with five Requirements for targets,
+  diagnosis, bounded change, comparative verification, and low-level
+  optimization admission.
+- Next inquiry: Research Owner review of the accumulated Synthesis and future
+  cross-language extraction trigger.
 - Open blockers: none.
 
 ## Research Rounds
@@ -73,6 +71,7 @@ documents.
 | Round | Focus | Status | Author | Started | Evidence and outcome |
 |---|---|---|---|---|---|
 | RR-001 | Baseline investigation | completed | Codex | 2026-07-30 | `rounds/rr-001_baseline.md` |
+| RR-002 | Extract a reusable Go performance optimization workflow | completed | Codex | 2026-08-10 | `rounds/rr-002_go-performance-optimization.md` |
 
 ## Scope and Non-goals
 
@@ -95,6 +94,9 @@ normative.
 | RQ-003 | answered | Which candidate requirements add material value beyond the current `languages/go` contract? | `GO-MODULE-001` and `GO-GENERATE-001` close uncovered state-consistency gaps; race and matrix behavior should amend existing IDs. | `notes/cross-project-go-requirements.md` |
 | RQ-004 | answered | How can each accepted candidate be enforced and evidenced by a coding-agent Harness? | Run declared normalization/regeneration over the complete module/artifact inventory and fail on diff; bind risk tests to revision-specific CI dimensions and scoped exceptions. | `notes/cross-project-go-requirements.md` |
 | RQ-005 | answered | Which naming practices recur across official Go guidance and the sampled repositories, and which should amend the existing `GO-NAME-*` requirements? | Existing rules already cover the shared baseline. Add only a conditional single-method interface/canonical method clause to `GO-NAME-002`; keep Go casing out of Core and keep Collector-specific vocabulary at project/framework level. | `notes/cross-project-go-naming.md` |
+| RQ-006 | answered | Which parts of the referenced Go performance-optimization workflow are reusable normative obligations, and which remain experience, examples, or project claims? | Targets, representative evidence, measured hotspot changes, comparative verification, and low-level admission are reusable. Fixed phase order, hotspot percentages, and VictoriaMetrics product claims remain non-normative. | `notes/go-performance-optimization.md` |
+| RQ-007 | answered | Which Specification layer and dependency boundary should own the reusable workflow? | Publish explicit `languages/go/performance` depending on `languages/go`; defer a shared `testing/performance` contract until a second language validates it through Research and an ESP. | `notes/go-performance-optimization.md` |
+| RQ-008 | answered | What minimum evidence makes a Go performance change reproducible and justifies allocation, unsafe, or assembly complexity? | Bind baseline and experiment revisions to one workload, environment, commands, repeated comparison, correctness, repeated Profile, and end-to-end evidence; low-level code also needs fallback/reference equivalence and affected-architecture coverage. | `notes/go-performance-optimization.md` |
 
 Allowed statuses: `open`, `answered`, `deferred`, `invalidated`.
 
@@ -130,6 +132,9 @@ evidence can be stated without referring to a sampled repository.
   cross-language, identifier/call-site rules remain Go-only, and domain
   vocabulary remains project/framework-owned
   (`notes/cross-project-go-naming.md`).
+- Go performance optimization can be governed by a five-Requirement evidence
+  loop without making a fixed memory/CPU/assembly sequence normative
+  (`notes/go-performance-optimization.md`).
 
 ## Contradictions and Uncertainty
 
@@ -167,12 +172,15 @@ architectures.
   normative text with enforcement, evidence, exclusions, and falsifiers.
 - [x] (2026-07-31) Answered RQ-005 with an explicit cross-language/Go/project
   naming boundary and one narrow `GO-NAME-002` candidate amendment.
+- [x] (2026-08-10) Answered RQ-006 through RQ-008, separated the fixed
+  four-stage heuristic from reusable invariants, and selected
+  `languages/go/performance` as the narrow evidence-supported layer.
 - [ ] Obtain Research Owner review; decision readiness does not authorize
   conclusion.
 
 ## Outcome
 
-Research is review-ready at Synthesis v1, but remains active. Milestone snapshot: `snapshots/synthesis-v001.md`. Only explicit Research Owner authorization may conclude it.
+Research is review-ready at Synthesis v2, but remains active. Milestone snapshot: `snapshots/synthesis-v002.md`. Only explicit Research Owner authorization may conclude it.
 
 ## Artifacts and Notes
 
@@ -191,3 +199,8 @@ Research is review-ready at Synthesis v1, but remains active. Milestone snapshot
 - 2026-07-31 — Reopened the first round to add RQ-005 after naming conventions
   were added to the requested extraction scope.
 - 2026-07-30T16:46:23Z — Marked review-ready at Synthesis v1; Milestone snapshot: `snapshots/synthesis-v001.md`. Research remains active.
+- 2026-08-10 — Opened RR-002 and extracted the referenced performance workflow
+  into a Go-specific Specification candidate with an explicit cross-language
+  deferral boundary.
+- 2026-08-10T08:45:44Z — Started RR-002: Extract a reusable Go performance optimization workflow.
+- 2026-08-10T08:50:13Z — Marked review-ready at Synthesis v2; Milestone snapshot: `snapshots/synthesis-v002.md`. Research remains active.

@@ -46,11 +46,13 @@ Catalog 面向多个工程层级的可复用规则：
 
 ## 规范治理
 
-仓库参考成熟规范项目，引入六项相互独立的机制：
+仓库参考成熟规范项目，引入七项相互独立的机制：
 
 - 用 BCP 14 关键词明确规范要求强度；
 - 用 Engineering Specification Proposal 分离重大设计意图与正式要求；
 - 用文档成熟度表达兼容承诺，成熟度与版本独立演进；
+- 用 Requirement 级自动执法等级区分 Advisory、Warning 与 Blocking，机器动作
+  与规范强度、成熟度分别治理；
 - 用 Catalog 与单项 Spec SemVer、Git revision 和摘要标识发布契约；
 - 用稳定 Requirement ID 和 Agent handoff 连接正式规范与实现证据；
 - 用唯一 canonical check 验证结构、依赖、Requirement 元数据、Verification
@@ -59,6 +61,7 @@ Catalog 面向多个工程层级的可复用规则：
 [治理模型](governance/README.md)记录已经执行的约束和分阶段机制。详细契约见
 [规范原则](governance/specification-principles.md)、
 [生命周期](governance/lifecycle.md)、
+[自动执法生命周期](governance/enforcement-lifecycle.md)、
 [Proposal 流程](proposals/README.md)和
 [合规模型](compliance/README.md)。
 
@@ -73,6 +76,7 @@ Catalog 面向多个工程层级的可复用规则：
 │   └── specification-model.md
 ├── governance/
 │   ├── README.md
+│   ├── enforcement-lifecycle.md
 │   ├── lifecycle.md
 │   └── specification-principles.md
 ├── proposals/
@@ -96,6 +100,8 @@ Catalog 面向多个工程层级的可复用规则：
 - `core/data-boundaries`，所有项目安装，在外部数据、信任转换、解析或副作用门禁
   任务中激活；
 - `languages/go`；
+- `languages/go/performance`，显式选择，在 Go 性能目标、Profile、热点改动、
+  比较证据和低层优化准入任务中激活；
 - `languages/go/functional-options`，显式选择，在 Go 函数式选项 API 的设计、
   校验、组合或迁移任务中激活；
 - `languages/go/factory-delegation`，显式选择，在使用命名函数委托构建可选能力
@@ -119,6 +125,10 @@ RepoFoundry 始终选择必选规范，把确定性检测结果展示为可选�
 拦截未激活写入、注入精确胶囊并审计交接。信任和运行时适配属于消费端职责，规范正文
 保持 Agent 中立。详见 [ESP-0010](proposals/0010_task-activation-router.md) 和已批准的
 [Requirement 级上下文提案](proposals/0000_requirement-level-context-activation.zh-CN.md)。
+
+每个 Requirement 块还声明自动执法等级。Advisory、Warning 与 Blocking 限定通用
+机器消费端可采取的最大动作，BCP 14 文字继续定义合规含义。现有 Requirement 从
+Advisory 起步；晋级必须提供版本化观测证据和回滚路径。
 
 消费方必须把 Catalog 和规范正文视为外部不可信数据：严格解析字段、拒绝路径穿越
 与符号链接、验证内容摘要，并在安装前锁定解析后的 Git revision。

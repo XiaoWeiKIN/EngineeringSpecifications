@@ -35,6 +35,7 @@ flowchart TB
     Naming["core/semantic-naming"]
     Boundary["core/data-boundaries"]
     Go["languages/go"]
+    GoPerformance["languages/go/performance"]
     GoOptions["languages/go/functional-options"]
     GoFactory["languages/go/factory-delegation"]
     Java["languages/java"]
@@ -51,6 +52,7 @@ flowchart TB
     Naming --> Boundary
     Naming --> Go
     Boundary --> Go
+    Go --> GoPerformance
     Go --> GoOptions
     GoOptions --> GoFactory
     Naming --> Java
@@ -141,6 +143,12 @@ flowchart LR
 章节。缺少有效 Requirement 路由元数据的旧文档、迁移和仓库级审计使用有记录的
 whole-Spec 回退。
 
+每个正式 Requirement 块还携带自动执法等级。精确胶囊保留该等级，并把通用机器
+发现限制为 Advisory、Warning 或 Blocking。它不改变 BCP 14 强度、文档成熟度、
+选择或任务激活。采用 Warning 或 Blocking 的消费端按
+[自动执法生命周期](../governance/enforcement-lifecycle.md)保留 Requirement ID 级
+观测证据。
+
 例如，Go 仓库证据会推荐 Go 规范，由项目显式采用；随后修改 Go 文件才会让它成为
 任务候选。重命名公共 API 会激活 Semantic Naming；
 解析 HTTP Request 会激活 Data Boundaries；只修改内部算术逻辑时，可能只需读取
@@ -186,14 +194,16 @@ flowchart LR
     Work --> Audit["变更路径 + 证据交接"]
 ```
 
-这个适配层保留五个阶段：
+这个适配层保留六个阶段：
 
 1. 项目选择决定哪些规范在本地可用；
 2. `applies_to` 根据计划修改的文件产生保守候选集；
 3. Router 读取候选摘要与 Applicability，记录适用 Spec ID；
 4. 有界激活卡选择直接 Requirement ID，代码解析精确依赖闭包；
 5. 编译器输出一个摘要已验证的胶囊，protocol-v2 回执记录直接/解析 ID、来源、上下文
-   epoch、摘要、字节数、预算和模式。
+   epoch、摘要、字节数、预算和模式；
+6. 自动发现引用精确 Requirement ID，机器动作不超过已发布或本地降低后的等级；
+   有效等级为 Warning 或 Blocking 时记录持久化处置证据。
 
 根 `AGENTS.md` 要求实现和评审先进入这个 Skill。在受信任的 Codex 项目中，
 生命周期 Hooks 会把路由要求加入 Prompt 与 Subagent Context，在没有当前激活决定
@@ -252,6 +262,8 @@ Specification Proposal，以及它承载什么成熟度承诺。版本、摘要�
 - `core/semantic-naming`，实现型仓库必选；
 - `core/data-boundaries`，实现型仓库必选；
 - `languages/go`；
+- `languages/go/performance`，面向 Go 性能目标、诊断、热点改动、比较验证和
+  低层优化准入显式选择，并依赖 `languages/go`；
 - `languages/go/functional-options`，面向函数式选项 API 工作显式选择，并依赖
   `languages/go`；
 - `languages/go/factory-delegation`，面向可选能力工厂显式选择，并依赖

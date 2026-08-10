@@ -87,6 +87,8 @@ When this Specification is activated, the implementing or reviewing agent:
 
 **Context dependencies:** None
 
+**Automated enforcement:** Advisory
+
 Shared and public names **MUST** describe behavior that callers can observe. A
 reviewer must be able to determine the operation's result cardinality, failure
 behavior, and material side effects from its name, type, and surrounding API.
@@ -109,6 +111,8 @@ the observable contract and reuses the repository's existing vocabulary.
 **Activation:** Load when naming or changing parse, decode, validate, normalize, extract, load, fetch, resolve, plan, or execute behavior.
 
 **Context dependencies:** `SEM-NAME-001`
+
+**Automated enforcement:** Advisory
 
 An API **MUST** use the following verbs only when its observable behavior
 matches the stated contract:
@@ -168,6 +172,8 @@ effects appropriate to the selected verb.
 
 **Context dependencies:** `SEM-NAME-001`
 
+**Automated enforcement:** Advisory
+
 When one concept appears on multiple surfaces, the implementation **MUST**
 declare each externally visible spelling and **MUST** test the mappings between
 them. It **MUST NOT** mechanically derive a wire, storage, metric, or protocol
@@ -195,6 +201,8 @@ external spelling.
 
 **Context dependencies:** `SEM-NAME-001`
 
+**Automated enforcement:** Advisory
+
 Public contracts **MUST** distinguish incompatible identifiers, units, states,
 and time concepts through types or unambiguous names. Raw numeric values
 **MUST** identify their unit when the type does not.
@@ -217,6 +225,8 @@ conversion, unknown values, and incompatible states.
 **Activation:** Load when renaming a published API, schema, storage, configuration, telemetry, or other external name.
 
 **Context dependencies:** `SEM-NAME-001`, `SEM-SURFACE-001`
+
+**Automated enforcement:** Advisory
 
 A published external name **MUST NOT** be changed solely for stylistic
 consistency. A necessary rename **MUST** define the old-to-new mapping, read and
@@ -311,6 +321,13 @@ Compatibility or migration: none | <old-to-new contract>
 ```
 
 ## Compatibility and migration
+
+Version `1.2.0` adds the Requirement-level Automated enforcement contract and
+sets every existing `SEM-*` Requirement to `Advisory`. It preserves normative
+behavior, IDs, activation, context dependencies, enforcement classes, and
+Verification rows. Consumers may read the new marker immediately; automated
+Warning or Blocking requires separate promotion evidence under the
+[Automated Enforcement Lifecycle](../../governance/enforcement-lifecycle.md).
 
 Version `1.1.1` adds non-normative Requirement activation summaries and exact
 context-dependency metadata. It does not change the behavioral meaning of any

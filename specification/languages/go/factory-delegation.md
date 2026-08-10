@@ -95,6 +95,8 @@ When this Specification is activated, the implementing or reviewing agent:
 
 **Context dependencies:** `GO-API-001`, `GO-COMPAT-001`
 
+**Automated enforcement:** Advisory
+
 A public constructor **SHOULD** return a concrete factory type. Callers that
 need substitution **SHOULD** declare narrow consumer-owned interfaces
 containing only the capabilities they invoke.
@@ -127,6 +129,8 @@ fixtures, and an API diff showing the effect of each capability addition.
 **Activation:** Load when defining, storing, forwarding to, or concurrently invoking a named factory capability delegate.
 
 **Context dependencies:** `GO-ERROR-001`, `GO-LIFECYCLE-001`
+
+**Automated enforcement:** Advisory
 
 Each semantically distinct capability **MUST** use a named function type with
 typed inputs, results, and errors. A delegate that can block, perform I/O, or be
@@ -163,6 +167,8 @@ context and arguments, call count, error cause, and concurrent behavior.
 
 **Context dependencies:** `GO-OPTION-USE-001`, `GO-OPTION-TYPE-001`,
 `GO-OPTION-APPLY-001`, `GO-OPTION-VALIDATE-001`
+
+**Automated enforcement:** Advisory
 
 Required factory identity and required capabilities **MUST** remain explicit
 typed constructor inputs. Optional delegates **MUST** be installed through
@@ -202,6 +208,8 @@ rejected path.
 
 **Context dependencies:** `GO-ERROR-001`
 
+**Automated enforcement:** Advisory
+
 Invoking an absent capability **MUST NOT** panic. Unless a documented no-op is
 semantically valid, the factory **MUST** return the operation's zero result and
 a stable inspectable unsupported-capability error. The error **MUST** identify
@@ -239,6 +247,8 @@ tests with error identity and discovery consistency assertions.
 **Context dependencies:** `GO-FACTORY-SURFACE-001`,
 `GO-FACTORY-DELEGATE-001`, `GO-FACTORY-CONSTRUCT-001`,
 `GO-FACTORY-ABSENCE-001`, `GO-TEST-001`
+
+**Automated enforcement:** Advisory
 
 Tests **MUST** cover every capability when installed and absent, explicit nil
 and typed-nil delegates, duplicate and conflicting options, argument and
@@ -490,6 +500,13 @@ Compatibility or migration: none | <interfaces, adapters, deprecation/removal>
 ```
 
 ## Compatibility and migration
+
+Version `0.2.0` adds the Requirement-level Automated enforcement contract and
+sets every existing `GO-FACTORY-*` Requirement to `Advisory`. It preserves
+normative behavior, IDs, activation, context dependencies, enforcement classes,
+and Verification rows. Automated Warning or Blocking requires separate
+promotion evidence under the
+[Automated Enforcement Lifecycle](../../../governance/enforcement-lifecycle.md).
 
 Version `0.1.1` adds non-normative Requirement activation summaries and exact
 context-dependency metadata. It does not change the behavioral meaning of any

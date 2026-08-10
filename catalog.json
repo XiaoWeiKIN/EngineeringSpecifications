@@ -1,6 +1,6 @@
 {
   "catalog_id": "io.github.xiaoweikin.engineering-specifications",
-  "catalog_version": "1.5.0",
+  "catalog_version": "1.6.0",
   "schema_version": 1,
   "specs": [
     {
@@ -12,8 +12,8 @@
       "path": "specification/core/semantic-naming.md",
       "required": true,
       "requires": [],
-      "sha256": "29b6e5e19edaa3d87457a8418a4d020f563348c7d0fe6f7d3ab24a4c702c9e11",
-      "version": "1.1.1"
+      "sha256": "b190713f27efc11eba59551d4026036d87f30027dd624b17e62d6627e5814c83",
+      "version": "1.2.0"
     },
     {
       "applies_to": [
@@ -26,8 +26,8 @@
       "requires": [
         "core/semantic-naming"
       ],
-      "sha256": "644ffec3b6a1dbdb3e05797f665a9282e90397ca587850902c737cc2f2b9b5c2",
-      "version": "0.1.1"
+      "sha256": "7d3691af05770bcd4500c69040bd1aff3ec47d2d9558459d38528435eb9c95ec",
+      "version": "0.2.0"
     },
     {
       "applies_to": [
@@ -54,8 +54,23 @@
         "core/semantic-naming",
         "core/data-boundaries"
       ],
-      "sha256": "1d6a82e7380425b65983531f80a43442e35d831a2b65cb7ebc17918c1c0ee68b",
-      "version": "0.4.1"
+      "sha256": "81ac50ab7987ac45255fd2e67f1d7b8b4381e7d98a85bf3ba8dfb308f98f8d94",
+      "version": "0.5.0"
+    },
+    {
+      "applies_to": [
+        "**/*.go",
+        "**/*.s"
+      ],
+      "description": "Load when diagnosing or changing Go performance, profiles, benchmarks, allocation or GC behavior, or architecture-specific fast paths",
+      "id": "languages/go/performance",
+      "path": "specification/languages/go/performance.md",
+      "required": false,
+      "requires": [
+        "languages/go"
+      ],
+      "sha256": "7c1399228a609af8671fa7e8df982ac1a8744cc588ab01de9bec5c4f77b3fe22",
+      "version": "0.1.0"
     },
     {
       "applies_to": [
@@ -68,8 +83,8 @@
       "requires": [
         "languages/go"
       ],
-      "sha256": "3e1133f9e0624a0f0ea230721e7cca070163fe1cf39122e61734621014a81282",
-      "version": "0.1.1"
+      "sha256": "bc29018852cbb45e5a7ad5c58ff726d550d494e22130de760045cf6dde95ce49",
+      "version": "0.2.0"
     },
     {
       "applies_to": [
@@ -82,8 +97,8 @@
       "requires": [
         "languages/go/functional-options"
       ],
-      "sha256": "ca9480ebbf25f184ce2a6a80106ca3dfa65ca2e13c610f46036d6d8b0b5f7e84",
-      "version": "0.1.1"
+      "sha256": "f12b2bcfa0f9a74ad8103690ffa3e86c5ff76a6041684bf60f0ad14f0f2e4436",
+      "version": "0.2.0"
     }
   ]
 }

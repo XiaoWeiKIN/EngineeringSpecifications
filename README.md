@@ -53,13 +53,15 @@ boundary.
 
 ## Governance
 
-The repository adapts six mechanisms from mature specification projects:
+The repository adapts seven mechanisms from mature specification projects:
 
 - BCP 14 keywords give normative requirements explicit strength;
 - Engineering Specification Proposals separate significant design intent from
   integrated requirements;
 - document maturity communicates compatibility promises independently from
   versions;
+- Requirement-level automated enforcement separates Advisory, Warning, and
+  Blocking machine action from normativity and maturity;
 - Catalog and per-Spec SemVer, Git revisions, and digests identify released
   contracts;
 - stable Requirement IDs and Agent handoffs connect formalized specifications
@@ -71,6 +73,7 @@ The [Governance Model](governance/README.md) records what is already enforced
 and which mechanisms remain staged. The
 [Specification Principles](governance/specification-principles.md),
 [Lifecycle](governance/lifecycle.md),
+[Automated Enforcement Lifecycle](governance/enforcement-lifecycle.md),
 [Proposal Process](proposals/README.md), and
 [Compliance Model](compliance/README.md) provide the detailed contracts.
 
@@ -85,6 +88,7 @@ and which mechanisms remain staged. The
 │   └── specification-model.md
 ├── governance/
 │   ├── README.md
+│   ├── enforcement-lifecycle.md
 │   ├── lifecycle.md
 │   └── specification-principles.md
 ├── proposals/
@@ -110,6 +114,9 @@ The current catalog contains:
 - `core/data-boundaries`, installed everywhere and activated for external data,
   trust transitions, parsing, and effect gating;
 - `languages/go`;
+- `languages/go/performance`, explicitly selected and activated for Go
+  performance objectives, profiles, hotspot changes, comparative evidence, and
+  low-level optimization admission;
 - `languages/go/functional-options`, explicitly selected and activated for Go
   functional-option API design, validation, composition, and migration;
 - `languages/go/factory-delegation`, explicitly selected and activated for
@@ -141,6 +148,12 @@ and audit the handoff. The trust and runtime adapter remain consumer concerns,
 so normative Specifications stay Agent-neutral. See
 [ESP-0010](proposals/0010_task-activation-router.md) and the approved
 [Requirement-level context proposal](proposals/0000_requirement-level-context-activation.md).
+
+Each Requirement block also declares an Automated enforcement level. Advisory,
+Warning, and Blocking control the maximum generic machine response while BCP 14
+wording continues to define conformance. Current Requirements begin at
+Advisory; promotion requires versioned observation evidence and a rollback
+path.
 
 Consumers must treat catalog and specification content as untrusted external
 data: parse exact shapes, reject traversal and symbolic links, verify digests,

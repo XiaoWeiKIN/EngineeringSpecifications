@@ -85,6 +85,8 @@ When this Specification is activated, the implementing or reviewing agent:
 
 **Context dependencies:** None
 
+**Automated enforcement:** Advisory
+
 Boundary code **MUST** decode external bytes, tokens, rows, fields, or tool
 results into an explicitly untrusted transport or source shape. Decoding
 success **MUST NOT** be treated as proof of domain validity.
@@ -109,6 +111,8 @@ unknown, and structurally valid but semantically invalid inputs.
 **Activation:** Load when converting an untrusted boundary shape into a domain value or validating a type with no safe zero value.
 
 **Context dependencies:** `DATA-SHAPE-001`
+
+**Automated enforcement:** Advisory
 
 Boundary code **MUST** parse or explicitly convert an untrusted shape into a
 domain-safe value before core logic consumes it. Successful parsing **MUST**
@@ -135,6 +139,8 @@ success value used by core logic.
 
 **Context dependencies:** `DATA-PARSE-001`
 
+**Automated enforcement:** Advisory
+
 Core logic and boundary effects **MUST NOT** run until every required boundary
 parse succeeds. Partial parsing **MUST NOT** leave an externally observable
 mutation unless the protocol defines a reviewed transactional or compensating
@@ -156,6 +162,8 @@ the protocol's documented compensation behavior.
 **Activation:** Load when defining, translating, logging, or returning errors for rejected external input.
 
 **Context dependencies:** `DATA-PARSE-001`
+
+**Automated enforcement:** Advisory
 
 A rejected input **MUST** produce an error that identifies the affected field,
 path, or contract and the violated expectation. The error **MUST NOT** expose
@@ -182,6 +190,8 @@ invalid, and secret-bearing inputs.
 **Activation:** Load when trimming, case-folding, normalizing, decoding, reordering, or canonicalizing protocol-owned values.
 
 **Context dependencies:** `SEM-VERB-001`
+
+**Automated enforcement:** Advisory
 
 Boundary code **MUST NOT** trim, case-fold, Unicode-normalize, reorder, decode,
 or otherwise transform credentials, signatures, tokens, password material, or
@@ -274,6 +284,13 @@ Exceptions: none | <upstream contract and remaining local checks>
 ```
 
 ## Compatibility and migration
+
+Version `0.2.0` adds the Requirement-level Automated enforcement contract and
+sets every existing `DATA-*` Requirement to `Advisory`. It preserves normative
+behavior, IDs, activation, context dependencies, enforcement classes, and
+Verification rows. Automated Warning or Blocking requires separate promotion
+evidence under the
+[Automated Enforcement Lifecycle](../../governance/enforcement-lifecycle.md).
 
 Version `0.1.1` adds non-normative Requirement activation summaries and exact
 context-dependency metadata. It does not change the behavioral meaning of any

@@ -75,15 +75,17 @@ Catalog carries machine-readable maturity, a missing marker means Development.
 
 Copy the
 [Formal Specification Template](specification/0000-template.md) when creating a
-normative document. The template separates six concerns that a coding agent and
+normative document. The template separates seven concerns that a coding agent and
 reviewer both need:
 
 1. selection says how the Specification becomes locally available;
 2. applicability says when it enters task context;
 3. a stable Requirement ID identifies the behavioral contract;
 4. enforcement classifies mechanical, review, or hybrid protection;
-5. evidence says how a consumer demonstrates compliance;
-6. the Agent handoff indexes activated IDs, verification, exceptions, and
+5. automated enforcement limits machine findings to Advisory, Warning, or
+   Blocking action;
+6. evidence says how a consumer demonstrates compliance;
+7. the Agent handoff indexes activated IDs, verification, exceptions, and
    migration effects.
 
 Keep proposal reasoning in the related ESP. The integrated specification
@@ -113,14 +115,16 @@ contract.
    category path and replace every authoring placeholder.
 6. Edit or add normative Markdown under `specification/`.
 7. Keep each rule testable, scoped, and independent of one private repository.
-8. Update `catalog.json`:
+8. Start new Requirements at `Automated enforcement: Advisory`; promote them
+   only with the evidence required by the automated enforcement lifecycle.
+9. Update `catalog.json`:
    - preserve stable IDs;
    - bump the affected specification version for normative changes;
    - refresh the source SHA-256;
    - declare dependencies and deterministic detection evidence.
    - write the description as an Agent-readable activation summary.
-9. Update `CHANGELOG.md` for externally observable changes.
-10. Run the canonical check:
+10. Update `CHANGELOG.md` for externally observable changes.
+11. Run the canonical check:
 
 ```bash
 python3 -B scripts/check.py

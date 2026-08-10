@@ -41,6 +41,8 @@ Identify:
 Explain:
 
 - affected Development, Stable, or Deprecated contracts;
+- affected Advisory, Warning, or Blocking automated enforcement levels and the
+  observation evidence for any promotion;
 - breaking and backward-compatible effects;
 - version changes;
 - migration and rollback expectations.

@@ -96,6 +96,8 @@ When this Specification is activated, the implementing or reviewing agent:
 
 **Context dependencies:** `GO-API-001`
 
+**Automated enforcement:** Advisory
+
 A public Go API **SHOULD** use functional options only when it has a useful
 default call, multiple independent optional settings, and a credible need to
 add settings without expanding its function signature. Values required to
@@ -125,6 +127,8 @@ fits their lifecycle.
 **Activation:** Load when defining a Go option type, target ownership, external extension boundary, or option representation.
 
 **Context dependencies:** `GO-API-001`
+
+**Automated enforcement:** Advisory
 
 Independently configured targets **MUST** use distinct option types unless the
 options have exactly the same documented semantics for every target. An API
@@ -160,6 +164,8 @@ plus reviewed public documentation for extension ownership.
 
 **Context dependencies:** `GO-LIFECYCLE-001`
 
+**Automated enforcement:** Advisory
+
 The constructor **MUST** initialize private construction state from the
 required inputs and documented defaults. The default call **MUST** produce a
 valid baseline configuration. It **MUST** apply each supplied option exactly
@@ -193,6 +199,8 @@ before successful validation.
 
 **Context dependencies:** `GO-OPTION-APPLY-001`, `GO-ERROR-001`
 
+**Automated enforcement:** Advisory
+
 An exported constructor whose option values or combinations can be invalid
 **MUST** return an error. Per-option validation **MAY** reject a local value
 during application, but cross-option and required-input invariants **MUST** be
@@ -219,6 +227,8 @@ no partial result, and no downstream effect for every rejected class.
 **Activation:** Load when adding, changing, deprecating, or migrating an exported Go constructor or functional option.
 
 **Context dependencies:** `GO-COMPAT-001`
+
+**Automated enforcement:** Advisory
 
 An existing exported function that does not accept functional options
 **MUST NOT** gain a variadic option parameter in place as a compatible change.
@@ -256,6 +266,8 @@ changes.
 **Context dependencies:** `GO-OPTION-USE-001`, `GO-OPTION-TYPE-001`,
 `GO-OPTION-APPLY-001`, `GO-OPTION-VALIDATE-001`, `GO-OPTION-COMPAT-001`,
 `GO-TEST-001`
+
+**Automated enforcement:** Advisory
 
 Tests **MUST** cover the default call, every option's independent effect, the
 documented order-sensitive cases, duplicate and conflict behavior, invalid and
@@ -474,6 +486,13 @@ Compatibility or migration: none | <preserved entry point, behavior effect, and 
 ```
 
 ## Compatibility and migration
+
+Version `0.2.0` adds the Requirement-level Automated enforcement contract and
+sets every existing `GO-OPTION-*` Requirement to `Advisory`. It preserves
+normative behavior, IDs, activation, context dependencies, enforcement classes,
+and Verification rows. Automated Warning or Blocking requires separate
+promotion evidence under the
+[Automated Enforcement Lifecycle](../../../governance/enforcement-lifecycle.md).
 
 Version `0.1.1` adds non-normative Requirement activation summaries and exact
 context-dependency metadata. It does not change the behavioral meaning of any

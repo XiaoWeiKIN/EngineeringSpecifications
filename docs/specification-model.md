@@ -40,6 +40,7 @@ flowchart TB
     Naming["core/semantic-naming"]
     Boundary["core/data-boundaries"]
     Go["languages/go"]
+    GoPerformance["languages/go/performance"]
     GoOptions["languages/go/functional-options"]
     GoFactory["languages/go/factory-delegation"]
     Java["languages/java"]
@@ -56,6 +57,7 @@ flowchart TB
     Naming --> Boundary
     Naming --> Go
     Boundary --> Go
+    Go --> GoPerformance
     Go --> GoOptions
     GoOptions --> GoFactory
     Naming --> Java
@@ -160,6 +162,13 @@ Explicit supporting sections may be added when the task needs them. Legacy
 documents without valid Requirement routing metadata, migrations, and
 repository-wide audits use a recorded whole-Spec fallback.
 
+Every formal Requirement block also carries an Automated enforcement level.
+The level is preserved in the exact capsule and limits a generic machine
+finding to Advisory, Warning, or Blocking action. It does not change BCP 14
+strength, document maturity, selection, or task activation. Warning and
+Blocking consumers retain Requirement-ID observations under the
+[Automated Enforcement Lifecycle](../governance/enforcement-lifecycle.md).
+
 For example, Go repository evidence recommends the Go Specification; the
 project explicitly adopts it. A Go source change then makes it a task
 candidate. A public API rename activates Semantic Naming; an HTTP request
@@ -210,7 +219,7 @@ flowchart LR
     Work --> Audit["Changed paths + evidence handoff"]
 ```
 
-The adapter preserves five stages:
+The adapter preserves six stages:
 
 1. project selection determines what is locally available;
 2. `applies_to` determines conservative candidates for planned files;
@@ -220,7 +229,10 @@ The adapter preserves five stages:
    dependency closure;
 5. the compiler emits one digest-verified capsule and a protocol-v2 receipt
    records direct/resolved IDs, sources, context epoch, digest, bytes, budget,
-   and mode.
+   and mode;
+6. an automated finding cites the exact Requirement ID, applies no action above
+   its published or locally lowered level, and records a durable disposition
+   when the effective level is Warning or Blocking.
 
 The root `AGENTS.md` routes implementation and review through the Skill. In a
 trusted Codex project, lifecycle Hooks add the route to prompt and subagent
@@ -292,6 +304,9 @@ The current release publishes:
 - `core/semantic-naming`, required for implementation repositories;
 - `core/data-boundaries`, required for implementation repositories;
 - `languages/go`;
+- `languages/go/performance`, explicitly selected for Go performance
+  objectives, diagnosis, measured hotspot changes, comparative verification,
+  and low-level optimization admission, and dependent on `languages/go`;
 - `languages/go/functional-options`, explicitly selected for functional-option
   API work and dependent on `languages/go`;
 - `languages/go/factory-delegation`, explicitly selected for optional

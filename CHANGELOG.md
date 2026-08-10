@@ -4,6 +4,42 @@ All notable Catalog and normative specification changes are recorded here.
 
 ## Unreleased
 
+## [1.6.0] - 2026-08-10
+
+### Added
+
+- Approved the Requirement-level automated enforcement ESP and added the
+  independent `Advisory`, `Warning`, and `Blocking` lifecycle, evidence-gated
+  promotion, expiring gate overrides, and append-only finding observations.
+- Added `Automated enforcement: Advisory` to all 32 published Requirement
+  blocks and the formal Specification template.
+- Added canonical validation for missing, duplicated, unknown, and ineligible
+  Warning or Blocking metadata. Warning requires a `SHOULD`/`SHOULD NOT` or
+  stronger obligation; Blocking requires a `MUST` or `MUST NOT` obligation.
+- Added Development `languages/go/performance` version `0.1.0` with five
+  Advisory Requirements for explicit performance targets, representative
+  diagnosis, bounded hotspot hypotheses, repeated comparative verification,
+  and stricter admission of `unsafe`, assembly, and architecture-specific
+  implementations.
+- Added R-001/RR-002 evidence that separates the reusable Go performance loop
+  from fixed phase order, hotspot percentages, and VictoriaMetrics-specific
+  product claims.
+
+### Changed
+
+- Advanced the Catalog to `1.6.0`; advanced `core/semantic-naming` to `1.2.0`,
+  `core/data-boundaries` and both narrow Go pattern Specifications to `0.2.0`,
+  and `languages/go` to `0.5.0`. Existing normative behavior, Requirement IDs,
+  routing metadata, enforcement classes, and Verification rows are preserved.
+- Separated machine action from BCP 14 strength, document maturity, and
+  enforcement class. Existing Requirements begin at Advisory; no Warning or
+  Blocking claim exists until a consumer supplies versioned observation
+  evidence.
+- Kept Go performance guidance explicitly selected and dependent on
+  `languages/go`; cross-language `testing/performance` extraction remains
+  deferred until a materially different language/runtime supplies evidence
+  through an ESP.
+
 ## [1.5.0] - 2026-08-05
 
 ### Added

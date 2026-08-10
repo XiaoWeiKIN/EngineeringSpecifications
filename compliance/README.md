@@ -53,6 +53,34 @@ activated Requirement IDs, verification results, exceptions, and compatibility
 effects. It does not become conformance evidence until its referenced tests,
 revision, report, or reviewed artifact is durable and reproducible.
 
+## Enforcement observations measure the evaluator, not conformance alone
+
+Every formal Requirement declares an Automated enforcement level. The level
+controls machine action and remains independent from implementation compliance.
+An Advisory finding can identify a real violation. A Blocking finding can be
+overridden while the underlying implementation remains non-conforming.
+
+A consumer claiming Warning or Blocking operation retains the append-only
+observation fields defined by the
+[Automated Enforcement Lifecycle](../governance/enforcement-lifecycle.md).
+Stable Requirement IDs join findings to the normative contract. Stable finding
+IDs join one issue across repeated reviews, remediation, dismissal, override,
+and expiry events.
+
+Evidence reports distinguish at least:
+
+- event count, unique finding count, and unique affected-change count;
+- confirmed, remediated, false-positive, and escaped findings;
+- conforming `SHOULD` exceptions and non-conforming gate overrides;
+- time to disposition and time to remediation;
+- active, expired, and repeatedly renewed overrides.
+
+Finding volume and blocked-workflow count do not prove engineering impact on
+their own. Promotion evidence links these measurements to an executor version,
+configuration digest, observation window, repository revision, and durable
+evidence reference. Aggregate telemetry excludes source text, secrets, and
+personal content unless a separately governed policy authorizes collection.
+
 ## Generated views must not drift
 
 When compliance data is introduced:
@@ -61,6 +89,10 @@ When compliance data is introduced:
 2. this repository may aggregate versioned evidence records;
 3. a deterministic generator produces the human-readable matrix;
 4. the canonical check fails when generated output differs from its sources.
+
+Enforcement observations remain implementation-owned evidence. This repository
+may later aggregate privacy-reviewed records, but a generated dashboard never
+becomes the source of conformance or promotion authority.
 
 This follows the useful separation in OpenTelemetry's
 [implementation compliance matrix](https://github.com/open-telemetry/opentelemetry-specification/blob/main/spec-compliance-matrix.md)
