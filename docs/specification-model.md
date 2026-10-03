@@ -23,6 +23,7 @@ in `catalog.json` are currently published.
 | `databases/` | Vendor-neutral schema design and database-specific behavior for systems such as MySQL or ClickHouse | Explicit selection or deterministic repository evidence |
 | `testing/` | Cross-language test contracts plus focused unit, integration, contract, and end-to-end guidance | Explicit selection and test-file scopes |
 | `protocols/` | Shared HTTP, gRPC, messaging, serialization, and compatibility contracts | Explicit selection or repository evidence |
+| `documentation/` | Cross-language integrity contracts for technical documents and derived explanation surfaces | Explicit selection; task intent controls activation |
 
 Cross-language does not mean universally required. For example, a
 vendor-neutral database schema specification can apply to several programming
@@ -52,6 +53,8 @@ flowchart TB
     MySQL["databases/mysql"]
     ClickHouse["databases/clickhouse"]
     Testing["testing/foundations"]
+    Docs["documentation/technical-documentation"]
+    Derived["documentation/derived-explanations"]
     Project["Project-owned specifications"]
 
     Naming --> Boundary
@@ -64,6 +67,8 @@ flowchart TB
     Boundary --> Java
     Naming --> Schema
     Naming --> Testing
+    Naming --> Docs
+    Docs --> Derived
     Go --> Gin
     HTTP --> Gin
     Go --> Gorm
@@ -310,7 +315,12 @@ The current release publishes:
 - `languages/go/functional-options`, explicitly selected for functional-option
   API work and dependent on `languages/go`;
 - `languages/go/factory-delegation`, explicitly selected for optional
-  capability factories and dependent on `languages/go/functional-options`.
+  capability factories and dependent on `languages/go/functional-options`;
+- `documentation/technical-documentation`, explicitly selected for reusable
+  state, evidence, procedure, terminology, and freshness integrity;
+- `documentation/derived-explanations`, explicitly selected for derived-view
+  authority, source provenance, and equivalent-information integrity, and
+  dependent on `documentation/technical-documentation`.
 
 See the [Specification Index](../specification/README.md) for the current
 normative documents and [catalog.json](../catalog.json) for the machine-readable
