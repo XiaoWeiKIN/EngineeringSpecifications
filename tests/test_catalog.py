@@ -90,13 +90,15 @@ class CatalogTestCase(unittest.TestCase):
             catalog["catalog_id"],
             "io.github.xiaoweikin.engineering-specifications",
         )
-        self.assertEqual(catalog["catalog_version"], "1.6.0")
-        self.assertEqual(len(catalog["specs"]), 6)
+        self.assertEqual(catalog["catalog_version"], "1.7.0")
+        self.assertEqual(len(catalog["specs"]), 8)
         self.assertEqual(
             {item["id"] for item in catalog["specs"]},
             {
                 "core/semantic-naming",
                 "core/data-boundaries",
+                "documentation/derived-explanations",
+                "documentation/technical-documentation",
                 "languages/go",
                 "languages/go/factory-delegation",
                 "languages/go/functional-options",
@@ -137,8 +139,33 @@ class CatalogTestCase(unittest.TestCase):
             for item in catalog["specs"]
             if item["id"] == "core/data-boundaries"
         )
+        technical_documentation = next(
+            item
+            for item in catalog["specs"]
+            if item["id"] == "documentation/technical-documentation"
+        )
+        derived_explanations = next(
+            item
+            for item in catalog["specs"]
+            if item["id"] == "documentation/derived-explanations"
+        )
         self.assertEqual(semantic_naming["version"], "1.2.0")
         self.assertEqual(data_boundaries["version"], "0.2.0")
+        self.assertEqual(technical_documentation["version"], "0.1.0")
+        self.assertEqual(
+            technical_documentation["requires"], ["core/semantic-naming"]
+        )
+        self.assertEqual(
+            technical_documentation["applies_to"], ["**/*.md", "**/*.mdx"]
+        )
+        self.assertNotIn("detection", technical_documentation)
+        self.assertEqual(derived_explanations["version"], "0.1.0")
+        self.assertEqual(
+            derived_explanations["requires"],
+            ["documentation/technical-documentation"],
+        )
+        self.assertEqual(derived_explanations["applies_to"], ["**/*"])
+        self.assertNotIn("detection", derived_explanations)
         self.assertIn("Normalize or Extract", semantic_naming["description"])
         semantic_naming_text = (
             ROOT / "specification/core/semantic-naming.md"
@@ -182,7 +209,7 @@ class CatalogTestCase(unittest.TestCase):
             self.assertNotIn("**Automated enforcement:** Warning", source)
             self.assertNotIn("**Automated enforcement:** Blocking", source)
             advisory_markers += marker_count
-        self.assertEqual(advisory_markers, 37)
+        self.assertEqual(advisory_markers, 45)
         self.assertEqual(
             CHECK.check_requirement_ids(ROOT, catalog),
             (
@@ -191,6 +218,14 @@ class CatalogTestCase(unittest.TestCase):
                 "DATA-NORMALIZE-001",
                 "DATA-PARSE-001",
                 "DATA-SHAPE-001",
+                "DOC-A11Y-001",
+                "DOC-DERIVED-AUTH-001",
+                "DOC-DERIVED-PROV-001",
+                "DOC-EVIDENCE-001",
+                "DOC-FRESH-001",
+                "DOC-PROC-001",
+                "DOC-STATE-001",
+                "DOC-TERM-001",
                 "GO-API-001",
                 "GO-BOUNDARY-001",
                 "GO-COMPAT-001",
