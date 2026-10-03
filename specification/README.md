@@ -28,8 +28,9 @@ hybrid enforcement class. New Requirements start at Advisory. See the
 promotion evidence, override, and observation contracts.
 
 `core/semantic-naming`, `core/data-boundaries`, `languages/go`,
-`languages/go/performance`, `languages/go/functional-options`, and
-`languages/go/factory-delegation` publish stable Requirement IDs.
+`languages/go/performance`, `languages/go/functional-options`,
+`languages/go/factory-delegation`, `documentation/technical-documentation`,
+and `documentation/derived-explanations` publish stable Requirement IDs.
 
 ## Authoring
 
@@ -65,13 +66,18 @@ for legacy, migration, or repository-wide audit work.
 - [Go functional options](languages/go/functional-options.md)
 - [Go capability factory delegation](languages/go/factory-delegation.md)
 
+## Documentation
+
+- [Technical documentation integrity](documentation/technical-documentation.md)
+- [Derived explanation integrity](documentation/derived-explanations.md)
+
 The Markdown files are the normative sources. `catalog.json` supplies stable
 IDs, versions, dependencies, scopes, detection evidence, and content digests
 for machine consumers.
 
 This index lists only published specifications. The
 [Specification Model](../docs/specification-model.md) defines how future Core,
-language, framework, database, testing, and protocol specifications compose
+language, framework, database, testing, protocol, and documentation specifications compose
 without turning planned categories into published contracts.
 
 The [Governance Model](../governance/README.md) defines the Proposal, maturity,

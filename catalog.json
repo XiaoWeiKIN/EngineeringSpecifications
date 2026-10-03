@@ -1,6 +1,6 @@
 {
   "catalog_id": "io.github.xiaoweikin.engineering-specifications",
-  "catalog_version": "1.6.0",
+  "catalog_version": "1.7.0",
   "schema_version": 1,
   "specs": [
     {
@@ -99,6 +99,35 @@
       ],
       "sha256": "f12b2bcfa0f9a74ad8103690ffa3e86c5ff76a6041684bf60f0ad14f0f2e4436",
       "version": "0.2.0"
+    },
+    {
+      "applies_to": [
+        "**/*.md",
+        "**/*.mdx"
+      ],
+      "description": "Load when writing or reviewing engineering documentation, procedures, architecture explanations, or evidence-backed technical claims",
+      "id": "documentation/technical-documentation",
+      "path": "specification/documentation/technical-documentation.md",
+      "required": false,
+      "requires": [
+        "core/semantic-naming"
+      ],
+      "sha256": "22a3325883a37df48f5d0040c18be8c5fdc6079315265d733a540d0efc38d1ba",
+      "version": "0.1.0"
+    },
+    {
+      "applies_to": [
+        "**/*"
+      ],
+      "description": "Load when generating or reviewing diagrams, interactive views, presentations, simulations, or video that explain engineering facts",
+      "id": "documentation/derived-explanations",
+      "path": "specification/documentation/derived-explanations.md",
+      "required": false,
+      "requires": [
+        "documentation/technical-documentation"
+      ],
+      "sha256": "fdbe9951e1beb1d7ddb69ba18868b8afa4fc2d77b93770e53e49da36facb9adc",
+      "version": "0.1.0"
     }
   ]
 }
