@@ -36,16 +36,18 @@ The catalog is designed for reusable rules across several engineering layers:
 - `databases/` for shared schema design and systems such as MySQL or
   ClickHouse;
 - `testing/` for cross-language and technology-specific test contracts;
-- `protocols/` for shared HTTP, gRPC, messaging, and compatibility rules.
+- `protocols/` for shared HTTP, gRPC, messaging, and compatibility rules;
+- `documentation/` for optional cross-language contracts that preserve
+  engineering meaning in technical documents and derived explanation surfaces.
 
 These are independent composition dimensions. A database schema rule can be
 cross-language without being required in a repository that has no database.
 Framework and database specifications can depend on language, protocol, or
 shared data specifications without copying their rules.
 
-The current release contains only Core and Go specifications. The remaining
-categories describe where future reusable specifications belong; they are not
-published until they appear in `catalog.json`.
+The current Catalog contains Core, Go, and documentation specifications. The
+remaining categories describe where future reusable specifications belong;
+they are not published until they appear in `catalog.json`.
 
 Read the [Specification Model](docs/specification-model.md) for the taxonomy,
 dependency model, selection modes, task-time routing, and project ownership
@@ -100,6 +102,7 @@ and which mechanisms remain staged. The
 ├── specification/
 │   ├── 0000-template.md
 │   ├── core/
+│   ├── documentation/
 │   └── languages/
 ├── scripts/
 │   ├── check.py
@@ -120,7 +123,12 @@ The current catalog contains:
 - `languages/go/functional-options`, explicitly selected and activated for Go
   functional-option API design, validation, composition, and migration;
 - `languages/go/factory-delegation`, explicitly selected and activated for
-  optional capability factories built from named function delegates.
+  optional capability factories built from named function delegates;
+- `documentation/technical-documentation`, explicitly selected for preserving
+  state, evidence, procedure semantics, terminology ownership, and freshness;
+- `documentation/derived-explanations`, explicitly selected for preserving
+  authority, provenance, and equivalent information in diagrams, interactive
+  views, presentations, simulations, and video.
 
 ## Catalog contract
 
