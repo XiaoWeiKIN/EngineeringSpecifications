@@ -272,7 +272,11 @@ Specification Proposal，以及它承载什么成熟度承诺。版本、摘要�
 - `languages/go/functional-options`，面向函数式选项 API 工作显式选择，并依赖
   `languages/go`；
 - `languages/go/factory-delegation`，面向可选能力工厂显式选择，并依赖
-  `languages/go/functional-options`。
+  `languages/go/functional-options`；
+- `documentation/technical-documentation`，面向工程状态、证据、操作步骤、术语和
+  当前性完整性显式选择，并依赖 `core/semantic-naming`；
+- `documentation/derived-explanations`，面向派生解释的权威边界、来源追踪和等价
+  信息显式选择，并依赖 `documentation/technical-documentation`。
 
 当前规范正文见[规范索引](../specification/README.md)，机器事实源见
 [catalog.json](../catalog.json)。
