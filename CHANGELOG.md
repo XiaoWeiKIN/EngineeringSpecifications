@@ -4,6 +4,8 @@ All notable Catalog and normative specification changes are recorded here.
 
 ## Unreleased
 
+## [1.7.0] - 2026-10-04
+
 ### Added
 
 - Approved ESP-0014 and added the optional `documentation/` Catalog layer for
@@ -20,10 +22,10 @@ All notable Catalog and normative specification changes are recorded here.
 
 ### Changed
 
-- Advanced the development Catalog to `1.7.0`. Both documentation
-  Specifications are explicitly selected, the technical-documentation Spec
-  depends on `core/semantic-naming`, and the derived-explanations Spec depends
-  on `documentation/technical-documentation`. Catalog schema version 1 and all
+- Advanced the Catalog to `1.7.0`. Both documentation Specifications are
+  explicitly selected, the technical-documentation Spec depends on
+  `core/semantic-naming`, and the derived-explanations Spec depends on
+  `documentation/technical-documentation`. Catalog schema version 1 and all
   previously published Requirement behavior remain unchanged.
 
 ## [1.6.0] - 2026-08-10
