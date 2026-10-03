@@ -20,6 +20,7 @@ Catalog 会沿独立的工程维度扩展。下面的分类定义未来规范的
 | `databases/` | 与厂商无关的 Schema 设计，以及 MySQL、ClickHouse 等数据库特有行为 | 显式选择或确定性仓库证据 |
 | `testing/` | 跨语言测试契约，以及单元、集成、契约和端到端测试规范 | 显式选择与测试文件作用域 |
 | `protocols/` | HTTP、gRPC、消息、序列化和兼容性契约 | 显式选择或仓库证据 |
+| `documentation/` | 技术文档与派生解释界面的跨语言完整性契约 | 显式选择；任务意图决定激活 |
 
 跨语言可复用不等于所有项目必选。例如，与厂商无关的数据库建表规范可以服务多种
 编程语言，但没有数据库的仓库不需要安装它。`core/` 只保留每个实现型仓库都应携带
@@ -47,6 +48,8 @@ flowchart TB
     MySQL["databases/mysql"]
     ClickHouse["databases/clickhouse"]
     Testing["testing/foundations"]
+    Docs["documentation/technical-documentation"]
+    Derived["documentation/derived-explanations"]
     Project["项目自有规范"]
 
     Naming --> Boundary
@@ -59,6 +62,8 @@ flowchart TB
     Boundary --> Java
     Naming --> Schema
     Naming --> Testing
+    Naming --> Docs
+    Docs --> Derived
     Go --> Gin
     HTTP --> Gin
     Go --> Gorm
