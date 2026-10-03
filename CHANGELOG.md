@@ -4,6 +4,28 @@ All notable Catalog and normative specification changes are recorded here.
 
 ## Unreleased
 
+### Added
+
+- Approved ESP-0014 and added the optional `documentation/` Catalog layer for
+  reusable documentation-integrity contracts without making Google-informed or
+  STE-inspired editorial guidance normative.
+- Added Development `documentation/technical-documentation` version `0.1.0`
+  with five Advisory Requirements covering engineering state, evidence-backed
+  claims, procedure semantics, owning terminology, and current-versus-historical
+  freshness.
+- Added Development `documentation/derived-explanations` version `0.1.0` with
+  three Advisory Requirements covering derived authority, source provenance,
+  and equivalent access to engineering information across diagrams,
+  interactive views, presentations, simulations, and video.
+
+### Changed
+
+- Advanced the development Catalog to `1.7.0`. Both documentation
+  Specifications are explicitly selected, the technical-documentation Spec
+  depends on `core/semantic-naming`, and the derived-explanations Spec depends
+  on `documentation/technical-documentation`. Catalog schema version 1 and all
+  previously published Requirement behavior remain unchanged.
+
 ## [1.6.0] - 2026-08-10
 
 ### Added
