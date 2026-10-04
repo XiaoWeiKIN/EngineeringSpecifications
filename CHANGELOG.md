@@ -4,6 +4,8 @@ All notable Catalog and normative specification changes are recorded here.
 
 ## Unreleased
 
+## [1.7.1] - 2026-10-04
+
 ### Changed
 
 - Prepare development Catalog `1.7.1` for an editorial review of existing Spec
