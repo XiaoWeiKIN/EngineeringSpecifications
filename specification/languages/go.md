@@ -6,8 +6,9 @@
 >
 > **Selection:** Detected
 >
-> **Routing:** Selection installs this Specification when Go is detected. Load
-> it only for tasks that create, change, or review hand-written Go contracts.
+> **Routing:** Go detection recommends this optional Specification; explicit
+> project selection installs it. Load it only for tasks that create, change,
+> or review hand-written Go contracts.
 >
 > **Catalog metadata:** `catalog.json` is the source of truth for version,
 > dependencies, file scopes, detection evidence, activation summary, and
@@ -185,8 +186,8 @@ context.
 **Automated enforcement:** Advisory
 
 Package names **SHOULD** be short, lowercase, and meaningful when combined with
-their exported identifiers. They **SHOULD NOT** repeat information already
-provided by the package name.
+their exported identifiers. Exported identifiers **SHOULD NOT** repeat
+information already provided by the package name.
 
 Ordinary accessors **SHOULD** omit `Get`. Protocol operations named `Get` and
 stable compatibility surfaces may retain it. Constructors **SHOULD** use names
@@ -397,7 +398,10 @@ matrix, and governed exceptions for intentionally uncovered dimensions.
 
 ## Approved patterns
 
-The following examples are non-normative:
+The following examples are non-normative. The snippet omits its package
+declaration and import block; a runnable wrapper supplies the `errors` and
+`net/url` imports. It is not a complete service or proof that a consuming
+project gates every effect.
 
 ```go
 type HTTPClient struct{}
@@ -494,6 +498,13 @@ Compatibility or migration: none | <preserved API and removal condition>
 ```
 
 ## Compatibility and migration
+
+Version `0.5.1` clarifies that Go detection recommends rather than installs
+the optional Specification, in line with the existing explicit-selection
+contract. It names exported identifiers as the subject of the anti-repetition
+guidance in `GO-NAME-002` and labels the example's omitted context. Requirement
+IDs, strength, applicability, dependencies, exceptions, and Verification rows
+are unchanged. No implementation migration is required.
 
 Version `0.5.0` adds the Requirement-level Automated enforcement contract and
 sets every existing `GO-*` Requirement to `Advisory`. It preserves normative

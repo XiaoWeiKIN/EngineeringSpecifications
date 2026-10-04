@@ -19,6 +19,14 @@ All notable Catalog and normative specification changes are recorded here.
   and include documentation in the repository guide's taxonomy.
 - Record a bounded semantic review and add preservation and example regression
   tests. Existing `core/semantic-naming` prose remains unchanged after review.
+- Continue the bounded editorial review with `languages/go` at `0.5.1` and
+  `documentation/derived-explanations` at `0.1.1`. Clarify optional Go selection
+  and the exported-identifier subject; align provenance examples with the
+  unchanged source-identity/currentness contract. Keep other reviewed Specs
+  unchanged and preserve the prepared `1.7.0` release.
+- Extend preservation tests with a separate follow-up delta and exercise the
+  unchanged Go implementation snippet with valid and invalid inputs. This is
+  example evidence, not a production conformance or accessibility claim.
 
 ## [1.7.0] - 2026-10-04
 

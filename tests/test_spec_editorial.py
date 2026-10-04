@@ -17,6 +17,9 @@ BASELINE = json.loads(
 )
 DATA_PATH = "specification/core/data-boundaries.md"
 GO_PATH = "specification/languages/go/functional-options.md"
+FOLLOWUP = json.loads(
+    (ROOT / "tests/fixtures/spec-editorial-followup.json").read_text(encoding="utf-8")
+)["edits"]
 
 
 def digest(text: str) -> str:
@@ -45,7 +48,7 @@ def restore_subject_edits(relative: str, text: str) -> str:
 
 
 class EditorialBoundaryTests(unittest.TestCase):
-    def test_catalog_only_changes_two_spec_patch_identities(self) -> None:
+    def test_catalog_only_changes_reviewed_spec_patch_identities(self) -> None:
         catalog = json.loads((ROOT / "catalog.json").read_text(encoding="utf-8"))
         self.assertEqual(catalog["schema_version"], 1)
         self.assertEqual(catalog["catalog_version"], "1.7.1")
@@ -61,6 +64,15 @@ class EditorialBoundaryTests(unittest.TestCase):
                 if item["path"] in (DATA_PATH, GO_PATH):
                     self.assertEqual(item["version"], "0.2.1")
                     self.assertNotEqual(item["sha256"], old["sha256"])
+                    self.assertEqual(item["sha256"], hashlib.sha256((ROOT / item["path"]).read_bytes()).hexdigest())
+                elif item["path"] in FOLLOWUP:
+                    # A separate reviewed delta extends, not replaces, the
+                    # original baseline. Follow-up tests reverse every edit.
+                    reviewed = FOLLOWUP[item["path"]]
+                    self.assertEqual(reviewed["before_sha256"], old["sha256"])
+                    self.assertEqual(reviewed["old_version"], old["version"])
+                    self.assertEqual(item["version"], reviewed["version"])
+                    self.assertEqual(item["sha256"], reviewed["sha256"])
                     self.assertEqual(item["sha256"], hashlib.sha256((ROOT / item["path"]).read_bytes()).hexdigest())
                 else:
                     self.assertEqual(item["version"], old["version"])
