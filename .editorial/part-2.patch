@@ -1,0 +1,521 @@
+diff --git a/specification/README.md b/specification/README.md
+index ae96e8a..7febd1d 100644
+--- a/specification/README.md
++++ b/specification/README.md
+@@ -15,7 +15,9 @@ normative requirements. New and substantially rewritten text should use BCP 14
+ terms when requirement strength affects compliance. Rationale, examples, and
+ implementation suggestions should be identified as non-normative.
+ 
+-Current documents without an explicit status are Development. See the
++Current Catalog documents include an explicit Status marker, which the
++canonical check validates. Historical sources without a marker retain the
++legacy Development default. See the
+ [Specification Lifecycle](../governance/lifecycle.md) for compatibility
+ expectations. Development requirements remain normative within a pinned
+ version; the status permits a later version to change incompatibly.
+@@ -41,9 +43,14 @@ IDs, bounded activation cards, exact context dependencies, enforcement
+ classes, automated enforcement levels, verification mechanisms,
+ implementation evidence, and an Agent handoff.
+ 
+-The template is an authoring resource, not a published specification. A
+-document becomes published only after it has its own path and stable Catalog
+-entry. `catalog.json` remains authoritative for version, dependencies, scopes,
++Use the non-normative
++[Specification writing guide](../governance/specification-writing.md) to review
++prose and examples without changing requirement strength.
++
++The template is an authoring resource, not a Catalog Specification. A document
++becomes selectable in a checkout after it has its own path and stable Catalog
++entry. A production release additionally needs the matching immutable tag.
++`catalog.json` remains authoritative for version, dependencies, scopes,
+ detection evidence, and digest.
+ 
+ Selection and task activation are separate. Required means the Specification
+@@ -75,7 +82,7 @@ The Markdown files are the normative sources. `catalog.json` supplies stable
+ IDs, versions, dependencies, scopes, detection evidence, and content digests
+ for machine consumers.
+ 
+-This index lists only published specifications. The
++This index lists only Specifications in the working-tree Catalog. The
+ [Specification Model](../docs/specification-model.md) defines how future Core,
+ language, framework, database, testing, protocol, and documentation specifications compose
+ without turning planned categories into published contracts.
+diff --git a/specification/core/data-boundaries.md b/specification/core/data-boundaries.md
+index f6350ee..9ebc0c1 100644
+--- a/specification/core/data-boundaries.md
++++ b/specification/core/data-boundaries.md
+@@ -228,16 +228,26 @@ encode_response(result)
+ `decode_json` establishes JSON structure. `parse_create_command` establishes
+ domain invariants and returns a command that `execute` can safely consume.
+ 
+-A rejection test observes the effect boundary:
+-
+-```text
+-command, error = parse_create_command(invalid_transport)
+-assert error.field == "retention_days"
+-assert command is absent
++A rejection test exercises the entry point that can reach the effect boundary,
++not only the parser. This non-normative Python test fragment uses a harness
++that supplies `boundary_entry`, `invalid_transport`, and fresh recording spies:
++
++```python
++repository = recording_repository()
++publisher = recording_publisher()
++outcome = boundary_entry(invalid_transport, repository, publisher)
++assert outcome.error.field == "retention_days"
++assert outcome.command is None
+ assert repository.write_count == 0
+ assert publisher.message_count == 0
+ ```
+ 
++The [executable illustration](../../tests/test_documentation_examples.py)
++supplies that harness. A valid-input control reaches both spies; an
++intentionally broken entry point makes the same rejection assertions fail.
++These controls detect a disconnected or vacuous test. They do not prove that
++a consuming project's actual boundary is safe.
++
+ ## Rejected patterns
+ 
+ - Casting a decoded map or transport object directly to a domain type violates
+@@ -285,6 +295,11 @@ Exceptions: none | <upstream contract and remaining local checks>
+ 
+ ## Compatibility and migration
+ 
++Version `0.2.1` clarifies prose, example boundaries, and reference authority.
++It preserves Requirement IDs, obligations, activation metadata, context
++dependencies, automated enforcement levels, and Verification mappings.
++No consumer behavior migration is introduced by this editorial patch.
++
+ Version `0.2.0` adds the Requirement-level Automated enforcement contract and
+ sets every existing `DATA-*` Requirement to `Advisory`. It preserves normative
+ behavior, IDs, activation, context dependencies, enforcement classes, and
+@@ -306,6 +321,9 @@ internal boundary without changing an owning external surface.
+ 
+ ## References
+ 
++References provide provenance and explanation. They do not add undeclared
++normative obligations or require adoption of an external style guide.
++
+ - [ESP-0007: Separate Spec selection from task activation](../../proposals/0007_agent-task-activation-and-data-boundaries.md)
+ - [Semantic Naming](semantic-naming.md)
+ - [BCP 14](https://www.rfc-editor.org/info/bcp14)
+diff --git a/specification/core/semantic-naming.md b/specification/core/semantic-naming.md
+index 0698cc4..acf813d 100644
+--- a/specification/core/semantic-naming.md
++++ b/specification/core/semantic-naming.md
+@@ -322,6 +322,11 @@ Compatibility or migration: none | <old-to-new contract>
+ 
+ ## Compatibility and migration
+ 
++Version `1.2.1` clarifies prose, example boundaries, and reference authority.
++It preserves Requirement IDs, obligations, activation metadata, context
++dependencies, automated enforcement levels, and Verification mappings.
++No consumer behavior migration is introduced by this editorial patch.
++
+ Version `1.2.0` adds the Requirement-level Automated enforcement contract and
+ sets every existing `SEM-*` Requirement to `Advisory`. It preserves normative
+ behavior, IDs, activation, context dependencies, enforcement classes, and
+@@ -363,6 +368,9 @@ version. Requirement IDs `SEM-NAME-001`, `SEM-VERB-001`, `SEM-SURFACE-001`,
+ 
+ ## References
+ 
++References provide provenance and explanation. They do not add undeclared
++normative obligations or require adoption of an external style guide.
++
+ - [ESP-0007: Separate Spec selection from task activation](../../proposals/0007_agent-task-activation-and-data-boundaries.md)
+ - [BCP 14](https://www.rfc-editor.org/info/bcp14)
+ - [Data Boundaries](data-boundaries.md)
+diff --git a/specification/documentation/derived-explanations.md b/specification/documentation/derived-explanations.md
+index 6ef8875..932eb43 100644
+--- a/specification/documentation/derived-explanations.md
++++ b/specification/documentation/derived-explanations.md
+@@ -198,7 +198,8 @@ accessibility check and a review of the engineering information it preserves.
+ 
+ ## Approved patterns
+ 
+-The following examples are non-normative.
++The following examples are non-normative. Artifact IDs and abbreviated
++revisions are placeholders, not evidence for a real project.
+ 
+ A generated diagram bundle can record:
+ 
+@@ -259,7 +260,8 @@ An agent applying this Specification reports:
+ Activated requirements: <DOC-DERIVED-* / DOC-A11Y-* IDs>
+ Canonical sources: <artifact IDs or paths>
+ Source identity: <revision / snapshot / digests, or unverifiable>
+-Derived authority: none | <exact embedded source that retains its original authority>
++Derived authority: none
++Embedded source attribution: none | <owning source and its unchanged authority>
+ Simulation or synthetic data: none | <assumptions and label>
+ Equivalent representation: <text, relationship list, keyboard path, captions, transcript>
+ Freshness: current at <source identity> | stale | unknown
+@@ -267,6 +269,11 @@ Freshness: current at <source identity> | stale | unknown
+ 
+ ## Compatibility and migration
+ 
++Version `0.1.1` clarifies prose, example boundaries, and reference authority.
++It preserves Requirement IDs, obligations, activation metadata, context
++dependencies, automated enforcement levels, and Verification mappings.
++No consumer behavior migration is introduced by this editorial patch.
++
+ Version `0.1.0` introduces the first Development contract for reusable derived
+ explanation surfaces. It does not require any renderer or media format and does
+ not convert existing diagrams, presentations, or videos into governed
+@@ -279,6 +286,9 @@ selected.
+ 
+ ## References
+ 
++References provide provenance and explanation. They do not add undeclared
++normative obligations or require adoption of an external style guide.
++
+ - [ESP-0014: Reusable documentation integrity contracts](../../proposals/0014_documentation-integrity-contracts.md)
+ - [Technical Documentation Integrity](technical-documentation.md)
+ - [Google Developer Documentation Style Guide: Accessibility](https://developers.google.com/style/accessibility)
+diff --git a/specification/documentation/technical-documentation.md b/specification/documentation/technical-documentation.md
+index 8d9a39d..cf780ae 100644
+--- a/specification/documentation/technical-documentation.md
++++ b/specification/documentation/technical-documentation.md
+@@ -231,7 +231,8 @@ Current guidance **MUST** identify an observable source owner or version
+ boundary when drift could make the documented behavior unsafe or misleading.
+ 
+ A historical ADR, plan, checkpoint, benchmark result, research snapshot, or
+-other immutable record **MUST** remain identifiable as historical and **MUST NOT** be treated as proof that the current implementation still has the same
++other immutable record **MUST** remain identifiable as historical and
++**MUST NOT** be treated as proof that the current implementation still has the same
+ behavior without current supporting evidence.
+ 
+ When current guidance is stale, the maintainer **MUST** update or supersede the
+@@ -252,7 +253,9 @@ for any historical artifact cited as context rather than current proof.
+ 
+ ## Approved patterns
+ 
+-The following examples are non-normative.
++The following examples are non-normative. Artifact IDs, abbreviated revisions,
++and command names are placeholders; they are not actual evidence or executable
++project instructions.
+ 
+ A proposal keeps its state:
+ 
+@@ -327,6 +330,11 @@ Exceptions: none | <project-owned or source-owned exception>
+ 
+ ## Compatibility and migration
+ 
++Version `0.1.1` clarifies prose, example boundaries, and reference authority.
++It preserves Requirement IDs, obligations, activation metadata, context
++dependencies, automated enforcement levels, and Verification mappings.
++No consumer behavior migration is introduced by this editorial patch.
++
+ Version `0.1.0` introduces the first Development contract for reusable
+ technical-documentation integrity. It does not require existing repositories
+ to adopt the Specification and does not rewrite existing documents.
+@@ -338,6 +346,9 @@ Specification.
+ 
+ ## References
+ 
++References provide provenance and explanation. They do not add undeclared
++normative obligations or require adoption of an external style guide.
++
+ - [ESP-0014: Reusable documentation integrity contracts](../../proposals/0014_documentation-integrity-contracts.md)
+ - [Semantic Naming](../core/semantic-naming.md)
+ - [BCP 14](https://www.rfc-editor.org/info/bcp14)
+diff --git a/specification/languages/go.md b/specification/languages/go.md
+index 197964c..ae437d7 100644
+--- a/specification/languages/go.md
++++ b/specification/languages/go.md
+@@ -6,8 +6,9 @@
+ >
+ > **Selection:** Detected
+ >
+-> **Routing:** Selection installs this Specification when Go is detected. Load
+-> it only for tasks that create, change, or review hand-written Go contracts.
++> **Routing:** Go detection recommends this optional Specification; explicit
++> project selection installs it. Load it only for tasks that create, change,
++> or review hand-written Go contracts.
+ >
+ > **Catalog metadata:** `catalog.json` is the source of truth for version,
+ > dependencies, file scopes, detection evidence, activation summary, and
+@@ -397,7 +398,9 @@ matrix, and governed exceptions for intentionally uncovered dimensions.
+ 
+ ## Approved patterns
+ 
+-The following examples are non-normative:
++The following examples are non-normative Go fragments. They omit the package
++declaration and the `errors` and `net/url` imports. They illustrate naming and
++boundary types, not a complete server or a conformance test suite.
+ 
+ ```go
+ type HTTPClient struct{}
+@@ -433,7 +436,9 @@ inventory.
+ 
+ ## Rejected patterns
+ 
+-- `type HttpClient` and `parseUrl` violate `GO-NAME-001`.
++- `type HttpClient` and `parseUrl` depart from the default casing in
++  `GO-NAME-001`. Review its documented exceptions before treating the spelling
++  as non-conforming.
+ - Package and type pairs such as `http.HTTPServer` may violate `GO-NAME-002`
+   when the package already supplies the missing context.
+ - Committing changed module metadata without normalizing every declared module
+@@ -495,6 +500,11 @@ Compatibility or migration: none | <preserved API and removal condition>
+ 
+ ## Compatibility and migration
+ 
++Version `0.5.1` clarifies prose, example boundaries, and reference authority.
++It preserves Requirement IDs, obligations, activation metadata, context
++dependencies, automated enforcement levels, and Verification mappings.
++No consumer behavior migration is introduced by this editorial patch.
++
+ Version `0.5.0` adds the Requirement-level Automated enforcement contract and
+ sets every existing `GO-*` Requirement to `Advisory`. It preserves normative
+ behavior, IDs, activation, context dependencies, enforcement classes, and
+@@ -521,6 +531,9 @@ while they prepare the required checks.
+ 
+ ## References
+ 
++References provide provenance and explanation. They do not add undeclared
++normative obligations or require adoption of an external style guide.
++
+ - [ESP-0007: Separate Spec selection from task activation](../../proposals/0007_agent-task-activation-and-data-boundaries.md)
+ - [Semantic Naming](../core/semantic-naming.md)
+ - [Data Boundaries](../core/data-boundaries.md)
+diff --git a/specification/languages/go/factory-delegation.md b/specification/languages/go/factory-delegation.md
+index 298ed07..5db929e 100644
+--- a/specification/languages/go/factory-delegation.md
++++ b/specification/languages/go/factory-delegation.md
+@@ -294,7 +294,10 @@ flowchart LR
+ 
+ This example is one non-normative implementation. It uses a concrete factory,
+ a closed option type, explicit nil rejection, immutable delegate state,
+-capability discovery, and a stable unsupported error.
++capability discovery, and a stable unsupported error. The Go fragments omit
++the package declaration and imports for `context`, `errors`, and `fmt`. The
++closed-interface fragment is an alternative to the concrete `Factory`, not a
++second declaration to paste into the same package.
+ 
+ ```go
+ var (
+@@ -411,6 +414,9 @@ func (factory *Factory) CreateMessageHandler(
+ 	if err != nil {
+ 		return nil, fmt.Errorf("create message handler: %w", err)
+ 	}
++	if handler == nil {
++		return nil, errors.New("message handler delegate returned nil")
++	}
+ 	return handler, nil
+ }
+ ```
+@@ -501,6 +507,11 @@ Compatibility or migration: none | <interfaces, adapters, deprecation/removal>
+ 
+ ## Compatibility and migration
+ 
++Version `0.2.1` clarifies prose, example boundaries, and reference authority.
++It preserves Requirement IDs, obligations, activation metadata, context
++dependencies, automated enforcement levels, and Verification mappings.
++No consumer behavior migration is introduced by this editorial patch.
++
+ Version `0.2.0` adds the Requirement-level Automated enforcement contract and
+ sets every existing `GO-FACTORY-*` Requirement to `Advisory`. It preserves
+ normative behavior, IDs, activation, context dependencies, enforcement classes,
+@@ -533,6 +544,9 @@ deprecation and versioning rules rather than being silently removed.
+ 
+ ## References
+ 
++References provide provenance and explanation. They do not add undeclared
++normative obligations or require adoption of an external style guide.
++
+ - [Go Functional Options](functional-options.md)
+ - [Go Implementation Specification](../go.md)
+ - [Keeping Your Modules Compatible](https://go.dev/blog/module-compatibility)
+diff --git a/specification/languages/go/functional-options.md b/specification/languages/go/functional-options.md
+index 1c9171f..8b52be5 100644
+--- a/specification/languages/go/functional-options.md
++++ b/specification/languages/go/functional-options.md
+@@ -168,8 +168,8 @@ plus reviewed public documentation for extension ownership.
+ 
+ The constructor **MUST** initialize private construction state from the
+ required inputs and documented defaults. The default call **MUST** produce a
+-valid baseline configuration. It **MUST** apply each supplied option exactly
+-once in documented application order.
++valid baseline configuration. The constructor **MUST** apply each supplied
++option exactly once in documented application order.
+ 
+ The API **MUST** define how duplicate and conflicting options behave. Override,
+ composition, and rejection are all permitted when the selected behavior is
+@@ -308,7 +308,11 @@ flowchart LR
+ 
+ This closed-interface implementation is one compliant representation; it is
+ not required when a function type or an intentionally open contract better
+-matches `GO-OPTION-TYPE-001`.
++matches `GO-OPTION-TYPE-001`. The snippets are Go fragments: the server
++example needs a package declaration and imports for `errors`, `fmt`, and
++`time`. The call-site fragment belongs inside a function. The separate worker
++example needs `errors` and `fmt`; it is an alternative, not an extra option
++requirement.
+ 
+ ```go
+ var ErrInvalidServerOption = errors.New("invalid server option")
+@@ -487,6 +491,11 @@ Compatibility or migration: none | <preserved entry point, behavior effect, and
+ 
+ ## Compatibility and migration
+ 
++Version `0.2.1` clarifies prose, example boundaries, and reference authority.
++It preserves Requirement IDs, obligations, activation metadata, context
++dependencies, automated enforcement levels, and Verification mappings.
++No consumer behavior migration is introduced by this editorial patch.
++
+ Version `0.2.0` adds the Requirement-level Automated enforcement contract and
+ sets every existing `GO-OPTION-*` Requirement to `Advisory`. It preserves
+ normative behavior, IDs, activation, context dependencies, enforcement classes,
+@@ -516,6 +525,9 @@ removing only unpublished adapters or newly added optional entry points.
+ 
+ ## References
+ 
++References provide provenance and explanation. They do not add undeclared
++normative obligations or require adoption of an external style guide.
++
+ - [Go Implementation Specification](../go.md)
+ - [Keeping Your Modules Compatible](https://go.dev/blog/module-compatibility)
+ - [Rob Pike: Self-referential functions and the design of options](https://commandcenter.blogspot.com/2014/01/self-referential-functions-and-design-of.html)
+diff --git a/specification/languages/go/performance.md b/specification/languages/go/performance.md
+index 9ae1c2f..cef1cab 100644
+--- a/specification/languages/go/performance.md
++++ b/specification/languages/go/performance.md
+@@ -277,7 +277,12 @@ flowchart TD
+     I -->|"Yes"| J["Record evidence and stop"]
+ ```
+ 
+-A compact evidence record can use this non-normative shape:
++The diagram starts with an objective, chooses a diagnostic branch from the
++evidence, and compares the changed implementation before stopping. No branch
++is a mandatory optimization order.
++
++A compact evidence record can use this non-normative shape. Its target and
++revision placeholders are illustrative, not measurements or project defaults:
+ 
+ ```yaml
+ objective: "p99 <= 40 ms at 10k requests/s without higher error rate"
+@@ -291,7 +296,7 @@ verification: "tests, repeated profile, end-to-end metrics"
+ stopping_condition: "objective met and no-regression constraints pass"
+ ```
+ 
+-CPU and allocation Profiles often form a useful first pass for compute-heavy
++CPU and allocation profiles often form a useful first pass for compute-heavy
+ services. Mutex, block, trace, runtime metrics, and dependency latency are
+ equally valid branches when the evidence points elsewhere. Compiler-assisted
+ optimization such as PGO can be evaluated before hand-written assembly when it
+@@ -358,6 +363,11 @@ Compatibility or migration: none | <supported surface and adoption plan>
+ 
+ ## Compatibility and migration
+ 
++Version `0.1.1` clarifies prose, example boundaries, and reference authority.
++It preserves Requirement IDs, obligations, activation metadata, context
++dependencies, automated enforcement levels, and Verification mappings.
++No consumer behavior migration is introduced by this editorial patch.
++
+ Version `0.1.0` introduces `GO-PERF-TARGET-001`,
+ `GO-PERF-DIAGNOSE-001`, `GO-PERF-CHANGE-001`,
+ `GO-PERF-VERIFY-001`, and `GO-PERF-LOWLEVEL-001`. Every Requirement begins
+@@ -376,6 +386,9 @@ an approved Proposal before it changes this dependency boundary.
+ 
+ ## References
+ 
++References provide provenance and explanation. They do not add undeclared
++normative obligations or require adoption of an external style guide.
++
+ - [Go Implementation](../go.md)
+ - [R-001 / RT-005: Go performance optimization workflow and specification boundary](../../../docs/research/active/r-001_reusable-go-project-practices/notes/go-performance-optimization.md)
+ - [Go Diagnostics](https://go.dev/doc/diagnostics)
+diff --git a/tests/check_go_examples.py b/tests/check_go_examples.py
+new file mode 100644
+index 0000000..2624d12
+--- /dev/null
++++ b/tests/check_go_examples.py
+@@ -0,0 +1,88 @@
++#!/usr/bin/env python3
++"""Compile the repository's exact non-normative Go fragments offline."""
++from pathlib import Path
++import argparse, os, re, shutil, subprocess, tempfile
++
++if shutil.which("go") is None:
++    raise SystemExit("A local Go toolchain is required for this optional example check.")
++
++p = argparse.ArgumentParser(description=__doc__)
++p.add_argument('root', nargs='?', type=Path, default=Path(__file__).resolve().parents[1])
++a = p.parse_args()
++def blocks(path):
++    return re.findall(r'^```go\n(.*?)^```$',(a.root/path).read_text(),re.M|re.S)
++with tempfile.TemporaryDirectory(prefix='spec-go-examples-') as tmp:
++    root=Path(tmp)
++    def write(name,content):
++        path=root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text(content)
++    write('go.mod','module example.test/spec-examples\n\ngo 1.20\n')
++    go=blocks('specification/languages/go.md');assert len(go)==1
++    write('basic/example.go','package basic\nimport("errors";"net/url")\n'+go[0])
++    write('basic/example_test.go','''package basic
++import "testing"
++func TestParser(t *testing.T) {
++ if _,err:=ParseCreateCommand(CreateRequest{}); err==nil { t.Fatal("missing name accepted") }
++ got,err:=ParseCreateCommand(CreateRequest{Name:"valid"}); if err!=nil || got.name!="valid" { t.Fatal(got,err) }
++}
++''')
++    options=blocks('specification/languages/go/functional-options.md');assert len(options)==3
++    write('options/example.go','package options\nimport("errors";"fmt";"time")\n'+options[0]+options[2])
++    write('options/example_test.go','''package options
++import("testing";"time";"errors")
++func TestCallSite(t *testing.T) {
++'''+options[1]+'''
++ if err!=nil || server==nil { t.Fatal(err) }
++}
++func TestDefaultAndOrder(t *testing.T) {
++ base,err:=NewServer("local");if err!=nil || base.options.timeout!=30*time.Second { t.Fatal(base,err) }
++ changed,err:=NewServer("local",WithTimeout(time.Second),WithTimeout(2*time.Second));if err!=nil || changed.options.timeout!=2*time.Second { t.Fatal(changed,err) }
++}
++func TestInvalidOptions(t *testing.T) {
++ for _,options:=range [][]ServerOption{{nil},{WithTimeout(0)}} {
++  got,err:=NewServer("local",options...);if got!=nil || !errors.Is(err,ErrInvalidServerOption) { t.Fatal(got,err) }
++ }
++}
++func TestWorkerConfig(t *testing.T) {
++ if _,err:=NewWorker(WorkerConfig{});err==nil {t.Fatal("invalid config accepted")}
++ if _,err:=NewWorker(WorkerConfig{Queue:"jobs",Workers:2});err!=nil {t.Fatal(err)}
++}
++''')
++    factory=blocks('specification/languages/go/factory-delegation.md');assert len(factory)==3
++    write('factory/example.go','package factory\nimport("context";"errors";"fmt")\n'+factory[0]+factory[1])
++    write('factory/example_test.go','''package factory
++import("testing";"context";"errors")
++type handler struct{}
++func (*handler) HandleMessage(context.Context,string) error {return nil}
++func TestAbsentAndNilDelegate(t *testing.T) {
++ f,err:=NewFactory("plugin");if err!=nil || f.Supports(CapabilityMessages) {t.Fatal(f,err)}
++ got,err:=f.CreateMessageHandler(context.Background(),MessageConfig{Route:"r"})
++ if got!=nil || !errors.Is(err,ErrCapabilityNotSupported) {t.Fatal(got,err)}
++ var fn CreateMessageHandlerFunc
++ if f,err:=NewFactory("p",WithMessageHandler(fn));f!=nil || !errors.Is(err,ErrInvalidFactoryOption) {t.Fatal(f,err)}
++}
++func TestDispatchIdentity(t *testing.T) {
++ ctx:=context.Background(); calls:=0; want:=&handler{}
++ f,err:=NewFactory("p",WithMessageHandler(func(c context.Context,config MessageConfig)(MessageHandler,error) {
++  calls++;if c!=ctx || config.Route!="r" {t.Fatal("arguments changed")};return want,nil
++ }))
++ if err!=nil {t.Fatal(err)}
++ got,err:=f.CreateMessageHandler(ctx,MessageConfig{Route:"r"});if err!=nil || got!=want || calls!=1 {t.Fatal(got,err,calls)}
++}
++func TestDelegateError(t *testing.T) {
++ want:=errors.New("delegate failed")
++ f,err:=NewFactory("p",WithMessageHandler(func(context.Context,MessageConfig)(MessageHandler,error){return nil,want}))
++ if err!=nil {t.Fatal(err)}
++ _,err=f.CreateMessageHandler(context.Background(),MessageConfig{Route:"r"});if !errors.Is(err,want) || errors.Is(err,ErrCapabilityNotSupported) {t.Fatal(err)}
++}
++func TestNilResultCannotBeSuccess(t *testing.T) {
++ f,err:=NewFactory("p",WithMessageHandler(func(context.Context,MessageConfig)(MessageHandler,error){return nil,nil}))
++ if err!=nil {t.Fatal(err)}
++ got,err:=f.CreateMessageHandler(context.Background(),MessageConfig{Route:"r"})
++ if got!=nil || err==nil {t.Fatal("example returned successful nil handler",got,err)}
++}
++''')
++    shared=factory[0].split('type MessageConfig',1)[1].split('type factoryOptions',1)[0]
++    write('closed/example.go','package closed\nimport "context"\ntype MessageConfig'+shared+factory[2])
++    env=dict(os.environ,GOTOOLCHAIN='local',GOPROXY='off',GOSUMDB='off',GOWORK='off')
++    print(subprocess.check_output(['go','version'],text=True).strip(),flush=True)
++    raise SystemExit(subprocess.run(['go','test','-count=1','-v','./...'],cwd=root,env=env,timeout=90).returncode)

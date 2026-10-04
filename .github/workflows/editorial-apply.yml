@@ -1,0 +1,75 @@
+name: editorial-apply-once
+on:
+  pull_request:
+    types: [opened, synchronize]
+permissions:
+  contents: read
+jobs:
+  apply-reviewed-patch:
+    if: >-
+      github.repository == 'XiaoWeiKIN/EngineeringSpecifications' &&
+      github.event.pull_request.number == 18 &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.head_ref == 'docs/spec-content-consistency'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    env:
+      EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+      WORK_REF: refs/heads/docs/spec-content-consistency
+      BASELINE: 5deda62dbacdbc753b9edbb00d1a891c76415b4a
+      FINAL_TREE: be401b2d24f9c8ac2aaec865c81008ecce7773da
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.2'
+          cache: false
+      - name: Apply only the preverified patch and check its exact final tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          test "$(git ls-remote --heads origin "$WORK_REF" | cut -f1)" = "$EXPECTED_HEAD"
+          git merge-base --is-ancestor "$BASELINE" HEAD
+          git diff --exit-code
+          git diff --cached --exit-code
+          cat .editorial/part-{0,1,2,3}.patch > "$RUNNER_TEMP/editorial.patch"
+          test "$(wc -c < "$RUNNER_TEMP/editorial.patch")" -eq 81719
+          printf '%s  %s\n' d399e39a0ecc338850fd78b26cb76b9b06f2ef2c660d8e1811395e73af6b02cd "$RUNNER_TEMP/editorial.patch" | sha256sum --check
+          git apply --index --check --whitespace=error-all "$RUNNER_TEMP/editorial.patch"
+          git apply --index --whitespace=error-all "$RUNNER_TEMP/editorial.patch"
+          git rm -- .editorial/part-{0,1,2,3}.patch .github/workflows/editorial-workspace.yml .github/workflows/editorial-apply.yml
+          test "$(git write-tree)" = "$FINAL_TREE"
+          echo "VERIFIED_SOURCE_TREE=$FINAL_TREE"
+          # Transport files remain unchanged in this work-branch push. The
+          # connector removes them in the final source-only commit.
+          git restore --source=HEAD --staged --worktree -- .editorial/part-{0,1,2,3}.patch .github/workflows/editorial-workspace.yml .github/workflows/editorial-apply.yml
+          test "$(git diff --cached --name-only | wc -l)" -eq 29
+          test -z "$(git diff --cached --name-only -- .github .editorial proposals docs/research schemas scripts)"
+          git diff --cached --check
+      - name: Run the exact reviewed source checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -B scripts/check.py
+          python3 -B tests/check_go_examples.py
+          git diff --exit-code
+          git diff --cached --check
+      - name: Commit only on the authorized work branch without force
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git ls-remote --heads origin "$WORK_REF" | cut -f1)" = "$EXPECTED_HEAD"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'docs: align specification prose, examples, metadata guidance, and tests'
+          git push origin "HEAD:$WORK_REF"
+          git rev-parse HEAD

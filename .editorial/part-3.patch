@@ -1,0 +1,240 @@
+diff --git a/tests/test_catalog.py b/tests/test_catalog.py
+index 7cda9d1..51d9500 100644
+--- a/tests/test_catalog.py
++++ b/tests/test_catalog.py
+@@ -90,7 +90,7 @@ class CatalogTestCase(unittest.TestCase):
+             catalog["catalog_id"],
+             "io.github.xiaoweikin.engineering-specifications",
+         )
+-        self.assertEqual(catalog["catalog_version"], "1.7.0")
++        self.assertEqual(catalog["catalog_version"], "1.7.1")
+         self.assertEqual(len(catalog["specs"]), 8)
+         self.assertEqual(
+             {item["id"] for item in catalog["specs"]},
+@@ -149,9 +149,9 @@ class CatalogTestCase(unittest.TestCase):
+             for item in catalog["specs"]
+             if item["id"] == "documentation/derived-explanations"
+         )
+-        self.assertEqual(semantic_naming["version"], "1.2.0")
+-        self.assertEqual(data_boundaries["version"], "0.2.0")
+-        self.assertEqual(technical_documentation["version"], "0.1.0")
++        self.assertEqual(semantic_naming["version"], "1.2.1")
++        self.assertEqual(data_boundaries["version"], "0.2.1")
++        self.assertEqual(technical_documentation["version"], "0.1.1")
+         self.assertEqual(
+             technical_documentation["requires"], ["core/semantic-naming"]
+         )
+@@ -159,7 +159,7 @@ class CatalogTestCase(unittest.TestCase):
+             technical_documentation["applies_to"], ["**/*.md", "**/*.mdx"]
+         )
+         self.assertNotIn("detection", technical_documentation)
+-        self.assertEqual(derived_explanations["version"], "0.1.0")
++        self.assertEqual(derived_explanations["version"], "0.1.1")
+         self.assertEqual(
+             derived_explanations["requires"],
+             ["documentation/technical-documentation"],
+@@ -178,19 +178,19 @@ class CatalogTestCase(unittest.TestCase):
+             "`Extract` **MUST NOT** be a catch-all name",
+             semantic_naming_text,
+         )
+-        self.assertEqual(go_spec["version"], "0.5.0")
++        self.assertEqual(go_spec["version"], "0.5.1")
+         self.assertIn("**/go.sum", go_spec["applies_to"])
+         self.assertIn("**/vendor/modules.txt", go_spec["applies_to"])
+-        self.assertEqual(functional_options_spec["version"], "0.2.0")
++        self.assertEqual(functional_options_spec["version"], "0.2.1")
+         self.assertEqual(functional_options_spec["requires"], ["languages/go"])
+         self.assertNotIn("detection", functional_options_spec)
+-        self.assertEqual(factory_delegation_spec["version"], "0.2.0")
++        self.assertEqual(factory_delegation_spec["version"], "0.2.1")
+         self.assertEqual(
+             factory_delegation_spec["requires"],
+             ["languages/go/functional-options"],
+         )
+         self.assertNotIn("detection", factory_delegation_spec)
+-        self.assertEqual(performance_spec["version"], "0.1.0")
++        self.assertEqual(performance_spec["version"], "0.1.1")
+         self.assertEqual(performance_spec["requires"], ["languages/go"])
+         self.assertIn("**/*.s", performance_spec["applies_to"])
+         self.assertNotIn("detection", performance_spec)
+diff --git a/tests/test_documentation_examples.py b/tests/test_documentation_examples.py
+new file mode 100644
+index 0000000..03d5a69
+--- /dev/null
++++ b/tests/test_documentation_examples.py
+@@ -0,0 +1,103 @@
++"""Exercise the exact documented fragment, not a consumer conformance claim."""
++from __future__ import annotations
++
++import re
++import unittest
++from pathlib import Path
++from types import SimpleNamespace
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++class RecordingRepository:
++    def __init__(self) -> None:
++        self.write_count = 0
++
++    def write(self, command: object) -> None:
++        self.write_count += 1
++
++
++class RecordingPublisher:
++    def __init__(self) -> None:
++        self.message_count = 0
++
++    def publish(self, command: object) -> None:
++        self.message_count += 1
++
++
++def boundary_entry(shape, repository, publisher):
++    """Illustrative domain: a decoded mapping with positive retention days."""
++    days = shape.get("retention_days")
++    if type(days) is not int or days <= 0:
++        return SimpleNamespace(
++            command=None, error=SimpleNamespace(field="retention_days")
++        )
++    command = {"retention_days": days}
++    repository.write(command)
++    publisher.publish(command)
++    return SimpleNamespace(command=command, error=None)
++
++
++def run_documented_fragment(entry, invalid_transport) -> dict:
++    text = (ROOT / "specification/core/data-boundaries.md").read_text(
++        encoding="utf-8"
++    )
++    examples = text.split("## Approved patterns\n", 1)[1].split(
++        "## Rejected patterns\n", 1
++    )[0]
++    fragments = re.findall(r"^```python\n(.*?)^```$", examples, re.M | re.S)
++    if len(fragments) != 1:
++        raise AssertionError("Expected exactly one documented Python fragment")
++    namespace = {
++        "recording_repository": RecordingRepository,
++        "recording_publisher": RecordingPublisher,
++        "boundary_entry": entry,
++        "invalid_transport": invalid_transport,
++    }
++    # The versioned local example is test code. No remotely loaded Specification
++    # is executed, and these fakes perform no network, process, or file effects.
++    exec(compile(fragments[0], "data-boundaries.md example", "exec"), namespace)
++    return namespace
++
++
++class DocumentationExampleTests(unittest.TestCase):
++    def test_documented_rejection_fragment_exercises_the_boundary(self) -> None:
++        for shape in ({}, {"retention_days": 0}, {"retention_days": -1},
++                      {"retention_days": False}, {"retention_days": "7"}):
++            with self.subTest(shape=shape):
++                calls = []
++
++                def observed_entry(value, repository, publisher):
++                    calls.append(value)
++                    return boundary_entry(value, repository, publisher)
++
++                run_documented_fragment(observed_entry, shape)
++                self.assertEqual(calls, [shape])
++
++    def test_valid_input_control_reaches_both_recording_spies(self) -> None:
++        repository, publisher = RecordingRepository(), RecordingPublisher()
++        outcome = boundary_entry({"retention_days": 7}, repository, publisher)
++        self.assertIsNone(outcome.error)
++        self.assertEqual(outcome.command, {"retention_days": 7})
++        self.assertEqual(repository.write_count, 1)
++        self.assertEqual(publisher.message_count, 1)
++
++    def test_same_fragment_detects_a_write_before_rejection(self) -> None:
++        def broken_entry(shape, repository, publisher):
++            repository.write(shape)
++            return boundary_entry(shape, repository, publisher)
++
++        with self.assertRaises(AssertionError):
++            run_documented_fragment(broken_entry, {"retention_days": 0})
++
++    def test_same_fragment_detects_publication_before_rejection(self) -> None:
++        def broken_entry(shape, repository, publisher):
++            publisher.publish(shape)
++            return boundary_entry(shape, repository, publisher)
++
++        with self.assertRaises(AssertionError):
++            run_documented_fragment(broken_entry, {"retention_days": 0})
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tests/test_editorial_consistency.py b/tests/test_editorial_consistency.py
+new file mode 100644
+index 0000000..9be764f
+--- /dev/null
++++ b/tests/test_editorial_consistency.py
+@@ -0,0 +1,66 @@
++"""Check authoring/distribution consistency, not linguistic or semantic quality."""
++from __future__ import annotations
++
++import json
++import re
++import unittest
++from pathlib import Path
++
++ROOT = Path(__file__).resolve().parents[1]
++CATALOG = json.loads((ROOT / "catalog.json").read_text(encoding="utf-8"))
++GUIDE = "governance/specification-writing.md"
++
++
++class EditorialConsistencyTests(unittest.TestCase):
++    def test_authoring_entrypoints_resolve_the_same_local_guide(self) -> None:
++        for relative in ("AGENTS.md", "CONTRIBUTING.md", "governance/README.md",
++                         "specification/0000-template.md", "specification/README.md",
++                         "README.md", "README.zh-CN.md"):
++            with self.subTest(path=relative):
++                text = (ROOT / relative).read_text(encoding="utf-8")
++                if relative == "AGENTS.md":
++                    self.assertIn(f"`{GUIDE}`", text)
++                else:
++                    links = re.findall(r"\]\(([^)]+)\)", text)
++                    targets = {(ROOT / relative).parent.joinpath(link).resolve()
++                               for link in links if not link.startswith("https://")}
++                    self.assertIn((ROOT / GUIDE).resolve(), targets)
++
++    def test_authoring_guidance_is_not_installed_as_a_spec_dependency(self) -> None:
++        for item in CATALOG["specs"]:
++            self.assertNotEqual(item["path"], GUIDE)
++            if item["id"].startswith(("core/", "languages/")):
++                self.assertFalse(any(d.startswith("documentation/")
++                                     for d in item["requires"]))
++
++    def test_spec_index_matches_the_current_catalog_paths(self) -> None:
++        text = (ROOT / "specification/README.md").read_text(encoding="utf-8")
++        links = re.findall(r"\]\(([^)]+)\)", text)
++        indexed = {"specification/" + link for link in links
++                   if link.startswith(("core/", "languages/", "documentation/"))}
++        self.assertEqual(indexed, {item["path"] for item in CATALOG["specs"]})
++
++    def test_catalog_versions_match_the_first_compatibility_note(self) -> None:
++        for item in CATALOG["specs"]:
++            with self.subTest(spec=item["id"]):
++                text = (ROOT / item["path"]).read_text(encoding="utf-8")
++                compatibility = text.split("## Compatibility and migration\n", 1)[1]
++                first = re.search(r"Version `([0-9]+\.[0-9]+\.[0-9]+)`", compatibility)
++                self.assertIsNotNone(first)
++                self.assertEqual(first.group(1), item["version"])
++
++    def test_reference_sections_keep_external_sources_non_normative(self) -> None:
++        for item in CATALOG["specs"]:
++            with self.subTest(spec=item["id"]):
++                text = (ROOT / item["path"]).read_text(encoding="utf-8")
++                references = text.split("## References\n", 1)[1]
++                self.assertIn("They do not add undeclared\nnormative obligations", references)
++
++    def test_current_repository_entry_names_the_current_consumer(self) -> None:
++        text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
++        self.assertIn("RepoFoundry AI", text)
++        self.assertNotIn("EngineeringWorkflow", text)
++
++
++if __name__ == "__main__":
++    unittest.main()
