@@ -54,8 +54,8 @@
         "core/semantic-naming",
         "core/data-boundaries"
       ],
-      "sha256": "81ac50ab7987ac45255fd2e67f1d7b8b4381e7d98a85bf3ba8dfb308f98f8d94",
-      "version": "0.5.0"
+      "sha256": "83ac7fd8b367a7305bbb95cee8bd4b42293969ce5150ea35030a39aabcc2e557",
+      "version": "0.5.1"
     },
     {
       "applies_to": [
@@ -126,8 +126,8 @@
       "requires": [
         "documentation/technical-documentation"
       ],
-      "sha256": "fdbe9951e1beb1d7ddb69ba18868b8afa4fc2d77b93770e53e49da36facb9adc",
-      "version": "0.1.0"
+      "sha256": "e4ce1cab5143b645185854781de93f6e5e5416c6be3faad2aa14a2cadc864ec8",
+      "version": "0.1.1"
     }
   ]
 }

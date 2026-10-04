@@ -159,7 +159,7 @@ class CatalogTestCase(unittest.TestCase):
             technical_documentation["applies_to"], ["**/*.md", "**/*.mdx"]
         )
         self.assertNotIn("detection", technical_documentation)
-        self.assertEqual(derived_explanations["version"], "0.1.0")
+        self.assertEqual(derived_explanations["version"], "0.1.1")
         self.assertEqual(
             derived_explanations["requires"],
             ["documentation/technical-documentation"],
@@ -178,7 +178,7 @@ class CatalogTestCase(unittest.TestCase):
             "`Extract` **MUST NOT** be a catch-all name",
             semantic_naming_text,
         )
-        self.assertEqual(go_spec["version"], "0.5.0")
+        self.assertEqual(go_spec["version"], "0.5.1")
         self.assertIn("**/go.sum", go_spec["applies_to"])
         self.assertIn("**/vendor/modules.txt", go_spec["applies_to"])
         self.assertEqual(functional_options_spec["version"], "0.2.1")
