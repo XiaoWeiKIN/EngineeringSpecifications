@@ -39,8 +39,10 @@ Catalog 面向多个工程层级的可复用规则：
 这些是独立的组合维度。数据库 Schema 规则可以跨语言复用，但没有数据库的仓库
 不需要安装。框架和数据库规范可以依赖语言、协议或共享数据规范，无需复制上游规则。
 
-当前 Catalog 包含 Core、Go 和 documentation 规范。其余分类用于约束未来可复用
-规范的归属；只有进入 `catalog.json` 的规范才视为已经发布。
+工作树中的 Catalog 包含 Core、Go 和 documentation 规范。其余分类用于约束未来
+可复用规范的归属；只有进入 `catalog.json` 的规范才在当前检出中可供选择。
+Catalog 条目不等于已发布版本；生产发布还需要[发布流程](RELEASING.md)规定的
+匹配且不可变的 tag。
 
 分类、依赖、选择方式、任务时路由和项目规则边界见
 [规范模型](docs/specification-model.zh-CN.md)。
@@ -95,7 +97,7 @@ Catalog 面向多个工程层级的可复用规则：
 └── tests/
 ```
 
-当前 Catalog 包含：
+工作树中的 Catalog 包含：
 
 - `core/semantic-naming`，所有项目安装，在共享命名、映射、单位、状态或命名兼容
   任务中激活；
@@ -141,7 +143,9 @@ Advisory 起步；晋级必须提供版本化观测证据和回滚路径。
 
 ## 贡献
 
-规范变更与兼容流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。摘要如下：
+规范变更与兼容流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+正文、示例和评审方法见非规范性的[规范写作指导](governance/specification-writing.md)。
+摘要如下：
 
 1. 把变更分为编辑性、局部规范性或重大变更。
 2. 跨领域或公共契约的重大变化先提交 ESP。

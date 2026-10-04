@@ -228,15 +228,25 @@ encode_response(result)
 `decode_json` establishes JSON structure. `parse_create_command` establishes
 domain invariants and returns a command that `execute` can safely consume.
 
-A rejection test observes the effect boundary:
+A rejection test exercises the entry point that can reach the effect boundary,
+not only the parser. This non-normative Python test fragment uses a harness
+that supplies `boundary_entry`, `invalid_transport`, and fresh recording spies:
 
-```text
-command, error = parse_create_command(invalid_transport)
-assert error.field == "retention_days"
-assert command is absent
+```python
+repository = recording_repository()
+publisher = recording_publisher()
+outcome = boundary_entry(invalid_transport, repository, publisher)
+assert outcome.error.field == "retention_days"
+assert outcome.command is None
 assert repository.write_count == 0
 assert publisher.message_count == 0
 ```
+
+The [executable illustration](../../tests/test_documentation_examples.py)
+supplies that harness. A valid-input control reaches both spies; an
+intentionally broken entry point makes the same rejection assertions fail.
+These controls detect a disconnected or vacuous test. They do not prove that
+a consuming project's actual boundary is safe.
 
 ## Rejected patterns
 
@@ -285,6 +295,11 @@ Exceptions: none | <upstream contract and remaining local checks>
 
 ## Compatibility and migration
 
+Version `0.2.1` clarifies prose, example boundaries, and reference authority.
+It preserves Requirement IDs, obligations, activation metadata, context
+dependencies, automated enforcement levels, and Verification mappings.
+No consumer behavior migration is introduced by this editorial patch.
+
 Version `0.2.0` adds the Requirement-level Automated enforcement contract and
 sets every existing `DATA-*` Requirement to `Advisory`. It preserves normative
 behavior, IDs, activation, context dependencies, enforcement classes, and
@@ -305,6 +320,9 @@ signature, token, or public error formats. Adapters can adopt the stronger
 internal boundary without changing an owning external surface.
 
 ## References
+
+References provide provenance and explanation. They do not add undeclared
+normative obligations or require adoption of an external style guide.
 
 - [ESP-0007: Separate Spec selection from task activation](../../proposals/0007_agent-task-activation-and-data-boundaries.md)
 - [Semantic Naming](semantic-naming.md)

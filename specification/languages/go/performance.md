@@ -277,7 +277,12 @@ flowchart TD
     I -->|"Yes"| J["Record evidence and stop"]
 ```
 
-A compact evidence record can use this non-normative shape:
+The diagram starts with an objective, chooses a diagnostic branch from the
+evidence, and compares the changed implementation before stopping. No branch
+is a mandatory optimization order.
+
+A compact evidence record can use this non-normative shape. Its target and
+revision placeholders are illustrative, not measurements or project defaults:
 
 ```yaml
 objective: "p99 <= 40 ms at 10k requests/s without higher error rate"
@@ -291,7 +296,7 @@ verification: "tests, repeated profile, end-to-end metrics"
 stopping_condition: "objective met and no-regression constraints pass"
 ```
 
-CPU and allocation Profiles often form a useful first pass for compute-heavy
+CPU and allocation profiles often form a useful first pass for compute-heavy
 services. Mutex, block, trace, runtime metrics, and dependency latency are
 equally valid branches when the evidence points elsewhere. Compiler-assisted
 optimization such as PGO can be evaluated before hand-written assembly when it
@@ -358,6 +363,11 @@ Compatibility or migration: none | <supported surface and adoption plan>
 
 ## Compatibility and migration
 
+Version `0.1.1` clarifies prose, example boundaries, and reference authority.
+It preserves Requirement IDs, obligations, activation metadata, context
+dependencies, automated enforcement levels, and Verification mappings.
+No consumer behavior migration is introduced by this editorial patch.
+
 Version `0.1.0` introduces `GO-PERF-TARGET-001`,
 `GO-PERF-DIAGNOSE-001`, `GO-PERF-CHANGE-001`,
 `GO-PERF-VERIFY-001`, and `GO-PERF-LOWLEVEL-001`. Every Requirement begins
@@ -375,6 +385,9 @@ future extraction requires materially different language/runtime evidence and
 an approved Proposal before it changes this dependency boundary.
 
 ## References
+
+References provide provenance and explanation. They do not add undeclared
+normative obligations or require adoption of an external style guide.
 
 - [Go Implementation](../go.md)
 - [R-001 / RT-005: Go performance optimization workflow and specification boundary](../../../docs/research/active/r-001_reusable-go-project-practices/notes/go-performance-optimization.md)

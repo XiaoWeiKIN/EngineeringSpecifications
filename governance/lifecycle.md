@@ -57,12 +57,15 @@ scopes, and migration paths.
 
 ## Status metadata will become mechanical through a Proposal
 
-The current Catalog schema has no maturity field. Until a coordinated Catalog
+Document markers are already checked mechanically. Current Catalog documents
+include `> **Status:** Development`, `Stable`, or `Deprecated` immediately
+after the title. The validator rejects a missing or duplicate marker.
+
+Catalog schema 1 has no separate maturity field. Until a coordinated Catalog
 and RepoFoundry change is approved:
 
-- a document may display `**Status**: Development`, `Stable`, or `Deprecated`
-  immediately after its title;
-- absence of a marker means Development;
+- the document marker carries maturity;
+- historical sources without a marker retain the legacy Development default;
 - reviewers enforce transition evidence and Changelog entries;
 - the Catalog remains the machine source for version, dependency, scope, and
   digest data.

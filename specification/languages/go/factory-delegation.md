@@ -294,7 +294,10 @@ flowchart LR
 
 This example is one non-normative implementation. It uses a concrete factory,
 a closed option type, explicit nil rejection, immutable delegate state,
-capability discovery, and a stable unsupported error.
+capability discovery, and a stable unsupported error. The Go fragments omit
+the package declaration and imports for `context`, `errors`, and `fmt`. The
+closed-interface fragment is an alternative to the concrete `Factory`, not a
+second declaration to paste into the same package.
 
 ```go
 var (
@@ -411,6 +414,9 @@ func (factory *Factory) CreateMessageHandler(
 	if err != nil {
 		return nil, fmt.Errorf("create message handler: %w", err)
 	}
+	if handler == nil {
+		return nil, errors.New("message handler delegate returned nil")
+	}
 	return handler, nil
 }
 ```
@@ -501,6 +507,11 @@ Compatibility or migration: none | <interfaces, adapters, deprecation/removal>
 
 ## Compatibility and migration
 
+Version `0.2.1` clarifies prose, example boundaries, and reference authority.
+It preserves Requirement IDs, obligations, activation metadata, context
+dependencies, automated enforcement levels, and Verification mappings.
+No consumer behavior migration is introduced by this editorial patch.
+
 Version `0.2.0` adds the Requirement-level Automated enforcement contract and
 sets every existing `GO-FACTORY-*` Requirement to `Advisory`. It preserves
 normative behavior, IDs, activation, context dependencies, enforcement classes,
@@ -532,6 +543,9 @@ capability, unsupported error, default, or discovery result must follow normal
 deprecation and versioning rules rather than being silently removed.
 
 ## References
+
+References provide provenance and explanation. They do not add undeclared
+normative obligations or require adoption of an external style guide.
 
 - [Go Functional Options](functional-options.md)
 - [Go Implementation Specification](../go.md)

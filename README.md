@@ -47,7 +47,9 @@ shared data specifications without copying their rules.
 
 The current Catalog contains Core, Go, and documentation specifications. The
 remaining categories describe where future reusable specifications belong;
-they are not published until they appear in `catalog.json`.
+they are not available in this checkout until they appear in `catalog.json`.
+A Catalog entry is not a release: production releases also require the matching
+immutable tag described in [RELEASING.md](RELEASING.md).
 
 Read the [Specification Model](docs/specification-model.md) for the taxonomy,
 dependency model, selection modes, task-time routing, and project ownership
@@ -110,7 +112,7 @@ and which mechanisms remain staged. The
 └── tests/
 ```
 
-The current catalog contains:
+The working-tree Catalog contains:
 
 - `core/semantic-naming`, installed everywhere and activated for shared names,
   mappings, units, states, and naming compatibility;
@@ -170,7 +172,9 @@ and pin the resolved Git revision before materializing files.
 ## Contributing
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for the normative change and
-compatibility process. In summary:
+compatibility process and the
+[Specification writing guide](governance/specification-writing.md) for
+non-normative authoring and review methods. In summary:
 
 1. Classify the change as editorial, scoped normative, or significant.
 2. Use an ESP before significant cross-cutting or public-contract changes.

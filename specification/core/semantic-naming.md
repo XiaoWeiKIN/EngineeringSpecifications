@@ -322,6 +322,11 @@ Compatibility or migration: none | <old-to-new contract>
 
 ## Compatibility and migration
 
+Version `1.2.1` clarifies prose, example boundaries, and reference authority.
+It preserves Requirement IDs, obligations, activation metadata, context
+dependencies, automated enforcement levels, and Verification mappings.
+No consumer behavior migration is introduced by this editorial patch.
+
 Version `1.2.0` adds the Requirement-level Automated enforcement contract and
 sets every existing `SEM-*` Requirement to `Advisory`. It preserves normative
 behavior, IDs, activation, context dependencies, enforcement classes, and
@@ -362,6 +367,9 @@ version. Requirement IDs `SEM-NAME-001`, `SEM-VERB-001`, `SEM-SURFACE-001`,
 `SEM-TYPE-001`, and `SEM-COMPAT-001` preserve their previous meanings.
 
 ## References
+
+References provide provenance and explanation. They do not add undeclared
+normative obligations or require adoption of an external style guide.
 
 - [ESP-0007: Separate Spec selection from task activation](../../proposals/0007_agent-task-activation-and-data-boundaries.md)
 - [BCP 14](https://www.rfc-editor.org/info/bcp14)

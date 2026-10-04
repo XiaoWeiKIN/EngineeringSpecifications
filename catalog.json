@@ -1,6 +1,6 @@
 {
   "catalog_id": "io.github.xiaoweikin.engineering-specifications",
-  "catalog_version": "1.7.0",
+  "catalog_version": "1.7.1",
   "schema_version": 1,
   "specs": [
     {
@@ -12,8 +12,8 @@
       "path": "specification/core/semantic-naming.md",
       "required": true,
       "requires": [],
-      "sha256": "b190713f27efc11eba59551d4026036d87f30027dd624b17e62d6627e5814c83",
-      "version": "1.2.0"
+      "sha256": "56ab15b90b14122680c8d9c01fc19e084c7cc4ef77416a04d8f84f7adcc6107d",
+      "version": "1.2.1"
     },
     {
       "applies_to": [
@@ -26,8 +26,8 @@
       "requires": [
         "core/semantic-naming"
       ],
-      "sha256": "7d3691af05770bcd4500c69040bd1aff3ec47d2d9558459d38528435eb9c95ec",
-      "version": "0.2.0"
+      "sha256": "fa52a6cc11cf6e68a3cae455c3dc61e4073710b5b8d1fc284a95dbd35e0f460b",
+      "version": "0.2.1"
     },
     {
       "applies_to": [
@@ -54,8 +54,8 @@
         "core/semantic-naming",
         "core/data-boundaries"
       ],
-      "sha256": "81ac50ab7987ac45255fd2e67f1d7b8b4381e7d98a85bf3ba8dfb308f98f8d94",
-      "version": "0.5.0"
+      "sha256": "cc799acb6caeec9d0911845f4bf1c5731158288e319345767f3662243d20f4d5",
+      "version": "0.5.1"
     },
     {
       "applies_to": [
@@ -69,8 +69,8 @@
       "requires": [
         "languages/go"
       ],
-      "sha256": "7c1399228a609af8671fa7e8df982ac1a8744cc588ab01de9bec5c4f77b3fe22",
-      "version": "0.1.0"
+      "sha256": "00c1c74b80b86391bc1f144539fbf9a1f7ec9ef6040bcd8af0ba3e530b056e67",
+      "version": "0.1.1"
     },
     {
       "applies_to": [
@@ -83,8 +83,8 @@
       "requires": [
         "languages/go"
       ],
-      "sha256": "bc29018852cbb45e5a7ad5c58ff726d550d494e22130de760045cf6dde95ce49",
-      "version": "0.2.0"
+      "sha256": "c08e0778ad2fe58ae3bfdff53eb9ee41e633f22bc53735ad06b7bf8af42c5974",
+      "version": "0.2.1"
     },
     {
       "applies_to": [
@@ -97,8 +97,8 @@
       "requires": [
         "languages/go/functional-options"
       ],
-      "sha256": "f12b2bcfa0f9a74ad8103690ffa3e86c5ff76a6041684bf60f0ad14f0f2e4436",
-      "version": "0.2.0"
+      "sha256": "f6cc71e80614c2383b3a9e23da58b7b808797a35140e8fc3fba6b86d7b5a5935",
+      "version": "0.2.1"
     },
     {
       "applies_to": [
@@ -112,8 +112,8 @@
       "requires": [
         "core/semantic-naming"
       ],
-      "sha256": "22a3325883a37df48f5d0040c18be8c5fdc6079315265d733a540d0efc38d1ba",
-      "version": "0.1.0"
+      "sha256": "b7ee1f9283cbe7a0b102bc9150a920fc0289187d4740e95f05e8283f8f0e149e",
+      "version": "0.1.1"
     },
     {
       "applies_to": [
@@ -126,8 +126,8 @@
       "requires": [
         "documentation/technical-documentation"
       ],
-      "sha256": "fdbe9951e1beb1d7ddb69ba18868b8afa4fc2d77b93770e53e49da36facb9adc",
-      "version": "0.1.0"
+      "sha256": "21bd4f2a194a6dc16a79624f0727784ad3cce5f6c09189179dfb9edbcbabfcbd",
+      "version": "0.1.1"
     }
   ]
 }
