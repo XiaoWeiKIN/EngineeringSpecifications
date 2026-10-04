@@ -1,6 +1,6 @@
 {
   "catalog_id": "io.github.xiaoweikin.engineering-specifications",
-  "catalog_version": "1.7.0",
+  "catalog_version": "1.7.1",
   "schema_version": 1,
   "specs": [
     {
@@ -26,8 +26,8 @@
       "requires": [
         "core/semantic-naming"
       ],
-      "sha256": "7d3691af05770bcd4500c69040bd1aff3ec47d2d9558459d38528435eb9c95ec",
-      "version": "0.2.0"
+      "sha256": "4a6a68d93110ff3853a825ec4ce78d1f8731bd1fe635b7aaa1eccb64a56819e9",
+      "version": "0.2.1"
     },
     {
       "applies_to": [
@@ -83,8 +83,8 @@
       "requires": [
         "languages/go"
       ],
-      "sha256": "bc29018852cbb45e5a7ad5c58ff726d550d494e22130de760045cf6dde95ce49",
-      "version": "0.2.0"
+      "sha256": "dfc7660f9663286e1df592b557abb09f1d1f445c1a5d10cc2aa9c0250a8f2d1c",
+      "version": "0.2.1"
     },
     {
       "applies_to": [

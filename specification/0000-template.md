@@ -16,6 +16,13 @@
 Replace the title and metadata before review. Delete every authoring
 instruction that does not belong in the published Specification.
 
+Before drafting or reviewing, use the non-normative
+[Specification authoring guide](../governance/specification-authoring.md).
+Identify the actor, action, conditions, exceptions, and evidence for each
+Requirement. Label examples as illustrative or runnable, and state what their
+checks actually demonstrate. Remove this authoring paragraph from the final
+Specification; do not add an authoring guide to consumer dependencies.
+
 ## Purpose
 
 State one reusable engineering outcome. Identify the recurring failure,

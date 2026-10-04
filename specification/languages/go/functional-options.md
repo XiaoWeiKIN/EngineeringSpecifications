@@ -107,9 +107,9 @@ functional options **MUST NOT** be the sole representation of required inputs.
 
 An API **SHOULD** prefer a configuration struct when callers need to decode,
 store, compare, inspect, validate independently, or reuse the complete
-configuration. It **SHOULD** prefer a dedicated constructor or configuration
-method when the behavior is a distinct mode rather than an independent
-optional setting.
+configuration. The API **SHOULD** prefer a dedicated constructor or
+configuration method when the behavior is a distinct mode rather than an
+independent optional setting.
 
 **Rationale (non-normative):** Functional options improve extensibility and
 default-call readability, but add package-level symbols, obscure the complete
@@ -168,8 +168,8 @@ plus reviewed public documentation for extension ownership.
 
 The constructor **MUST** initialize private construction state from the
 required inputs and documented defaults. The default call **MUST** produce a
-valid baseline configuration. It **MUST** apply each supplied option exactly
-once in documented application order.
+valid baseline configuration. The constructor **MUST** apply each supplied
+option exactly once in documented application order.
 
 The API **MUST** define how duplicate and conflicting options behave. Override,
 composition, and rejection are all permitted when the selected behavior is
@@ -486,6 +486,11 @@ Compatibility or migration: none | <preserved entry point, behavior effect, and 
 ```
 
 ## Compatibility and migration
+
+Version `0.2.1` clarifies the subjects of `GO-OPTION-USE-001` and
+`GO-OPTION-APPLY-001`. It preserves the conditions, requirement strength,
+exactly-once ordering, exceptions, routing metadata, and Verification contract.
+No consumer implementation change is required by this editorial patch.
 
 Version `0.2.0` adds the Requirement-level Automated enforcement contract and
 sets every existing `GO-OPTION-*` Requirement to `Advisory`. It preserves

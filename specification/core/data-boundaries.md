@@ -228,15 +228,86 @@ encode_response(result)
 `decode_json` establishes JSON structure. `parse_create_command` establishes
 domain invariants and returns a command that `execute` can safely consume.
 
-A rejection test observes the effect boundary:
+A rejection test exercises the entry point that can reach effects, rather
+than calling only the parser and observing unused spies. The following
+self-contained Python example is non-normative. It illustrates
+`DATA-EFFECT-001` with an already decoded object, an immutable command, and
+in-memory effect spies; it does not prescribe Python or a production design.
 
-```text
-command, error = parse_create_command(invalid_transport)
-assert error.field == "retention_days"
-assert command is absent
-assert repository.write_count == 0
-assert publisher.message_count == 0
+<!-- boundary-effect-example:start -->
+```python
+from dataclasses import dataclass
+
+
+class Rejected(ValueError):
+    pass
+
+
+@dataclass(frozen=True)
+class CreateCommand:
+    retention_days: int
+
+    def __post_init__(self):
+        if type(self.retention_days) is not int or self.retention_days <= 0:
+            raise Rejected("retention_days must be a positive integer")
+
+
+class EffectsSpy:
+    def __init__(self):
+        self.writes = []
+        self.messages = []
+
+    def write(self, command):
+        self.writes.append(command)
+
+    def publish(self, command):
+        self.messages.append(command)
+
+
+def parse_create_command(transport):
+    return CreateCommand(transport.get("retention_days"))
+
+
+def handle_create(transport, effects):
+    command = parse_create_command(transport)
+    effects.write(command)
+    effects.publish(command)
+    return command
+
+
+def check_boundary(entrypoint):
+    for transport in ({}, {"retention_days": 0}, {"retention_days": True}):
+        effects = EffectsSpy()
+        try:
+            entrypoint(transport, effects)
+        except Rejected as error:
+            assert str(error) == "retention_days must be a positive integer"
+        else:
+            raise AssertionError("invalid input was accepted")
+        assert effects.writes == []
+        assert effects.messages == []
+
+    effects = EffectsSpy()
+    command = entrypoint({"retention_days": 7}, effects)
+    assert command == CreateCommand(7)
+    assert effects.writes == [command]
+    assert effects.messages == [command]
+
+
+check_boundary(handle_create)
 ```
+<!-- boundary-effect-example:end -->
+
+The invalid cases exercise `handle_create`, which owns the calls to both
+spies. The valid case is a positive control: it proves the same entry point
+can reach those spies. `tests/test_spec_editorial.py` executes this exact
+example and checks that its assertions reject deliberately broken entry points
+that write or publish before parsing, or silently omit valid-path effects.
+
+These checks establish only the behavior of this fixture. They do not verify
+a consuming application's transport decoder, persistence transactions,
+concurrency, or the protocol-specific compensation alternative allowed by
+`DATA-EFFECT-001`. Those need evidence from the consuming implementation.
 
 ## Rejected patterns
 
@@ -284,6 +355,11 @@ Exceptions: none | <upstream contract and remaining local checks>
 ```
 
 ## Compatibility and migration
+
+Version `0.2.1` replaces the parser-only rejection illustration with a runnable
+entry-point example and a valid-input positive control. Requirement text,
+exceptions, routing metadata, enforcement classes, and Verification rows are
+unchanged. The example does not add consumer tests or implementation duties.
 
 Version `0.2.0` adds the Requirement-level Automated enforcement contract and
 sets every existing `DATA-*` Requirement to `Advisory`. It preserves normative
