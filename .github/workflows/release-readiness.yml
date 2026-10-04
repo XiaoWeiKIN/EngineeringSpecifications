@@ -1,0 +1,36 @@
+name: release-readiness
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  release-identity:
+    if: startsWith(github.head_ref, 'release/')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Verify release version with the canonical read-only checker
+        env:
+          RELEASE_BRANCH: ${{ github.head_ref }}
+        run: |
+          python3 -B - <<'PY'
+          import os
+          import re
+          import subprocess
+          import sys
+          match = re.fullmatch(r"release/(\d+\.\d+\.\d+)", os.environ["RELEASE_BRANCH"])
+          if match is None:
+              raise SystemExit("Expected release/MAJOR.MINOR.PATCH")
+          subprocess.run([sys.executable, "-B", "scripts/check_release.py", match[1]], check=True)
+          PY

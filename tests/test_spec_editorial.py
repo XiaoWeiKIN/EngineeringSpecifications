@@ -119,7 +119,8 @@ class EditorialBoundaryTests(unittest.TestCase):
         self.assertEqual(changelog.count("## [1.7.0]"), 1)
         self.assertEqual(digest(changelog.split("## [1.7.0]", 1)[1]), BASELINE["release_history_sha256"])
         self.assertIn("## Unreleased", changelog)
-        self.assertNotIn("## [1.7.1]", changelog)
+        # Release preparation changes only the new heading, not past notes.
+        self.assertEqual(changelog.count("## [1.7.1] - 2026-10-04"), 1)
 
 
 class BoundaryExampleTests(unittest.TestCase):
