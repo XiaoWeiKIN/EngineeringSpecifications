@@ -1,6 +1,6 @@
 {
   "catalog_id": "io.github.xiaoweikin.engineering-specifications",
-  "catalog_version": "1.6.0",
+  "catalog_version": "1.7.0",
   "schema_version": 1,
   "specs": [
     {
@@ -101,37 +101,33 @@
       "version": "0.2.0"
     },
     {
+      "applies_to": [
+        "**/*.md",
+        "**/*.mdx"
+      ],
+      "description": "Load when writing or reviewing engineering documentation, procedures, architecture explanations, or evidence-backed technical claims",
       "id": "documentation/technical-documentation",
-      "version": "0.1.0",
       "path": "specification/documentation/technical-documentation.md",
-      "sha256": "c5b2bceae346fe9ed0aa44cb07a492df0f3f44c274c6a688e6c71b2cd2a3c6cd",
       "required": false,
       "requires": [
         "core/semantic-naming"
       ],
-      "applies_to": [
-        "**/*.md",
-        "**/*.mdx",
-        "**/*.rst",
-        "**/*.adoc",
-        "**/*.html",
-        "**/*.htm"
-      ],
-      "description": "Load when writing or reviewing engineering claims, executable procedures, technical vocabulary, or documentation affected by behavior changes"
+      "sha256": "22a3325883a37df48f5d0040c18be8c5fdc6079315265d733a540d0efc38d1ba",
+      "version": "0.1.0"
     },
     {
+      "applies_to": [
+        "**/*"
+      ],
+      "description": "Load when generating or reviewing diagrams, interactive views, presentations, simulations, or video that explain engineering facts",
       "id": "documentation/derived-explanations",
-      "version": "0.1.0",
       "path": "specification/documentation/derived-explanations.md",
-      "sha256": "f032aff210b3ef2f6bb4bfd888247abfe447a09844809455355b395f68560a5d",
       "required": false,
       "requires": [
         "documentation/technical-documentation"
       ],
-      "applies_to": [
-        "**/*"
-      ],
-      "description": "Load when producing or reviewing diagrams, interactive views, presentations, or videos that explain engineering facts, including their generators"
+      "sha256": "fdbe9951e1beb1d7ddb69ba18868b8afa4fc2d77b93770e53e49da36facb9adc",
+      "version": "0.1.0"
     }
   ]
 }

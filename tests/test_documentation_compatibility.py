@@ -1,4 +1,4 @@
-"""Validate documentation contracts and review fixtures, not semantic conformance."""
+"""Validate actual documentation contracts, not natural-language conformance."""
 from __future__ import annotations
 
 import hashlib
@@ -11,7 +11,6 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-FIXTURES = ROOT / "tests/fixtures/documentation-contract"
 PROPOSAL = ROOT / "proposals/0014_documentation-integrity-contracts.md"
 REQ = re.compile(r"^### ([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+-[0-9]{3}) — .+$", re.M)
 EXPECTED = {
@@ -38,7 +37,7 @@ def blocks(text: str) -> list[tuple[str, str]]:
 class DocumentationShapeTests(unittest.TestCase):
     """Portable shape/rubric checks; no inference about natural-language truth."""
 
-    def test_fixture_plan_is_explicit_and_schema1_shaped(self) -> None:
+    def test_documentation_plan_is_explicit_and_schema1_shaped(self) -> None:
         plan = entries()
         self.assertEqual([e["id"] for e in plan], [
             "documentation/technical-documentation", "documentation/derived-explanations"])
@@ -51,10 +50,10 @@ class DocumentationShapeTests(unittest.TestCase):
             self.assertLessEqual(len(entry["description"]), 180)
         self.assertEqual(plan[0]["requires"], ["core/semantic-naming"])
         self.assertEqual(plan[1]["requires"], [plan[0]["id"]])
-        self.assertIn("**/*.html", plan[0]["applies_to"])
+        self.assertEqual(plan[0]["applies_to"], ["**/*.md", "**/*.mdx"])
         self.assertEqual(plan[1]["applies_to"], ["**/*"])
 
-    def test_fixture_digests_and_document_identity_match(self) -> None:
+    def test_documentation_digests_and_document_identity_match(self) -> None:
         for entry in entries():
             with self.subTest(spec=entry["id"]):
                 raw = (ROOT / entry["path"]).read_bytes()
@@ -64,7 +63,7 @@ class DocumentationShapeTests(unittest.TestCase):
                 self.assertIn("> **Selection:** Explicit", text)
                 self.assertNotIn("Proposal fixture", text)
 
-    def test_fixture_has_eight_bounded_advisory_blocks_and_verification(self) -> None:
+    def test_documentation_has_eight_bounded_advisory_blocks_and_verification(self) -> None:
         seen = set()
         for entry in entries():
             text = content(entry)
@@ -83,7 +82,7 @@ class DocumentationShapeTests(unittest.TestCase):
                 self.assertEqual(len(re.findall(r"\*\*Enforcement \((?:review|hybrid|mechanical)\):\*\*", block)), 1)
         self.assertEqual(seen, EXPECTED)
 
-    def test_fixture_exact_dependencies_are_closed_and_acyclic(self) -> None:
+    def test_documentation_exact_dependencies_are_closed_and_acyclic(self) -> None:
         graph = {rid: re.findall(r"`([^`]+)`", block.split("**Context dependencies:** ", 1)[1].split("\n", 1)[0])
                  for entry in entries() for rid, block in blocks(content(entry))}
         upstream = {"SEM-NAME-001", "SEM-SURFACE-001"}
@@ -94,23 +93,11 @@ class DocumentationShapeTests(unittest.TestCase):
         remaining = {rid: set(deps) - upstream for rid, deps in graph.items()}
         while remaining:
             ready = {rid for rid, deps in remaining.items() if not deps}
-            self.assertTrue(ready, "Candidate Requirement cycle")
+            self.assertTrue(ready, "Requirement cycle")
             remaining = {rid: deps-ready for rid, deps in remaining.items() if rid not in ready}
         self.assertEqual(set(graph["DOC-TERM-001"]), upstream)
 
-    def test_fixture_review_cases_cover_positive_and_negative_conditions(self) -> None:
-        rubrics = json.loads((FIXTURES / "review-cases.json").read_text(encoding="utf-8"))
-        self.assertEqual(rubrics["kind"], "unexecuted-review-rubrics")
-        cases = rubrics["cases"]
-        self.assertEqual(len(cases), 16)
-        self.assertEqual(len({c["id"] for c in cases}), len(cases))
-        for rid in EXPECTED:
-            selected = [c for c in cases if rid in c["requirements"]]
-            self.assertEqual({c["expected_review"] for c in selected}, {
-                "satisfies-described-condition", "violates-described-condition"})
-            self.assertTrue(all(c["scenario"] and c["rubric"] for c in selected))
-
-    def test_fixture_integration_links_recorded_approval(self) -> None:
+    def test_documentation_integration_links_recorded_approval(self) -> None:
         text = PROPOSAL.read_text(encoding="utf-8")
         self.assertTrue(text.startswith("# ESP-0014:"))
         self.assertIn("**Status:** Approved", text)
@@ -124,7 +111,7 @@ class CanonicalDocumentationTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        spec = importlib.util.spec_from_file_location("documentation_prototype_check", ROOT / "scripts/check.py")
+        spec = importlib.util.spec_from_file_location("documentation_compatibility_check", ROOT / "scripts/check.py")
         assert spec is not None and spec.loader is not None
         cls.check = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(cls.check)
@@ -164,41 +151,41 @@ class CanonicalDocumentationTests(unittest.TestCase):
     def validate(self):
         return self.check.check_requirement_ids(self.root, self.check.load_catalog(self.root))
 
-    def test_overlay_uses_real_catalog_and_requirement_checks(self) -> None:
+    def test_canonical_uses_real_catalog_and_requirement_checks(self) -> None:
         baseline = self.check.check_requirement_ids(ROOT, self.check.load_catalog(ROOT))
         self.assertEqual(set(self.validate()), set(baseline))
         self.assertLessEqual(EXPECTED, set(baseline))
         # Exact root/nested file matching belongs to the RF consumer's separate
         # integration test. This test validates scopes as Catalog strings only.
 
-    def test_overlay_source_drift_fails_closed(self) -> None:
+    def test_canonical_source_drift_fails_closed(self) -> None:
         entry = self.catalog["specs"][-2]
         path = self.root / entry["path"]
         path.write_bytes(path.read_bytes()+b"\ndrift\n")
         with self.assertRaisesRegex(ValueError, "digest mismatch"):
             self.validate()
 
-    def test_overlay_missing_verification_fails_closed(self) -> None:
-        self.mutate("| `DOC-STATE-001` | Source-to-statement review of state, conditions, units, and normative strength |\n", "")
+    def test_canonical_missing_verification_fails_closed(self) -> None:
+        self.mutate("| `DOC-STATE-001` | Compare edited claims with source lifecycle and requirement state |\n", "")
         with self.assertRaisesRegex(ValueError, "Verification coverage mismatch"):
             self.validate()
 
-    def test_overlay_context_cycle_fails_closed(self) -> None:
+    def test_canonical_context_cycle_fails_closed(self) -> None:
         self.mutate("**Context dependencies:** None", "**Context dependencies:** `DOC-FRESH-001`")
         with self.assertRaisesRegex(ValueError, "Requirement context dependency cycle"):
             self.validate()
 
-    def test_overlay_undeclared_catalog_dependency_fails_closed(self) -> None:
+    def test_canonical_undeclared_catalog_dependency_fails_closed(self) -> None:
         self.catalog["specs"][-1]["requires"] = []
         self.save_catalog()
         with self.assertRaisesRegex(ValueError, "outside its Catalog dependency closure"):
             self.validate()
 
-    def test_overlay_oversized_activation_and_block_fail_closed(self) -> None:
+    def test_canonical_oversized_activation_and_block_fail_closed(self) -> None:
         original = content(entries()[0])
         for old, new, error in [
-            ("Load when writing, revising, or translating statements about engineering behavior, decisions, requirements, or verification status.", "Load when "+"x"*181, "Activation exceeds"),
-            ("The author **MUST** preserve", "x"*8192+"\nThe author **MUST** preserve", "maximum is 8192")]:
+            ("Load when editing text that describes current, proposed, accepted, planned, implemented, verified, unverified, or historical behavior.", "Load when "+"x"*181, "Activation exceeds"),
+            ("An engineering document **MUST** preserve", "x"*8192+"\nAn engineering document **MUST** preserve", "maximum is 8192")]:
             with self.subTest(error=error):
                 path = self.root / self.catalog["specs"][-2]["path"]
                 path.write_text(original, encoding="utf-8")

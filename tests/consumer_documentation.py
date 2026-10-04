@@ -74,16 +74,18 @@ class RFDocumentationTests(unittest.TestCase):
         result = self.preview(["README.md"])
         self.assertTrue(all(not s["id"].startswith("documentation/") for s in result["specs"]))
 
-    def test_technical_selection_root_nested_html_and_external_dependencies(self) -> None:
+    def test_technical_selection_document_scopes_and_external_dependencies(self) -> None:
         self.assertEqual(self.bootstrap(TECHNICAL), REQUIRED | {TECHNICAL})
-        for path in ("README.md", "docs/intro.md", "guide.mdx", "guide.rst", "manual.adoc", "view.html", "docs/view.htm"):
+        for path in ("README.md", "docs/intro.md", "guide.mdx"):
             with self.subTest(path=path):
                 result = self.preview([path], ["DOC-TERM-001"])
                 self.assertEqual({r["id"] for r in result["resolved"]}, {
                     "DOC-TERM-001", "SEM-NAME-001", "SEM-SURFACE-001"})
                 self.assertNotIn(DERIVED, {s["id"] for s in result["specs"]})
-        unrelated = self.preview(["src/main.go"])
-        self.assertNotIn(TECHNICAL, {s["id"] for s in unrelated["specs"]})
+        for path in ("src/main.go", "guide.rst", "manual.adoc", "view.html"):
+            with self.subTest(path=path):
+                unrelated = self.preview([path])
+                self.assertNotIn(TECHNICAL, {s["id"] for s in unrelated["specs"]})
 
     def test_derived_selection_exact_capsule_read_only_and_budget(self) -> None:
         self.assertEqual(self.bootstrap(DERIVED), REQUIRED | {TECHNICAL, DERIVED})

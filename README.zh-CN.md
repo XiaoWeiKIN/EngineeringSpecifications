@@ -33,13 +33,14 @@ Catalog 面向多个工程层级的可复用规则：
 - `frameworks/` 存放 Gin、GORM、Spring、Netty 等技术生态规范；
 - `databases/` 存放共享 Schema 设计，以及 MySQL、ClickHouse 等数据库规范；
 - `testing/` 存放跨语言和特定技术的测试契约；
-- `protocols/` 存放 HTTP、gRPC、消息和兼容性规则。
+- `protocols/` 存放 HTTP、gRPC、消息和兼容性规则；
+- `documentation/` 存放可选的跨语言文档完整性契约，用于技术文档和派生解释界面。
 
 这些是独立的组合维度。数据库 Schema 规则可以跨语言复用，但没有数据库的仓库
 不需要安装。框架和数据库规范可以依赖语言、协议或共享数据规范，无需复制上游规则。
 
-当前版本只发布 Core 和 Go 规范。其余分类用于约束未来可复用规范的归属；只有进入
-`catalog.json` 的规范才视为已经发布。
+当前 Catalog 包含 Core、Go 和 documentation 规范。其余分类用于约束未来可复用
+规范的归属；只有进入 `catalog.json` 的规范才视为已经发布。
 
 分类、依赖、选择方式、任务时路由和项目规则边界见
 [规范模型](docs/specification-model.zh-CN.md)。
@@ -87,6 +88,7 @@ Catalog 面向多个工程层级的可复用规则：
 ├── specification/
 │   ├── 0000-template.md
 │   ├── core/
+│   ├── documentation/
 │   └── languages/
 ├── scripts/
 │   └── check.py
@@ -105,7 +107,11 @@ Catalog 面向多个工程层级的可复用规则：
 - `languages/go/functional-options`，显式选择，在 Go 函数式选项 API 的设计、
   校验、组合或迁移任务中激活；
 - `languages/go/factory-delegation`，显式选择，在使用命名函数委托构建可选能力
-  工厂的任务中激活。
+  工厂的任务中激活；
+- `documentation/technical-documentation`，显式选择，用于保持工程状态、证据、
+  操作步骤语义、术语归属和当前性；
+- `documentation/derived-explanations`，显式选择，用于保持图、交互界面、演示、
+  模拟和视频中的权威边界、来源追踪和等价信息。
 
 ## Catalog 契约
 

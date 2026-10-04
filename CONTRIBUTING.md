@@ -19,7 +19,10 @@ Place a rule in the broadest reusable layer where its meaning remains true:
 - `frameworks/` contains framework or major-library constraints;
 - `databases/` contains shared schema rules and database-engine specifics;
 - `testing/` contains cross-language and focused testing contracts;
-- `protocols/` contains shared wire, API, messaging, and compatibility rules.
+- `protocols/` contains shared wire, API, messaging, and compatibility rules;
+- `documentation/` contains optional cross-language integrity contracts for
+  technical documentation and derived explanation surfaces. Editorial style,
+  project templates, and domain vocabulary remain consumer or project owned.
 
 A cross-language rule is not automatically a Core rule. For example, database
 schema design is reusable across languages but remains conditional on a project

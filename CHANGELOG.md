@@ -4,23 +4,29 @@ All notable Catalog and normative specification changes are recorded here.
 
 ## Unreleased
 
+## [1.7.0] - 2026-10-04
+
 ### Added
 
-- Integrated ESP-0014 as optional Development `documentation/technical-documentation`
-  and `documentation/derived-explanations`, each at `0.1.0`, with eight Advisory
-  Requirements covering engineering state, evidence, procedure effects, owning
-  terminology, freshness, derived authority, provenance and equivalent access.
-- Added bilingual documentation-layer guidance, exact Requirement metadata and
-  Verification coverage, positive/negative review rubrics, and pinned RF
-  consumer compatibility tests. Rubrics are not completed model evaluations.
+- Approved ESP-0014 and added the optional `documentation/` Catalog layer for
+  reusable documentation-integrity contracts without making Google-informed or
+  STE-inspired editorial guidance normative.
+- Added Development `documentation/technical-documentation` version `0.1.0`
+  with five Advisory Requirements covering engineering state, evidence-backed
+  claims, procedure semantics, owning terminology, and current-versus-historical
+  freshness.
+- Added Development `documentation/derived-explanations` version `0.1.0` with
+  three Advisory Requirements covering derived authority, source provenance,
+  and equivalent access to engineering information across diagrams,
+  interactive views, presentations, simulations, and video.
 
-### Compatibility
+### Changed
 
-- Preserved every existing Spec entry, version and digest. Catalog schema stays
-  at 1; documentation adoption is explicit, not detected or required by default.
-- This is an Unreleased integration, not Catalog `1.6.0` tag content. A separate
-  minor-release PR will choose the new Catalog version. No release tag, RF
-  default, installed project, or protected historical artifact is changed here.
+- Advanced the Catalog to `1.7.0`. Both documentation Specifications are
+  explicitly selected, the technical-documentation Spec depends on
+  `core/semantic-naming`, and the derived-explanations Spec depends on
+  `documentation/technical-documentation`. Catalog schema version 1 and all
+  previously published Requirement behavior remain unchanged.
 
 ## [1.6.0] - 2026-08-10
 

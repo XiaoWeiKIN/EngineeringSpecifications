@@ -1,4 +1,4 @@
-# Technical Documentation
+# Technical Documentation Integrity
 
 > **Status:** Development
 >
@@ -6,256 +6,341 @@
 >
 > **Selection:** Explicit
 >
-> **Routing:** Selection installs this Specification. File candidates and task
-> intent determine which requirements apply.
+> **Routing:** Selection installs this Specification. Load it only when the
+> task writes or reviews engineering documentation whose state, evidence,
+> procedures, terminology, or freshness can affect an engineering decision.
 >
-> **Catalog metadata:** `catalog.json` owns version, dependencies, scopes,
-> activation summary, and content digest.
+> **Catalog metadata:** `catalog.json` is the source of truth for version,
+> dependencies, file scopes, detection evidence, activation summary, and
+> content digest.
 
 ## Purpose
 
-Preserve engineering meaning when documentation is created, edited, translated,
-or reviewed. Prevent unsupported claims, hidden command effects, terminology
-changes, and confusion between decisions, implementation, and verification.
+Engineering documentation can change the meaning of a system even when it does
+not change executable code. A polished sentence can turn a proposal into an
+implemented fact, turn an expectation into a verified result, or make a
+mutating command look like a harmless inspection.
 
-Sentence length, voice, capitalization, document layout, and renderer choices
-remain editorial or project concerns. This contract neither incorporates an
-external style guide nor claims ASD-STE100 or accessibility-standard compliance.
+This Specification preserves engineering meaning across human-readable
+technical documentation. It governs lifecycle and epistemic state, evidence
+binding, procedure semantics, terminology ownership, and freshness boundaries.
+It does not prescribe prose style, sentence length, tone, document templates,
+heading capitalization, or one preferred authoring method.
 
 ## Applicability
 
 ### Load this specification when
 
-- Writing or reviewing engineering behavior, architecture, interfaces, or claims.
-- Documenting commands that readers might execute.
-- Revising an explanation after its implementation or evidence changes.
-- Translating technical statements across languages or presentation surfaces.
+- writing or revising architecture, internals, design, runbook, operations,
+  migration, verification, benchmark, research, or decision documentation;
+- documenting commands or ordered procedures whose execution can mutate state,
+  verify a condition, or change approval or release authority;
+- making or reviewing measured, verified, reliability, security, performance,
+  compatibility, or completion claims;
+- editing terminology that appears across code, schemas, protocols, metrics,
+  generated views, or other documentation;
+- updating current guidance while historical decisions or evidence remain in
+  the repository.
 
 ### Do not apply this specification when
 
-- Making a purely decorative change with no engineering information affected.
-- Reviewing unrelated application data just because a path matches a scope.
-- Reformatting vendored text, raw logs, or exact quotations owned elsewhere.
+- changing only spelling, punctuation, or formatting with no effect on
+  technical meaning;
+- editing generated or vendored documentation whose source owner defines the
+  content and is not being changed;
+- copying an exact normative excerpt, raw log, code block, or immutable
+  historical record without rewriting it;
+- applying a project-specific document layout or publication workflow that is
+  owned by the consuming repository.
 
-Do not edit a historical or sealed artifact merely to adopt this Specification.
-A newly authored explanation of that artifact still falls within scope. An
-external spelling or normative excerpt retains the meaning of its owning source.
-File scopes select candidates, not obligations. Only task-applicable requirements
-enter the context; adoption does not require a whole-repository rewrite.
+A project may still activate one Requirement when a narrow editorial change
+touches a load-bearing claim, stable term, or procedure.
 
 ## Agent workflow
 
-Identify the statement, command, or explanation being changed and its owning
-source. Select only the affected requirements. Compare against the available
-implementation and evidence, preserve unresolved gaps, and report the checks
-actually performed. Do not execute a destructive command merely to test its
-wording; verification must stay inside the authorized environment and scope.
+When this Specification is activated, the implementing or reviewing agent:
+
+1. identifies the owning artifact, intended reader task, and whether the text
+   describes current, proposed, accepted, verified, or historical information;
+2. locates the evidence or source contract for every load-bearing claim;
+3. preserves BCP 14 strength, lifecycle state, exact identifiers, and
+   externally owned spellings before improving prose;
+4. separates read-only or preview actions from mutation, verification, and
+   authority-changing steps when a procedure contains those effects;
+5. checks whether current guidance is still supported by the cited source
+   revision without rewriting immutable history;
+6. runs each applicable Verification entry and reports unresolved evidence or
+   freshness gaps.
 
 ## Terminology
 
-An **owning source** controls a fact, requirement, decision, or verification
-result. A **source identity** is a resolvable version/revision, immutable artifact,
-or retained snapshot with a digest. **Current guidance** describes a stated
-supported version; **history** records an earlier state without claiming currency.
-
-BCP 14 uppercase keywords express the obligations. Their automated
-enforcement level is independent of that strength. A valid digest establishes
-byte identity, not authenticity, truth, or approval.
+- **Engineering state** is the status that determines how a statement may be
+  used, including current, proposed, accepted, rejected, planned, implemented,
+  verified, unverified, and historical.
+- A **strong claim** is a statement whose truth can materially change an
+  engineering decision, such as a measured result or an assertion of
+  reliability, security, compatibility, completion, or verification.
+- An **evidence locator** identifies the source revision, test, benchmark,
+  report, approval record, or other reviewable artifact supporting a claim.
+- **Current guidance** describes behavior or procedure intended for present
+  use. A **historical record** preserves what was decided, observed, or
+  performed at an earlier revision.
+- An **owning surface** has the meaning defined by
+  `core/semantic-naming`; documentation does not gain ownership of a spelling
+  merely by repeating it.
 
 ## Requirements
 
-### DOC-STATE-001 — Preserve state and requirement strength
+### DOC-STATE-001 — Preserve engineering state and requirement strength
 
-**Activation:** Load when writing, revising, or translating statements about engineering behavior, decisions, requirements, or verification status.
+**Activation:** Load when editing text that describes current, proposed, accepted, planned, implemented, verified, unverified, or historical behavior.
 
 **Context dependencies:** None
 
 **Automated enforcement:** Advisory
 
-The author **MUST** preserve the owning source's distinctions between observed,
-proposed, decided, implemented, verified, and historical information. These are
-independent attributes, not a new lifecycle or a mandatory sequence of states.
-Editing **MUST NOT** change a condition, negation, uncertainty, unit, quantifier,
-or normative requirement strength. Missing implementation or approval evidence
-**MUST NOT** be presented as completed verification or authorization.
+An engineering document **MUST** preserve the source distinction between
+current, proposed, accepted, rejected, planned, implemented, verified,
+unverified, and historical information when that distinction changes how a
+reader may act on the statement.
 
-**Rationale (non-normative):** Polished wording can otherwise turn a plan into a
-claim that an implementation already exists or has been accepted.
+An editorial revision **MUST NOT** turn an expectation into a measured result,
+a proposal into current behavior, an implementation into verified behavior, or
+a historical decision into evidence of current implementation solely through
+wording or tense.
 
-**Enforcement (review):** Compare affected claims with their sources and actual
-statuses. Review translations for meaning, not literal English syntax. A
-keyword or tense checker alone does not determine compliance.
+When the source uses BCP 14 requirement terms, stable lifecycle labels, or
+approval states, a derived or edited document **MUST** preserve their strength
+and status unless the owning workflow authorizes a normative or lifecycle
+change.
 
-**Evidence:** Source identities and reviewed statement locations, including any
-unresolved status or evidence gap. An existing PR review can hold this record.
+**Rationale (non-normative):** Readers and coding agents often treat polished
+technical prose as fact. Preserving state prevents editorial changes from
+silently granting authority or verification that the source never established.
 
-### DOC-EVIDENCE-001 — Bound measured and verified claims
+**Enforcement (review):** Compare changed claims with their owning source,
+status metadata, and lifecycle records. A text classifier may find candidates
+but cannot prove semantic equivalence.
 
-**Activation:** Load when a document presents an outcome as measured, tested, verified, or established by comparative evidence.
+**Evidence:** A review that links each changed load-bearing statement to its
+owning artifact or explicitly records that the source state is unchanged.
 
-**Context dependencies:** `DOC-STATE-001`
+### DOC-EVIDENCE-001 — Strong engineering claims identify their evidence
 
-**Automated enforcement:** Advisory
-
-A claim presented as measured, tested, or verified **MUST** identify retrievable
-supporting evidence and the implementation, artifact, or configuration it covers.
-Material workload, units, conditions, negative results, and uncertainty **MUST**
-remain attached to the claim's interpretation. Predictions and recommendations
-**MUST** be distinguishable from those outcomes as required by `DOC-STATE-001`.
-A missing measurement or inaccessible evidence **MUST** be reported as a gap,
-not filled with an invented result. This does not require a benchmark for every
-conceptual statement or introduce a new evidence format.
-
-**Rationale (non-normative):** A result under one workload is not proof of every
-performance, security, or reliability claim about a system.
-
-**Enforcement (hybrid):** Resolve evidence references and review claim scope
-against the referenced report or test. A link or hash alone is insufficient.
-
-**Evidence:** A claim-to-evidence mapping in the document or existing review,
-with source identity and the scope of the actual observation.
-
-### DOC-PROC-001 — Expose procedure effects and prerequisites
-
-**Activation:** Load when publishing or changing executable instructions, command examples, prerequisites, verification, or recovery guidance.
+**Activation:** Load when stating or revising a measured, verified, reliability, security, performance, compatibility, completion, or conformance claim.
 
 **Context dependencies:** `DOC-STATE-001`
 
 **Automated enforcement:** Advisory
 
-A procedure **MUST** expose material prerequisites, its target environment, and
-whether an action previews/reads, mutates, verifies, or changes authority. These
-are effect descriptions, not required labels or CLI names. Before an action,
-the procedure **MUST** identify material destructive or external effects and the
-conditions that authorize or prevent it. Placeholders **MUST** be identifiable
-and their required values explained. Expected outcomes and failure/stop behavior
-**MUST** be distinguished from observed execution, consistent with
-`DOC-STATE-001`. Unverified commands **MUST NOT** be called tested or safe;
-unknown recovery behavior stays explicit rather than being invented.
+A strong claim **MUST** identify an evidence locator and the source revision or
+other version boundary to which the evidence applies when those facts are
+available.
 
-**Rationale (non-normative):** Readers need to know what running an example will
-change, not merely that its syntax looks plausible.
+When required evidence is missing, stale, or not accessible, the document
+**MUST** state that gap and **MUST NOT** invent a test result, benchmark,
+approval, source revision, or verification outcome.
 
-**Enforcement (review):** Walk through the instructions using the documented
-interface or a permitted isolated test. Do not run mutating examples without
-execution authority. Record which parts were inspected rather than executed.
+A summary **MUST NOT** strengthen the underlying evidence. Passing a structural
+check, digest check, or style review does not by itself prove semantic
+correctness, performance, reliability, security, accessibility, or release
+readiness.
 
-**Evidence:** Versioned command/interface references, a bounded walkthrough or
-execution record, and any untested branch or missing prerequisite.
+**Rationale (non-normative):** Strong claims influence design and operational
+decisions. Evidence and version boundaries let a reviewer determine what was
+actually demonstrated and where uncertainty remains.
 
-### DOC-TERM-001 — Preserve the owning technical vocabulary
+**Enforcement (hybrid):** Structural checks may require evidence fields or
+references. Human review verifies that the cited artifact supports the claim
+and that its revision remains applicable.
 
-**Activation:** Load when naming, translating, or mapping a technical concept across documentation, code, interfaces, or schemas.
+**Evidence:** A claim-to-evidence review containing the source revision and the
+test, report, benchmark, approval record, or explicit unresolved gap.
 
-**Context dependencies:** `SEM-NAME-001`, `SEM-SURFACE-001`
+### DOC-PROC-001 — Procedures expose material execution semantics
 
-**Automated enforcement:** Advisory
-
-Documentation **MUST** use the owning vocabulary for a technical concept under
-`SEM-NAME-001`. When presenting another language or naming surface, it **MUST**
-retain an explicit, unambiguous mapping under `SEM-SURFACE-001`. Explanatory
-translations **MUST NOT** silently rename commands, paths, identifiers, schema
-fields, or externally owned spellings. This adds a documentation application of
-the upstream contracts, not a competing glossary or English-only word list.
-
-**Rationale (non-normative):** A simpler synonym can hide a different operation,
-unit, or compatibility boundary.
-
-**Enforcement (review):** Trace affected terms to their code, schema, or project
-vocabulary. Review mappings rather than imposing the same spelling everywhere.
-
-**Evidence:** Source locations and the reviewed terminology or translation
-mapping. Reuse project terminology records instead of creating another owner.
-
-### DOC-FRESH-001 — Distinguish maintained guidance from history
-
-**Activation:** Load when behavior changes affect current documentation, or when earlier decisions and evidence are used to explain present behavior.
+**Activation:** Load when documenting commands or ordered steps that inspect, preview, mutate, verify, publish, approve, release, migrate, or recover engineering state.
 
 **Context dependencies:** `DOC-STATE-001`, `DOC-EVIDENCE-001`
 
 **Automated enforcement:** Advisory
 
-Documentation presented as current **MUST** identify its applicable source or
-supported version through the document or its publication context. When an
-authorized change makes that guidance inaccurate, the author **MUST** update the
-affected claims within scope or record the unresolved gap without reaffirming
-them as current. Historical records **MUST NOT** be rewritten in place for this
-purpose when the owning lifecycle protects them. Instead, a current explanation
-**MUST** distinguish historical intent from current evidence under
-`DOC-STATE-001` and `DOC-EVIDENCE-001`. This requires neither periodic monitoring
-nor a new owner field, approval process, or automatic archive rewrite.
+A procedure **MUST** state the prerequisites, action, and observable success or
+stop condition needed for a reader to execute the procedure safely.
 
-**Rationale (non-normative):** A correct account of an old decision does not prove
-that the present implementation still follows it.
+When materially different operations exist, the procedure **MUST** distinguish
+read-only inspection or preview from mutation, verification, publication,
+approval, release, or another authority-changing action.
 
-**Enforcement (review):** Compare affected current guidance with the change and
-its source identity. Check history links without modifying protected originals.
+A command presented as executable project guidance **MUST** be supported by the
+project or owning tool contract. An unverified command or placeholder **MUST**
+remain explicitly unverified or a placeholder and **MUST NOT** be presented as
+a confirmed repository command.
 
-**Evidence:** Updated current claims or a tracked gap, source/version scope,
-and references to untouched historical records where relevant.
+**Rationale (non-normative):** Command sequences are executable interfaces.
+Readers need to know which step changes state, which step only checks it, and
+what evidence establishes success.
+
+**Enforcement (review):** Execute or inspect the owning command contract when
+authorized, then review ordering, failure branches, and effect labels. Static
+checks may find unlabeled placeholders but cannot infer every shell side effect.
+
+**Evidence:** A reviewed procedure linked to command help, tool documentation,
+test execution, or other project evidence that establishes the described
+effects and stop conditions.
+
+### DOC-TERM-001 — Documentation reuses owning technical terminology
+
+**Activation:** Load when introducing, renaming, or mapping a technical term across documentation and another engineering surface.
+
+**Context dependencies:** `SEM-NAME-001`, `SEM-SURFACE-001`
+
+**Automated enforcement:** Advisory
+
+Documentation **MUST** use the owning surface's stable term when it refers to
+the same concept, and **MUST** declare a mapping when a different
+reader-facing term represents that concept.
+
+An editorial change **MUST NOT** rename a published API, schema field,
+protocol value, metric, state, or other stable external term solely for prose
+consistency.
+
+A document **SHOULD** use one stable term for one concept within its scope
+unless a documented semantic distinction requires different terms.
+
+**Rationale (non-normative):** Documentation participates in the same semantic
+system as code, schemas, protocols, and metrics. Unowned synonyms increase
+ambiguity and can become accidental compatibility promises.
+
+**Enforcement (hybrid):** Search terminology across owning surfaces and review
+mappings against `core/semantic-naming`. Automated searches identify candidates
+but do not decide whether two words represent the same concept.
+
+**Evidence:** Reviewed terminology mappings or links to the owning API, schema,
+protocol, metric, or project vocabulary.
+
+### DOC-FRESH-001 — Current guidance stays distinct from historical records
+
+**Activation:** Load when current documentation depends on implementation facts, old decisions, generated views, or evidence that can become stale.
+
+**Context dependencies:** `DOC-STATE-001`, `DOC-EVIDENCE-001`
+
+**Automated enforcement:** Advisory
+
+Current guidance **MUST** identify an observable source owner or version
+boundary when drift could make the documented behavior unsafe or misleading.
+
+A historical ADR, plan, checkpoint, benchmark result, research snapshot, or
+other immutable record **MUST** remain identifiable as historical and **MUST NOT** be treated as proof that the current implementation still has the same
+behavior without current supporting evidence.
+
+When current guidance is stale, the maintainer **MUST** update or supersede the
+current guidance through its owning workflow. The maintainer **MUST NOT**
+rewrite immutable historical evidence solely to make the current documentation
+appear consistent.
+
+**Rationale (non-normative):** Historical records can remain correct accounts
+of the past after implementation changes. Current operational guidance needs a
+different freshness contract.
+
+**Enforcement (review):** Compare current guidance with its source owner and
+revision. Repository checks may detect stale generated references or digests;
+human review determines whether behavior has materially drifted.
+
+**Evidence:** A current source revision or owner reference, plus a review record
+for any historical artifact cited as context rather than current proof.
 
 ## Approved patterns
 
-These are illustrative, not statements about a real project.
+The following examples are non-normative.
 
-- A proposed per-tenant queue design says that isolation is intended and that
-  latency has not been measured. It does not claim the proposal is deployed.
-- A procedure explains its dry run before the write operation and says that a
-  successful validation is not deployment approval.
-- A current guide cites a supported release and links an old ADR as history.
+A proposal keeps its state:
+
+```text
+Proposed behavior: route read traffic through the cache.
+Current behavior: direct database reads.
+Verification: not yet performed.
+```
+
+A procedure exposes effects:
+
+```text
+1. Run the plan command. This step is read-only.
+2. Review the proposed writes.
+3. Run the apply command to mutate repository state.
+4. Run validation and record the tested revision.
+```
+
+A current document can cite history without treating it as current proof:
+
+```text
+ADR-004 records why the project selected the cache in 2025.
+Current cache behavior is verified against revision abc123 and test T-17.
+```
 
 ## Rejected patterns
 
-- Replacing "the proposal would" with "the service does" without implementation
-  evidence violates `DOC-STATE-001`.
-- Calling a cache "proven faster" without a scoped measurement violates
-  `DOC-EVIDENCE-001`.
-- Describing a publishing command as a read-only preview violates `DOC-PROC-001`.
-- Translating a literal command flag changes the owning surface and violates
-  `DOC-TERM-001`.
-- Using an old accepted ADR alone as proof of current behavior violates
-  `DOC-FRESH-001`.
+- Rewriting "proposed" as present tense and implying implementation violates
+  `DOC-STATE-001`.
+- Writing "latency improved significantly" without a benchmark and applicable
+  revision violates `DOC-EVIDENCE-001`.
+- Listing mutating and read-only commands without explaining their effects
+  violates `DOC-PROC-001` when the distinction affects safe execution.
+- Renaming a protocol field in prose to match local casing violates
+  `DOC-TERM-001` when the owning protocol spelling remains unchanged.
+- Citing an accepted historical ADR as the only proof of current runtime
+  behavior violates `DOC-FRESH-001`.
 
 ## Exceptions
 
-No exception weakens a MUST obligation. Not-applicable tasks remain
-outside scope. Unknown evidence can be reported; it cannot be called a pass.
-Project-specific layouts and language preferences remain valid when they preserve
-meaning. Conflicting normative sources require explicit resolution, not a
-silent specificity override.
+Exact quoted source text, raw logs, code, generated external documentation, and
+immutable historical artifacts may preserve wording that does not follow local
+editorial guidance. Their owning source remains authoritative.
+
+Project-specific headings, templates, directory layouts, publication gates,
+domain vocabulary, and accessibility targets remain project-owned unless a
+separate central Specification explicitly governs them.
 
 ## Verification
 
 | Requirement | Minimum verification |
 | --- | --- |
-| `DOC-STATE-001` | Source-to-statement review of state, conditions, units, and normative strength |
-| `DOC-EVIDENCE-001` | Resolve evidence and review identity, conditions, units, and claim limits |
-| `DOC-PROC-001` | Authorized interface review or isolated walkthrough of effects and failure branches |
-| `DOC-TERM-001` | Review vocabulary ownership and cross-surface mappings |
-| `DOC-FRESH-001` | Compare changed current claims or tracked gaps without altering protected history |
+| `DOC-STATE-001` | Compare edited claims with source lifecycle and requirement state |
+| `DOC-EVIDENCE-001` | Review evidence locator and applicable source revision or explicit gap |
+| `DOC-PROC-001` | Review prerequisites, effect boundaries, stop conditions, and command evidence |
+| `DOC-TERM-001` | Review owning-surface terminology and declared mappings |
+| `DOC-FRESH-001` | Compare current guidance with current source owner and historical references |
 
 ## Agent handoff
 
-Use an existing task result or PR review to identify activated Requirement IDs,
-source/document identities, checks actually performed, exceptions or gaps, and
-compatibility effects. No separate report, approval, or receipt schema is added.
-A structural test pass does not prove that every statement is true.
+An agent applying this Specification reports:
+
+```text
+Activated requirements: <DOC-* IDs>
+Document state: <current / proposed / accepted / historical / mixed>
+Evidence and revision: <locators and applicable versions, or unresolved gaps>
+Procedure effects: none | <preview / mutation / verification / authority effects>
+Terminology owners: <owning surfaces and mappings>
+Freshness: <current source revision or stale/unknown condition>
+Exceptions: none | <project-owned or source-owned exception>
+```
 
 ## Compatibility and migration
 
-The first version is `0.1.0`, Development, with Advisory automated
-enforcement. Nothing is installed until a project explicitly selects a released
-Catalog entry. Existing locks and normative contracts remain unchanged. Adoption
-is scoped to authorized new work; it does not rewrite existing documents.
+Version `0.1.0` introduces the first Development contract for reusable
+technical-documentation integrity. It does not require existing repositories
+to adopt the Specification and does not rewrite existing documents.
 
-If later adopted, changing the selected set or returning to an earlier lock
-requires the consumer's normal explicit preview/apply flow. Such a change cannot
-undo effects that a user already performed by following a procedure.
+Consumers adopting this version should review only documentation changed by the
+task or otherwise selected for maintenance. Existing historical artifacts keep
+their owning lifecycle and are not rewritten merely to satisfy this
+Specification.
 
 ## References
 
-- [Approved ESP-0014](../../proposals/0014_documentation-integrity-contracts.md)
+- [ESP-0014: Reusable documentation integrity contracts](../../proposals/0014_documentation-integrity-contracts.md)
 - [Semantic Naming](../core/semantic-naming.md)
-- [BCP 14 notation](https://www.rfc-editor.org/info/bcp14)
-
-References explain provenance; they do not import undeclared obligations.
+- [BCP 14](https://www.rfc-editor.org/info/bcp14)
+- [Google Developer Documentation Style Guide](https://developers.google.com/style)
+- [Google Technical Writing](https://developers.google.com/tech-writing)
+- [ASD-STE100](https://asd-ste100.org/)
