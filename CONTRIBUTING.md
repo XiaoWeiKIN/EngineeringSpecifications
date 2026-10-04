@@ -58,6 +58,11 @@ validation.
 
 ## Write normative text intentionally
 
+Read [Specification authoring](governance/specification-authoring.md) before
+drafting or editing prose and examples. This local, non-normative guidance
+helps reviewers distinguish clearer wording from a changed obligation; it is
+not a consumer dependency or an additional approval step.
+
 The keywords `MUST`, `MUST NOT`, `REQUIRED`, `SHOULD`, `SHOULD NOT`,
 `RECOMMENDED`, `NOT RECOMMENDED`, `MAY`, and `OPTIONAL` carry their BCP 14
 meaning only when written in uppercase.

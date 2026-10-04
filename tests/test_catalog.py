@@ -90,7 +90,7 @@ class CatalogTestCase(unittest.TestCase):
             catalog["catalog_id"],
             "io.github.xiaoweikin.engineering-specifications",
         )
-        self.assertEqual(catalog["catalog_version"], "1.7.0")
+        self.assertEqual(catalog["catalog_version"], "1.7.1")
         self.assertEqual(len(catalog["specs"]), 8)
         self.assertEqual(
             {item["id"] for item in catalog["specs"]},
@@ -150,7 +150,7 @@ class CatalogTestCase(unittest.TestCase):
             if item["id"] == "documentation/derived-explanations"
         )
         self.assertEqual(semantic_naming["version"], "1.2.0")
-        self.assertEqual(data_boundaries["version"], "0.2.0")
+        self.assertEqual(data_boundaries["version"], "0.2.1")
         self.assertEqual(technical_documentation["version"], "0.1.0")
         self.assertEqual(
             technical_documentation["requires"], ["core/semantic-naming"]
@@ -181,7 +181,7 @@ class CatalogTestCase(unittest.TestCase):
         self.assertEqual(go_spec["version"], "0.5.0")
         self.assertIn("**/go.sum", go_spec["applies_to"])
         self.assertIn("**/vendor/modules.txt", go_spec["applies_to"])
-        self.assertEqual(functional_options_spec["version"], "0.2.0")
+        self.assertEqual(functional_options_spec["version"], "0.2.1")
         self.assertEqual(functional_options_spec["requires"], ["languages/go"])
         self.assertNotIn("detection", functional_options_spec)
         self.assertEqual(factory_delegation_spec["version"], "0.2.0")

@@ -4,6 +4,22 @@ All notable Catalog and normative specification changes are recorded here.
 
 ## Unreleased
 
+### Changed
+
+- Prepare development Catalog `1.7.1` for an editorial review of existing Spec
+  prose and examples; no release tag is created or moved by this change.
+- Advance `core/data-boundaries` and `languages/go/functional-options` to
+  `0.2.1`. Replace the parser-only no-effects illustration with an executable
+  boundary-entry fixture and positive control; name the API and constructor
+  explicitly in two functional-option sentences. Conformance duties,
+  Requirement IDs, scopes, dependencies, exceptions, enforcement levels, and
+  Verification mappings remain unchanged.
+- Add local non-normative Specification authoring guidance and route AGENTS,
+  CONTRIBUTING, and the formal template to it. Correct the old consumer name
+  and include documentation in the repository guide's taxonomy.
+- Record a bounded semantic review and add preservation and example regression
+  tests. Existing `core/semantic-naming` prose remains unchanged after review.
+
 ## [1.7.0] - 2026-10-04
 
 ### Added
