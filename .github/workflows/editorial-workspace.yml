@@ -1,0 +1,30 @@
+name: editorial-workspace
+on:
+  pull_request:
+    types: [opened, synchronize]
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    if: github.head_ref == 'docs/spec-content-consistency'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 5deda62dbacdbc753b9edbb00d1a891c76415b4a
+          persist-credentials: false
+      - name: Archive tracked baseline without executing repository code
+        shell: bash
+        run: |
+          git archive --format=tar --output="$RUNNER_TEMP/editorial-source.tar" HEAD
+          git ls-tree -r HEAD > "$RUNNER_TEMP/editorial-tree.txt"
+          git rev-parse HEAD > "$RUNNER_TEMP/editorial-commit.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: editorial-baseline-5deda62
+          retention-days: 1
+          if-no-files-found: error
+          path: |
+            ${{ runner.temp }}/editorial-source.tar
+            ${{ runner.temp }}/editorial-tree.txt
+            ${{ runner.temp }}/editorial-commit.txt
