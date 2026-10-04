@@ -30,6 +30,8 @@ promotion evidence, override, and observation contracts.
 `core/semantic-naming`, `core/data-boundaries`, `languages/go`,
 `languages/go/performance`, `languages/go/functional-options`, and
 `languages/go/factory-delegation` publish stable Requirement IDs.
+The two documentation Specs below add eight `DOC-*` IDs in the Unreleased
+working Catalog; they are not present in earlier release tags.
 
 ## Authoring
 
@@ -65,14 +67,24 @@ for legacy, migration, or repository-wide audit work.
 - [Go functional options](languages/go/functional-options.md)
 - [Go capability factory delegation](languages/go/factory-delegation.md)
 
+## Documentation (Unreleased)
+
+- [Technical documentation](documentation/technical-documentation.md)
+- [Derived engineering explanations](documentation/derived-explanations.md)
+
+Both are explicit optional Development Specs. The
+[documentation-layer guide](../docs/documentation-contracts.md)
+([简体中文](../docs/documentation-contracts.zh-CN.md)) explains composition,
+producer-path candidacy, verification limits and release/adoption boundaries.
+
 The Markdown files are the normative sources. `catalog.json` supplies stable
 IDs, versions, dependencies, scopes, detection evidence, and content digests
 for machine consumers.
 
-This index lists only published specifications. The
-[Specification Model](../docs/specification-model.md) defines how future Core,
-language, framework, database, testing, and protocol specifications compose
-without turning planned categories into published contracts.
+This index lists cataloged specifications, with unreleased additions marked.
+The [Specification Model](../docs/specification-model.md) and documentation-layer
+guide define how Core, language, framework, database, testing, protocol and
+documentation specifications compose without making every category required.
 
 The [Governance Model](../governance/README.md) defines the Proposal, maturity,
 automated enforcement, versioning, compliance, and quality contracts used to

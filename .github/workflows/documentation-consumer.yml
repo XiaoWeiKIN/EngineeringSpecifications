@@ -1,0 +1,33 @@
+name: documentation-consumer
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  rf-compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python: ["3.10", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: specs
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: XiaoWeiKIN/RepoFoundryAI
+          ref: 4a1f70c0c7222aeb5f9a8b8bf445f97c958b0a47
+          path: rf
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Exercise real selection and exact context without project mutation
+        run: python3 -B specs/tests/consumer_documentation.py --rf-root rf

@@ -1,0 +1,149 @@
+{
+  "kind": "unexecuted-review-rubrics",
+  "cases": [
+    {
+      "id": "doc-01-preserve",
+      "requirements": [
+        "DOC-STATE-001"
+      ],
+      "scenario": "The Chinese revision retains an unaccepted proposal, unmeasured latency, and the literal source keyword SHOULD.",
+      "expected_review": "satisfies-described-condition",
+      "rubric": "Compare the source state and strength; do not infer deployment or approval from tense."
+    },
+    {
+      "id": "doc-01-violate",
+      "requirements": [
+        "DOC-STATE-001"
+      ],
+      "scenario": "The editor changes a proposed queue into a deployed queue and SHOULD into MUST.",
+      "expected_review": "violates-described-condition",
+      "rubric": "Compare the source state and strength; do not infer deployment or approval from tense."
+    },
+    {
+      "id": "doc-02-preserve",
+      "requirements": [
+        "DOC-EVIDENCE-001"
+      ],
+      "scenario": "A latency claim cites a retained report, revision, workload, p99 unit and uncertainty; cost is explicitly unknown.",
+      "expected_review": "satisfies-described-condition",
+      "rubric": "A resolvable link is necessary but not sufficient; inspect claim scope and negative evidence."
+    },
+    {
+      "id": "doc-02-violate",
+      "requirements": [
+        "DOC-EVIDENCE-001"
+      ],
+      "scenario": "A report for a different workload is cited as proof of lower cost and all-workload latency.",
+      "expected_review": "violates-described-condition",
+      "rubric": "A resolvable link is necessary but not sufficient; inspect claim scope and negative evidence."
+    },
+    {
+      "id": "doc-03-preserve",
+      "requirements": [
+        "DOC-PROC-001"
+      ],
+      "scenario": "The guide identifies target, prerequisites, dry run, write effects and failure stop; the command was inspected but not executed.",
+      "expected_review": "satisfies-described-condition",
+      "rubric": "Inspect documented command effects without executing unauthorized writes; do not invent verification."
+    },
+    {
+      "id": "doc-03-violate",
+      "requirements": [
+        "DOC-PROC-001"
+      ],
+      "scenario": "A publishing command is labeled read-only and the author invents a successful test log.",
+      "expected_review": "violates-described-condition",
+      "rubric": "Inspect documented command effects without executing unauthorized writes; do not invent verification."
+    },
+    {
+      "id": "doc-04-preserve",
+      "requirements": [
+        "DOC-TERM-001"
+      ],
+      "scenario": "A translated explanation retains literal flags and maps human terms to owning schema fields.",
+      "expected_review": "satisfies-described-condition",
+      "rubric": "Review owning spellings and exact mappings, not English-only vocabulary."
+    },
+    {
+      "id": "doc-04-violate",
+      "requirements": [
+        "DOC-TERM-001"
+      ],
+      "scenario": "A translation changes a literal flag or aliases distinct operations with the same term.",
+      "expected_review": "violates-described-condition",
+      "rubric": "Review owning spellings and exact mappings, not English-only vocabulary."
+    },
+    {
+      "id": "doc-05-preserve",
+      "requirements": [
+        "DOC-FRESH-001"
+      ],
+      "scenario": "Current guidance identifies its supported version; an old ADR is linked as history without edits.",
+      "expected_review": "satisfies-described-condition",
+      "rubric": "Preserve protected history; update affected current claims or record a gap."
+    },
+    {
+      "id": "doc-05-violate",
+      "requirements": [
+        "DOC-FRESH-001"
+      ],
+      "scenario": "An old accepted ADR is rewritten for style and used alone to claim the current implementation was verified.",
+      "expected_review": "violates-described-condition",
+      "rubric": "Preserve protected history; update affected current claims or record a gap."
+    },
+    {
+      "id": "doc-06-preserve",
+      "requirements": [
+        "DOC-DERIVED-AUTH-001"
+      ],
+      "scenario": "The HTML labels simulated time and derived status and links the accepted decision instead of granting approval.",
+      "expected_review": "satisfies-described-condition",
+      "rubric": "Rendering and passing structural checks grant neither evidence nor decision authority."
+    },
+    {
+      "id": "doc-06-violate",
+      "requirements": [
+        "DOC-DERIVED-AUTH-001"
+      ],
+      "scenario": "A storyboard labels its 36-second reading duration as measured system runtime and declares approval.",
+      "expected_review": "violates-described-condition",
+      "rubric": "Rendering and passing structural checks grant neither evidence nor decision authority."
+    },
+    {
+      "id": "doc-07-preserve",
+      "requirements": [
+        "DOC-DERIVED-PROV-001"
+      ],
+      "scenario": "A private companion retains exact locally modified input bytes, digests and generator identity with restricted locators.",
+      "expected_review": "satisfies-described-condition",
+      "rubric": "Resolve actual source identity without leaking secrets; a digest alone proves no authenticity."
+    },
+    {
+      "id": "doc-07-violate",
+      "requirements": [
+        "DOC-DERIVED-PROV-001"
+      ],
+      "scenario": "Only HEAD and a hash are shown for dirty inputs; the snapshot is missing and a fake public URL is supplied.",
+      "expected_review": "violates-described-condition",
+      "rubric": "Resolve actual source identity without leaking secrets; a digest alone proves no authenticity."
+    },
+    {
+      "id": "doc-08-preserve",
+      "requirements": [
+        "DOC-A11Y-001"
+      ],
+      "scenario": "A view has material text relationships, labeled keyboard controls, non-color states and synchronized captions for meaningful audio.",
+      "expected_review": "satisfies-described-condition",
+      "rubric": "Review the actual rendered modes and text equivalence; report unavailable checks, not pass."
+    },
+    {
+      "id": "doc-08-violate",
+      "requirements": [
+        "DOC-A11Y-001"
+      ],
+      "scenario": "Essential evidence is available only through drag/hover, status only by color, and an unrelated transcript is called caption compliance.",
+      "expected_review": "violates-described-condition",
+      "rubric": "Review the actual rendered modes and text equivalence; report unavailable checks, not pass."
+    }
+  ]
+}

@@ -99,6 +99,39 @@
       ],
       "sha256": "f12b2bcfa0f9a74ad8103690ffa3e86c5ff76a6041684bf60f0ad14f0f2e4436",
       "version": "0.2.0"
+    },
+    {
+      "id": "documentation/technical-documentation",
+      "version": "0.1.0",
+      "path": "specification/documentation/technical-documentation.md",
+      "sha256": "c5b2bceae346fe9ed0aa44cb07a492df0f3f44c274c6a688e6c71b2cd2a3c6cd",
+      "required": false,
+      "requires": [
+        "core/semantic-naming"
+      ],
+      "applies_to": [
+        "**/*.md",
+        "**/*.mdx",
+        "**/*.rst",
+        "**/*.adoc",
+        "**/*.html",
+        "**/*.htm"
+      ],
+      "description": "Load when writing or reviewing engineering claims, executable procedures, technical vocabulary, or documentation affected by behavior changes"
+    },
+    {
+      "id": "documentation/derived-explanations",
+      "version": "0.1.0",
+      "path": "specification/documentation/derived-explanations.md",
+      "sha256": "f032aff210b3ef2f6bb4bfd888247abfe447a09844809455355b395f68560a5d",
+      "required": false,
+      "requires": [
+        "documentation/technical-documentation"
+      ],
+      "applies_to": [
+        "**/*"
+      ],
+      "description": "Load when producing or reviewing diagrams, interactive views, presentations, or videos that explain engineering facts, including their generators"
     }
   ]
 }

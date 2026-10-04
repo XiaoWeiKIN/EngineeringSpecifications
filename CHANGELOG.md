@@ -4,6 +4,24 @@ All notable Catalog and normative specification changes are recorded here.
 
 ## Unreleased
 
+### Added
+
+- Integrated ESP-0014 as optional Development `documentation/technical-documentation`
+  and `documentation/derived-explanations`, each at `0.1.0`, with eight Advisory
+  Requirements covering engineering state, evidence, procedure effects, owning
+  terminology, freshness, derived authority, provenance and equivalent access.
+- Added bilingual documentation-layer guidance, exact Requirement metadata and
+  Verification coverage, positive/negative review rubrics, and pinned RF
+  consumer compatibility tests. Rubrics are not completed model evaluations.
+
+### Compatibility
+
+- Preserved every existing Spec entry, version and digest. Catalog schema stays
+  at 1; documentation adoption is explicit, not detected or required by default.
+- This is an Unreleased integration, not Catalog `1.6.0` tag content. A separate
+  minor-release PR will choose the new Catalog version. No release tag, RF
+  default, installed project, or protected historical artifact is changed here.
+
 ## [1.6.0] - 2026-08-10
 
 ### Added
