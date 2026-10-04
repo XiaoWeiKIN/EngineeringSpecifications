@@ -231,7 +231,8 @@ Current guidance **MUST** identify an observable source owner or version
 boundary when drift could make the documented behavior unsafe or misleading.
 
 A historical ADR, plan, checkpoint, benchmark result, research snapshot, or
-other immutable record **MUST** remain identifiable as historical and **MUST NOT** be treated as proof that the current implementation still has the same
+other immutable record **MUST** remain identifiable as historical and
+**MUST NOT** be treated as proof that the current implementation still has the same
 behavior without current supporting evidence.
 
 When current guidance is stale, the maintainer **MUST** update or supersede the
@@ -252,7 +253,9 @@ for any historical artifact cited as context rather than current proof.
 
 ## Approved patterns
 
-The following examples are non-normative.
+The following examples are non-normative. Artifact IDs, abbreviated revisions,
+and command names are placeholders; they are not actual evidence or executable
+project instructions.
 
 A proposal keeps its state:
 
@@ -327,6 +330,11 @@ Exceptions: none | <project-owned or source-owned exception>
 
 ## Compatibility and migration
 
+Version `0.1.1` clarifies prose, example boundaries, and reference authority.
+It preserves Requirement IDs, obligations, activation metadata, context
+dependencies, automated enforcement levels, and Verification mappings.
+No consumer behavior migration is introduced by this editorial patch.
+
 Version `0.1.0` introduces the first Development contract for reusable
 technical-documentation integrity. It does not require existing repositories
 to adopt the Specification and does not rewrite existing documents.
@@ -337,6 +345,9 @@ their owning lifecycle and are not rewritten merely to satisfy this
 Specification.
 
 ## References
+
+References provide provenance and explanation. They do not add undeclared
+normative obligations or require adoption of an external style guide.
 
 - [ESP-0014: Reusable documentation integrity contracts](../../proposals/0014_documentation-integrity-contracts.md)
 - [Semantic Naming](../core/semantic-naming.md)

@@ -8,7 +8,9 @@ a new category or specification dependency.
 
 Read the [Specification Principles](governance/specification-principles.md) and
 [Lifecycle](governance/lifecycle.md) before adding behavior or changing a
-compatibility promise.
+compatibility promise. Read the non-normative
+[Specification writing guide](governance/specification-writing.md) before
+editing prose, examples, or review instructions.
 
 ## Choose the broadest valid layer
 
@@ -38,7 +40,9 @@ nesting does not define inheritance or override precedence.
 
 Spelling, formatting, broken links, and wording changes that preserve required
 behavior can use a normal pull request. Explain why the change is
-non-normative.
+non-normative. For changed Spec prose, use a patch version and refresh its
+Catalog digest. Record the preserved obligations and any unresolved semantic
+question rather than silently choosing a new interpretation.
 
 ### Scoped normative changes identify their contract
 
@@ -71,8 +75,11 @@ Use these terms sparingly:
 - rationale, examples, and implementation suggestions use ordinary
   non-normative language.
 
-New specifications state their maturity immediately after the title. Until the
-Catalog carries machine-readable maturity, a missing marker means Development.
+Current Catalog documents state their maturity immediately after the title:
+`> **Status:** Development`, `Stable`, or `Deprecated`. The canonical check
+requires this marker. The legacy default for historical sources without a
+marker is Development; that fallback does not permit new Catalog documents to
+omit it. Catalog schema 1 has no separate maturity field.
 
 ## New specifications close the Harness feedback loop
 
@@ -122,9 +129,10 @@ contract.
    only with the evidence required by the automated enforcement lifecycle.
 9. Update `catalog.json`:
    - preserve stable IDs;
-   - bump the affected specification version for normative changes;
+   - bump the affected specification version for normative changes, or its
+     patch version for editorial clarification;
    - refresh the source SHA-256;
-   - declare dependencies and deterministic detection evidence.
+   - declare dependencies and deterministic detection evidence;
    - write the description as an Agent-readable activation summary.
 10. Update `CHANGELOG.md` for externally observable changes.
 11. Run the canonical check:

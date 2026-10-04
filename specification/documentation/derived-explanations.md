@@ -198,7 +198,8 @@ accessibility check and a review of the engineering information it preserves.
 
 ## Approved patterns
 
-The following examples are non-normative.
+The following examples are non-normative. Artifact IDs and abbreviated
+revisions are placeholders, not evidence for a real project.
 
 A generated diagram bundle can record:
 
@@ -259,13 +260,19 @@ An agent applying this Specification reports:
 Activated requirements: <DOC-DERIVED-* / DOC-A11Y-* IDs>
 Canonical sources: <artifact IDs or paths>
 Source identity: <revision / snapshot / digests, or unverifiable>
-Derived authority: none | <exact embedded source that retains its original authority>
+Derived authority: none
+Embedded source attribution: none | <owning source and its unchanged authority>
 Simulation or synthetic data: none | <assumptions and label>
 Equivalent representation: <text, relationship list, keyboard path, captions, transcript>
 Freshness: current at <source identity> | stale | unknown
 ```
 
 ## Compatibility and migration
+
+Version `0.1.1` clarifies prose, example boundaries, and reference authority.
+It preserves Requirement IDs, obligations, activation metadata, context
+dependencies, automated enforcement levels, and Verification mappings.
+No consumer behavior migration is introduced by this editorial patch.
 
 Version `0.1.0` introduces the first Development contract for reusable derived
 explanation surfaces. It does not require any renderer or media format and does
@@ -278,6 +285,9 @@ Existing outputs do not become current merely because the Specification is
 selected.
 
 ## References
+
+References provide provenance and explanation. They do not add undeclared
+normative obligations or require adoption of an external style guide.
 
 - [ESP-0014: Reusable documentation integrity contracts](../../proposals/0014_documentation-integrity-contracts.md)
 - [Technical Documentation Integrity](technical-documentation.md)

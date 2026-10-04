@@ -168,8 +168,8 @@ plus reviewed public documentation for extension ownership.
 
 The constructor **MUST** initialize private construction state from the
 required inputs and documented defaults. The default call **MUST** produce a
-valid baseline configuration. It **MUST** apply each supplied option exactly
-once in documented application order.
+valid baseline configuration. The constructor **MUST** apply each supplied
+option exactly once in documented application order.
 
 The API **MUST** define how duplicate and conflicting options behave. Override,
 composition, and rejection are all permitted when the selected behavior is
@@ -308,7 +308,11 @@ flowchart LR
 
 This closed-interface implementation is one compliant representation; it is
 not required when a function type or an intentionally open contract better
-matches `GO-OPTION-TYPE-001`.
+matches `GO-OPTION-TYPE-001`. The snippets are Go fragments: the server
+example needs a package declaration and imports for `errors`, `fmt`, and
+`time`. The call-site fragment belongs inside a function. The separate worker
+example needs `errors` and `fmt`; it is an alternative, not an extra option
+requirement.
 
 ```go
 var ErrInvalidServerOption = errors.New("invalid server option")
@@ -487,6 +491,11 @@ Compatibility or migration: none | <preserved entry point, behavior effect, and 
 
 ## Compatibility and migration
 
+Version `0.2.1` clarifies prose, example boundaries, and reference authority.
+It preserves Requirement IDs, obligations, activation metadata, context
+dependencies, automated enforcement levels, and Verification mappings.
+No consumer behavior migration is introduced by this editorial patch.
+
 Version `0.2.0` adds the Requirement-level Automated enforcement contract and
 sets every existing `GO-OPTION-*` Requirement to `Advisory`. It preserves
 normative behavior, IDs, activation, context dependencies, enforcement classes,
@@ -515,6 +524,9 @@ not drift. Rollback preserves the earlier entry point and defaults while
 removing only unpublished adapters or newly added optional entry points.
 
 ## References
+
+References provide provenance and explanation. They do not add undeclared
+normative obligations or require adoption of an external style guide.
 
 - [Go Implementation Specification](../go.md)
 - [Keeping Your Modules Compatible](https://go.dev/blog/module-compatibility)

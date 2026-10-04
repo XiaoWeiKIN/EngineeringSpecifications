@@ -44,8 +44,9 @@ flowchart LR
 
 ## Adoption is intentionally incremental
 
-The current repository is at `0.x`, so the governance foundation arrives
-before every enforcement mechanism:
+Catalog versions and document maturity are independent. The current Catalog
+contains Development Specifications, including one with a `1.x` Spec version.
+The governance foundation is implemented incrementally:
 
 - BCP 14 interpretation, change lanes, Proposal templates, principles, and
   maturity definitions are documented now.
@@ -61,8 +62,9 @@ before every enforcement mechanism:
 - Existing Requirements begin at Advisory. Warning and Blocking promotions
   require versioned observation evidence and remain independent from BCP 14
   strength and document maturity.
-- Compliance data remains empty until specifications publish stable requirement
-  IDs and implementation repositories provide reviewable evidence.
+- Current Catalog Specifications already publish stable Requirement IDs.
+  This repository has no implementation compliance matrix; entries require
+  reviewable evidence from the implementation repositories.
 - A future machine-readable Catalog maturity field or dependency-package
   detector requires a coordinated Proposal and RepoFoundry change.
 
@@ -74,6 +76,10 @@ while making the target governance explicit.
 [Specification Principles](specification-principles.md) define the design
 rubric: reusable, behavior-focused, evidence-backed, stable, consistent, simple,
 and verifiable.
+
+The non-normative [Specification writing guide](specification-writing.md)
+helps authors apply that rubric without turning editorial preferences into
+consumer obligations.
 
 [Specification Lifecycle](lifecycle.md) defines compatibility expectations for
 Development, Stable, and Deprecated documents.

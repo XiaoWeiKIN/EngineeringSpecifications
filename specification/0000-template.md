@@ -14,7 +14,9 @@
 > content digest.
 
 Replace the title and metadata before review. Delete every authoring
-instruction that does not belong in the published Specification.
+instruction that does not belong in the published Specification. Use the
+non-normative [Specification writing guide](../governance/specification-writing.md)
+for the prose review; do not copy authoring guidance into consumer requirements.
 
 ## Purpose
 
@@ -122,8 +124,11 @@ UTF-8 source.
 ## Approved patterns
 
 Provide small, representative implementations, data shapes, or workflows that
-satisfy the requirements. Mark examples as non-normative and avoid turning one
-language or framework choice into a cross-ecosystem requirement.
+satisfy the requirements. Mark examples as non-normative and identify whether
+code is runnable, a fragment requiring a named harness, or pseudocode. For a
+no-effect failure example, exercise the boundary entry point, not only the
+parser. Avoid turning an illustrative language or framework into a
+cross-ecosystem requirement.
 
 ## Rejected patterns
 

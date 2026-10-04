@@ -4,6 +4,26 @@ All notable Catalog and normative specification changes are recorded here.
 
 ## Unreleased
 
+### Changed
+
+- Prepare development Catalog `1.7.1` for an editorial consistency pass. The
+  prepared `1.7.0` release commit and any immutable tags remain unchanged.
+- Clarify authoring routes, explicit selection versus detection, current
+  Catalog availability versus release identity, document maturity markers,
+  and the local-only scope of release validation. Add non-normative
+  Specification-writing guidance without new consumer dependencies.
+- Clarify code-fragment and synthetic-example boundaries, repair the
+  no-side-effect rejection example to exercise the full entry point, and
+  separate derived-bundle authority from embedded-source attribution.
+- Advance `core/semantic-naming` to `1.2.1`, `core/data-boundaries` to `0.2.1`,
+  `languages/go` to `0.5.1`, Go functional-options and factory-delegation to
+  `0.2.1`, and Go performance plus both documentation Specs to `0.1.1`.
+  Requirement IDs, obligations, scopes, dependencies, enforcement ceilings,
+  and Verification mappings remain unchanged; source digests are refreshed.
+- Record the full tracked-file review and intentionally preserved history in
+  `docs/editorial-consistency-review.md`. No release or project migration is
+  performed by this change.
+
 ## [1.7.0] - 2026-10-04
 
 ### Added

@@ -15,7 +15,9 @@ normative requirements. New and substantially rewritten text should use BCP 14
 terms when requirement strength affects compliance. Rationale, examples, and
 implementation suggestions should be identified as non-normative.
 
-Current documents without an explicit status are Development. See the
+Current Catalog documents include an explicit Status marker, which the
+canonical check validates. Historical sources without a marker retain the
+legacy Development default. See the
 [Specification Lifecycle](../governance/lifecycle.md) for compatibility
 expectations. Development requirements remain normative within a pinned
 version; the status permits a later version to change incompatibly.
@@ -41,9 +43,14 @@ IDs, bounded activation cards, exact context dependencies, enforcement
 classes, automated enforcement levels, verification mechanisms,
 implementation evidence, and an Agent handoff.
 
-The template is an authoring resource, not a published specification. A
-document becomes published only after it has its own path and stable Catalog
-entry. `catalog.json` remains authoritative for version, dependencies, scopes,
+Use the non-normative
+[Specification writing guide](../governance/specification-writing.md) to review
+prose and examples without changing requirement strength.
+
+The template is an authoring resource, not a Catalog Specification. A document
+becomes selectable in a checkout after it has its own path and stable Catalog
+entry. A production release additionally needs the matching immutable tag.
+`catalog.json` remains authoritative for version, dependencies, scopes,
 detection evidence, and digest.
 
 Selection and task activation are separate. Required means the Specification
@@ -75,7 +82,7 @@ The Markdown files are the normative sources. `catalog.json` supplies stable
 IDs, versions, dependencies, scopes, detection evidence, and content digests
 for machine consumers.
 
-This index lists only published specifications. The
+This index lists only Specifications in the working-tree Catalog. The
 [Specification Model](../docs/specification-model.md) defines how future Core,
 language, framework, database, testing, protocol, and documentation specifications compose
 without turning planned categories into published contracts.

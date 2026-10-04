@@ -3,7 +3,7 @@
 ## Purpose
 
 This repository is the source of truth for versioned engineering
-specifications consumed by EngineeringWorkflow.
+specifications consumed by RepoFoundry AI.
 
 ## Read First
 
@@ -14,6 +14,8 @@ specifications consumed by EngineeringWorkflow.
   changing automated enforcement levels.
 - Read `proposals/README.md` when a change is cross-cutting or significant.
 - Read `catalog.json` before adding or moving a specification.
+- Read `governance/specification-writing.md` before writing or reviewing prose.
+  This is local authoring guidance, not an additional consumer Specification.
 - Start a new normative document from `specification/0000-template.md`.
 - Read the relevant file under `specification/` before changing its rules.
 
@@ -23,20 +25,22 @@ specifications consumed by EngineeringWorkflow.
 - Give every specification a stable lowercase slash-separated ID.
 - Bump a specification version when its normative content or consumer-visible
   Requirement metadata changes.
-- Update its SHA-256 in `catalog.json` after editing the Markdown source.
+- Use a patch version for editorial Spec changes that preserve obligations;
+  refresh the SHA-256 in `catalog.json` after editing the Markdown source.
 - Keep dependencies acyclic and reference only cataloged specification IDs.
 - Put shared rules in the broadest layer where they remain true; narrower
   specifications depend on them instead of copying them.
 - Reserve `core/` for rules required by every implementation repository.
-- Treat language, framework, database, testing, and protocol as independent
-  composition dimensions.
+- Treat language, framework, database, testing, protocol, and documentation as
+  independent composition dimensions.
 - Use BCP 14 keywords for explicit requirement strength and keep rationale
   clearly non-normative.
 - Give load-bearing requirements stable IDs and connect them to enforcement and
   expected implementation evidence.
 - Significant cross-cutting or public-contract changes require an approved ESP
   before normative integration.
-- Treat specifications without an explicit maturity marker as Development.
+- Historical sources without a maturity marker mean Development; current
+  Catalog documents require the explicit Status marker checked by the validator.
 - Keep detection rules deterministic and based on filenames or extensions.
 - Write Catalog descriptions as compact task-activation summaries.
 - Treat Required as local installation, not unconditional task-time reading.

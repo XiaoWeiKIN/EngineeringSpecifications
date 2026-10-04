@@ -6,8 +6,9 @@
 >
 > **Selection:** Detected
 >
-> **Routing:** Selection installs this Specification when Go is detected. Load
-> it only for tasks that create, change, or review hand-written Go contracts.
+> **Routing:** Go detection recommends this optional Specification; explicit
+> project selection installs it. Load it only for tasks that create, change,
+> or review hand-written Go contracts.
 >
 > **Catalog metadata:** `catalog.json` is the source of truth for version,
 > dependencies, file scopes, detection evidence, activation summary, and
@@ -397,7 +398,9 @@ matrix, and governed exceptions for intentionally uncovered dimensions.
 
 ## Approved patterns
 
-The following examples are non-normative:
+The following examples are non-normative Go fragments. They omit the package
+declaration and the `errors` and `net/url` imports. They illustrate naming and
+boundary types, not a complete server or a conformance test suite.
 
 ```go
 type HTTPClient struct{}
@@ -433,7 +436,9 @@ inventory.
 
 ## Rejected patterns
 
-- `type HttpClient` and `parseUrl` violate `GO-NAME-001`.
+- `type HttpClient` and `parseUrl` depart from the default casing in
+  `GO-NAME-001`. Review its documented exceptions before treating the spelling
+  as non-conforming.
 - Package and type pairs such as `http.HTTPServer` may violate `GO-NAME-002`
   when the package already supplies the missing context.
 - Committing changed module metadata without normalizing every declared module
@@ -495,6 +500,11 @@ Compatibility or migration: none | <preserved API and removal condition>
 
 ## Compatibility and migration
 
+Version `0.5.1` clarifies prose, example boundaries, and reference authority.
+It preserves Requirement IDs, obligations, activation metadata, context
+dependencies, automated enforcement levels, and Verification mappings.
+No consumer behavior migration is introduced by this editorial patch.
+
 Version `0.5.0` adds the Requirement-level Automated enforcement contract and
 sets every existing `GO-*` Requirement to `Advisory`. It preserves normative
 behavior, IDs, activation, context dependencies, enforcement classes, and
@@ -520,6 +530,9 @@ Development requirements can remain pinned to an earlier Catalog revision
 while they prepare the required checks.
 
 ## References
+
+References provide provenance and explanation. They do not add undeclared
+normative obligations or require adoption of an external style guide.
 
 - [ESP-0007: Separate Spec selection from task activation](../../proposals/0007_agent-task-activation-and-data-boundaries.md)
 - [Semantic Naming](../core/semantic-naming.md)
