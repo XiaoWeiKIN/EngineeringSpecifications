@@ -1,0 +1,150 @@
+name: publish-prepared-1.7-tags
+
+# One bounded publication: never select the moving main as a release target.
+on:
+  pull_request:
+    branches: [main]
+    paths: ['.github/workflows/publish-prepared-1.7-tags.yml']
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-prepared-1.7-tags.yml']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-prepared-1.7-tags-${{ github.event_name }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - version: '1.7.0'
+            commit: '5deda62dbacdbc753b9edbb00d1a891c76415b4a'
+          - version: '1.7.1'
+            commit: 'e2919c1d205372ad1d1c70808a000a7e80390c8b'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ matrix.commit }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Verify the exact merged release and all Catalog digests
+        env:
+          RELEASE_VERSION: ${{ matrix.version }}
+          RELEASE_COMMIT: ${{ matrix.commit }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$RELEASE_COMMIT"
+          git merge-base --is-ancestor "$RELEASE_COMMIT" origin/main
+          python3 -B scripts/check.py
+          python3 -B scripts/check_release.py "$RELEASE_VERSION"
+
+  publish:
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'XiaoWeiKIN/EngineeringSpecifications'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Publish only the two verified annotated tags, without force
+        env:
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        run: |
+          python3 -B - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import subprocess
+          import sys
+
+          releases = {
+              '1.7.0': '5deda62dbacdbc753b9edbb00d1a891c76415b4a',
+              '1.7.1': 'e2919c1d205372ad1d1c70808a000a7e80390c8b',
+          }
+          refs = [f'refs/tags/v{version}' for version in releases]
+
+          def git(*args):
+              return subprocess.run(['git', *args], check=True, capture_output=True,
+                                    text=True, timeout=120).stdout.strip()
+
+          def remote_refs():
+              lines = git('ls-remote', '--tags', 'origin',
+                          *[r for ref in refs for r in (ref, ref + '^{}')])
+              return {ref: sha for sha, ref in (line.split() for line in lines.splitlines())}
+
+          if (os.environ.get('GITHUB_REPOSITORY') != 'XiaoWeiKIN/EngineeringSpecifications'
+                  or os.environ.get('GITHUB_REF') != 'refs/heads/main'
+                  or os.environ.get('GITHUB_EVENT_NAME') != 'push'):
+              raise SystemExit('Publication requires the approved main-branch push.')
+
+          # Preflight BOTH versions before creating any local tag or pushing anything.
+          remote = remote_refs()
+          roots = {}
+          records = []
+          for version, commit in releases.items():
+              ref = f'refs/tags/v{version}'
+              git('merge-base', '--is-ancestor', commit, 'HEAD')
+              if git('cat-file', '-t', commit) != 'commit':
+                  raise SystemExit('Release target is not a commit: ' + commit)
+              if ref in remote and remote.get(ref + '^{}') != commit:
+                  raise SystemExit('Existing remote tag is non-annotated or mismatched: ' + ref)
+              local = subprocess.run(['git', 'show-ref', '--verify', '--quiet', ref])
+              if local.returncode not in (0, 1):
+                  raise SystemExit('Cannot inspect local tag: ' + ref)
+              if local.returncode == 0:
+                  if git('cat-file', '-t', ref) != 'tag' or git('rev-parse', ref + '^{commit}') != commit:
+                      raise SystemExit('Existing local tag is non-annotated or mismatched: ' + ref)
+                  if ref in remote and git('rev-parse', ref) != remote[ref]:
+                      raise SystemExit('Local and remote tag objects differ: ' + ref)
+              root = Path(os.environ['RUNNER_TEMP']) / ('prepared-catalog-' + version)
+              git('worktree', 'add', '--detach', str(root), commit)
+              roots[version] = root
+              raw = (root / 'catalog.json').read_bytes()
+              if json.loads(raw)['catalog_version'] != version:
+                  raise SystemExit('Catalog version mismatch: ' + ref)
+              subprocess.run([sys.executable, '-B', str(root / 'scripts/check_release.py'),
+                              version], cwd=root, check=True, timeout=120)
+              records.append({'tag': ref, 'commit': commit,
+                              'catalog_sha256': hashlib.sha256(raw).hexdigest(),
+                              'previously_published': ref in remote})
+
+          for version, commit in releases.items():
+              ref = f'refs/tags/v{version}'
+              if subprocess.run(['git', 'show-ref', '--verify', '--quiet', ref]).returncode == 1:
+                  git('tag', '-a', 'v' + version, commit,
+                      '-m', 'EngineeringSpecifications v' + version)
+
+          # Explicit refspecs only. No --force, --tags, branch update or ruleset bypass.
+          git('-c', 'push.followTags=false', 'push', '--atomic', 'origin',
+              *[ref + ':' + ref for ref in refs])
+          published = remote_refs()
+          for record in records:
+              ref = record['tag']
+              if (published.get(ref) != git('rev-parse', ref)
+                      or published.get(ref + '^{}') != record['commit']):
+                  raise SystemExit('Remote verification failed: ' + ref)
+              version = ref.removeprefix('refs/tags/v')
+              subprocess.run([sys.executable, '-B', str(roots[version] / 'scripts/check_release.py'),
+                              version, '--require-tag'], cwd=roots[version], check=True, timeout=120)
+              record['tag_object'] = published[ref]
+          result = json.dumps({'published_and_verified': records}, indent=2)
+          print(result)
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+              summary.write('## Verified Catalog tags\n\n```json\n' + result + '\n```\n')
+          PY
