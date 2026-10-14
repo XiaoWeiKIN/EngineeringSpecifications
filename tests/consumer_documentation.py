@@ -16,7 +16,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 RF_ROOT: Path
-REQUIRED = {"core/semantic-naming", "core/data-boundaries"}
+REQUIRED = {"core/semantic-naming", "core/data-boundaries", "core/implementation-simplicity"}
 TECHNICAL = "documentation/technical-documentation"
 DERIVED = "documentation/derived-explanations"
 DOC_IDS = {

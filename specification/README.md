@@ -29,7 +29,8 @@ hybrid enforcement class. New Requirements start at Advisory. See the
 [Automated Enforcement Lifecycle](../governance/enforcement-lifecycle.md) for
 promotion evidence, override, and observation contracts.
 
-`core/semantic-naming`, `core/data-boundaries`, `languages/go`,
+`core/semantic-naming`, `core/data-boundaries`, `core/implementation-simplicity`,
+`languages/go`,
 `languages/go/performance`, `languages/go/functional-options`,
 `languages/go/factory-delegation`, `documentation/technical-documentation`,
 and `documentation/derived-explanations` publish stable Requirement IDs.
@@ -65,6 +66,7 @@ for legacy, migration, or repository-wide audit work.
 
 - [Semantic naming](core/semantic-naming.md)
 - [Data boundaries](core/data-boundaries.md)
+- [Minimal sufficient implementation complexity](core/implementation-simplicity.md)
 
 ## Languages
 

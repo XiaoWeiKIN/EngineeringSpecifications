@@ -4,6 +4,16 @@ All notable Catalog and normative specification changes are recorded here.
 
 ## Unreleased
 
+### Added
+
+- Stage Catalog `1.8.0` with new required Development
+  `core/implementation-simplicity` Spec version `0.1.0`. Eight Advisory
+  Requirements cover business-supported scope, direct common paths, explicit
+  unsupported failures, boundary validation, justified abstractions, readable
+  flow, measured optimization, and minimal sufficient changes. This integration
+  remains pending [ESP-0024](https://github.com/XiaoWeiKIN/EngineeringSpecifications/pull/24)
+  approval and is not a release or an automatic consumer migration.
+
 ### Changed
 
 - Align non-normative authoring, governance, README, and release documentation

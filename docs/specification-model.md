@@ -310,6 +310,8 @@ The working-tree Catalog contains:
 
 - `core/semantic-naming`, required for implementation repositories;
 - `core/data-boundaries`, required for implementation repositories;
+- `core/implementation-simplicity`, required for implementation repositories
+  and activated for code design and implementation complexity decisions;
 - `languages/go`;
 - `languages/go/performance`, explicitly selected for Go performance
   objectives, diagnosis, measured hotspot changes, comparative verification,

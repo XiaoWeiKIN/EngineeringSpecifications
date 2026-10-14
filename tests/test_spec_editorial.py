@@ -51,12 +51,14 @@ class EditorialBoundaryTests(unittest.TestCase):
     def test_catalog_only_changes_reviewed_spec_patch_identities(self) -> None:
         catalog = json.loads((ROOT / "catalog.json").read_text(encoding="utf-8"))
         self.assertEqual(catalog["schema_version"], 1)
-        self.assertEqual(catalog["catalog_version"], "1.7.1")
+        self.assertEqual(catalog["catalog_version"], "1.8.0")
         self.assertEqual(
-            {item["id"] for item in catalog["specs"]},
+            {item["id"] for item in catalog["specs"]} - {"core/implementation-simplicity"},
             set(BASELINE["catalog_metadata"]),
         )
         for item in catalog["specs"]:
+            if item["id"] == "core/implementation-simplicity":
+                continue  # 1.7.1 historical preservation checks only its original Specs.
             with self.subTest(spec=item["id"]):
                 old = BASELINE["catalog_metadata"][item["id"]]
                 metadata = {k: v for k, v in item.items() if k not in ("sha256", "version")}
