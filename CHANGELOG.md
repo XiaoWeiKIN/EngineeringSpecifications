@@ -4,6 +4,16 @@ All notable Catalog and normative specification changes are recorded here.
 
 ## Unreleased
 
+### Changed
+
+- Align non-normative authoring, governance, README, and release documentation
+  with the existing Catalog, explicit optional-Spec selection, mandatory
+  maturity markers, and immutable-tag publication boundary. Reuse the existing
+  Specification authoring guide; no second consumer contract is introduced.
+- Clarify examples, source references, and Requirements review instructions.
+  Catalog version, Requirement texts, Spec digests, and released history are
+  unchanged by this documentation-only follow-up.
+
 ## [1.7.1] - 2026-10-04
 
 ### Changed

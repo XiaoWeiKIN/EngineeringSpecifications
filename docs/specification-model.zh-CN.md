@@ -10,7 +10,8 @@ EngineeringSpecifications 用一个可版本化、可组合的 Catalog 管理可
 ## 一个 Catalog 覆盖多个可复用层级
 
 Catalog 会沿独立的工程维度扩展。下面的分类定义未来规范的归属；只有
-`catalog.json` 中存在的条目才是当前已经发布的规范。
+`catalog.json` 中存在的条目才在当前检出中可供选择。生产发布还需要匹配且不可变的
+tag；工作树中的条目本身不是发布身份。
 
 | 层级 | 职责 | 典型选择方式 |
 | --- | --- | --- |
@@ -262,7 +263,7 @@ Specification Proposal，以及它承载什么成熟度承诺。版本、摘要�
 
 ## 当前 Catalog 是第一组规范
 
-当前版本发布：
+工作树中的 Catalog 包含：
 
 - `core/semantic-naming`，实现型仓库必选；
 - `core/data-boundaries`，实现型仓库必选；

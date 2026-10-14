@@ -13,7 +13,9 @@ copies.
 
 The catalog is designed to grow across independent engineering dimensions.
 This taxonomy defines where future specifications belong; only entries present
-in `catalog.json` are currently published.
+in `catalog.json` are available in this checkout. A production release also
+requires the matching immutable tag; a working-tree entry alone is not a
+release identity.
 
 | Layer | Responsibility | Typical selection |
 | --- | --- | --- |
@@ -304,7 +306,7 @@ changelog, and validation process.
 
 ## The current catalog is the first slice
 
-The current release publishes:
+The working-tree Catalog contains:
 
 - `core/semantic-naming`, required for implementation repositories;
 - `core/data-boundaries`, required for implementation repositories;

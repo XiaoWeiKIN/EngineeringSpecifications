@@ -25,7 +25,8 @@ specifications consumed by RepoFoundry AI.
 - Give every specification a stable lowercase slash-separated ID.
 - Bump a specification version when its normative content or consumer-visible
   Requirement metadata changes.
-- Update its SHA-256 in `catalog.json` after editing the Markdown source.
+- Use a patch version for editorial Spec changes that preserve obligations;
+  refresh the SHA-256 in `catalog.json` after editing the Markdown source.
 - Keep dependencies acyclic and reference only cataloged specification IDs.
 - Put shared rules in the broadest layer where they remain true; narrower
   specifications depend on them instead of copying them.
@@ -38,7 +39,8 @@ specifications consumed by RepoFoundry AI.
   expected implementation evidence.
 - Significant cross-cutting or public-contract changes require an approved ESP
   before normative integration.
-- Treat specifications without an explicit maturity marker as Development.
+- Historical sources without a maturity marker mean Development; current
+  Catalog documents require the explicit Status marker checked by the validator.
 - Keep detection rules deterministic and based on filenames or extensions.
 - Write Catalog descriptions as compact task-activation summaries.
 - Treat Required as local installation, not unconditional task-time reading.

@@ -25,9 +25,10 @@ Language, framework, database, testing, and protocol specifications add their
 own constraints through explicit dependencies.
 
 Selection controls local availability. File scopes produce task candidates.
-Applicability controls whether an agent loads the full contract. Authors keep
-these decisions separate so a broad reusable rule does not consume every task's
-context.
+Applicability controls which Specification applies to the task. Requirement
+routing then selects the exact contract blocks and their context dependencies.
+Authors keep these decisions separate so a broad reusable rule does not consume
+every task's context.
 
 ## Protect consumers from surprise
 

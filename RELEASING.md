@@ -81,8 +81,10 @@ python3 -B scripts/check_release.py MAJOR.MINOR.PATCH
    branch for a normal release.
 
 `check_release.py` verifies the requested SemVer, current
-`catalog_version`, Changelog entry, and—when a matching tag already exists—the
-tagged Catalog version. It never writes repository state.
+`catalog_version`, Changelog entry, and—when a matching local tag exists—the
+tagged Catalog version. It never writes repository state. It does not query
+the remote, require an annotated tag object, or compare the tagged tree with
+HEAD; those publication checks remain part of the release procedure.
 
 ## Publish the immutable tag
 
@@ -98,13 +100,16 @@ git push origin refs/tags/vMAJOR.MINOR.PATCH
 python3 -B scripts/check_release.py MAJOR.MINOR.PATCH --require-tag
 ```
 
-The final command verifies that the published tag resolves to a Catalog whose
-declared version matches the tag. Record the tag and full commit in the pull
-request or release notes.
+The final command verifies the local tag and its declared Catalog version.
+Confirm remote publication separately with
+`git ls-remote --tags origin refs/tags/vMAJOR.MINOR.PATCH refs/tags/vMAJOR.MINOR.PATCH^{}`.
+Compare the remote tag object and peeled commit with the local annotated tag
+and the reviewed, merged release commit. A local `RELEASE_OK` alone does not
+prove that a push succeeded. Record those identities in the release handoff.
 
-The historical `v1.2.0` tag establishes the first fixed-version source for the
-current RepoFoundry default. Future releases follow the merge-then-tag sequence
-above.
+The historical `v1.2.0` tag established the first fixed-version source. The
+RepoFoundry distribution chooses its own current default; consult that
+distribution rather than treating this historical version as the default.
 
 ## Consumer upgrade
 
@@ -118,6 +123,13 @@ python3 -B scripts/foundryctl.py --repo /absolute/project \
 python3 -B scripts/foundryctl.py --repo /absolute/project \
   spec update --spec-version MAJOR.MINOR.PATCH --apply
 ```
+
+Replace `MAJOR.MINOR.PATCH` and `/absolute/project` with the selected published
+version and the target repository. Review the first command's output before
+using `--apply`. If the new Catalog exposes unconfigured optional Specs, the
+consumer also requires an explicit complete `--spec` set, `--required-only`,
+or `--keep-selection`; it does not infer adoption from file detection. Repeat
+the preview with that decision before applying.
 
 The project manifest records `refs/tags/vMAJOR.MINOR.PATCH`. Its lock records
 the full commit and content digests. Later `spec sync` repairs from the locked

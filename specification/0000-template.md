@@ -129,8 +129,11 @@ UTF-8 source.
 ## Approved patterns
 
 Provide small, representative implementations, data shapes, or workflows that
-satisfy the requirements. Mark examples as non-normative and avoid turning one
-language or framework choice into a cross-ecosystem requirement.
+satisfy the requirements. Mark examples as non-normative and identify whether
+code is runnable, a fragment requiring a named harness, or pseudocode. For a
+no-effect rejection example, exercise the boundary entry point, not just the
+parser. Avoid turning a language or framework choice into a cross-ecosystem
+requirement.
 
 ## Rejected patterns
 

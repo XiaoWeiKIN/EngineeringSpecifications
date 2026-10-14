@@ -13,19 +13,19 @@ load-bearing requirements, for example:
 SEM-NAME-001
 DATA-PARSE-001
 GO-BOUNDARY-001
-MYSQL-SCHEMA-001
-GIN-HANDLER-001
-TEST-CONTRACT-001
+DOC-STATE-001
+DOC-DERIVED-PROV-001
 ```
 
 Wording and document paths may evolve without changing an ID's meaning. A
 semantic change creates a new requirement ID or follows an explicitly
 documented compatibility transition.
 
-`core/semantic-naming`, `core/data-boundaries`, `languages/go`,
-`languages/go/functional-options`, and `languages/go/factory-delegation`
-publish Requirement IDs. No implementation matrix should claim coverage for a
-requirement that lacks a published stable ID.
+Every current Catalog Specification publishes stable Requirement IDs. Use the
+[Specification index](../specification/README.md) and the selected Catalog
+revision to identify the available set, rather than a second hand-maintained
+list. No implementation matrix should claim coverage for a requirement that
+lacks a stable ID in its selected source.
 
 New documents use the
 [Formal Specification Template](../specification/0000-template.md) to connect
