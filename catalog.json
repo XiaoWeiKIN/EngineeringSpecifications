@@ -1,6 +1,6 @@
 {
   "catalog_id": "io.github.xiaoweikin.engineering-specifications",
-  "catalog_version": "1.7.1",
+  "catalog_version": "1.8.0",
   "schema_version": 1,
   "specs": [
     {
@@ -28,6 +28,18 @@
       ],
       "sha256": "4a6a68d93110ff3853a825ec4ce78d1f8731bd1fe635b7aaa1eccb64a56819e9",
       "version": "0.2.1"
+    },
+    {
+      "applies_to": [
+        "**/*"
+      ],
+      "description": "Load when designing, implementing, refactoring, or reviewing code complexity, common paths, validation, abstractions, or performance",
+      "id": "core/implementation-simplicity",
+      "path": "specification/core/implementation-simplicity.md",
+      "required": true,
+      "requires": [],
+      "sha256": "58759dae5985f61ab6105ea41ca360122790d1d930f11e83a7c64f6c1ca7f41d",
+      "version": "0.1.0"
     },
     {
       "applies_to": [

@@ -101,6 +101,8 @@ Catalog 条目不等于已发布版本；生产发布还需要[发布流程](REL
 
 - `core/semantic-naming`，所有项目安装，在共享命名、映射、单位、状态或命名兼容
   任务中激活；
+- `core/implementation-simplicity`，所有项目安装，设计、实现、重构或评审代码时，
+  用实际业务需求约束复杂度、快慢路径、校验、抽象和性能决策；
 - `core/data-boundaries`，所有项目安装，在外部数据、信任转换、解析或副作用门禁
   任务中激活；
 - `languages/go`；

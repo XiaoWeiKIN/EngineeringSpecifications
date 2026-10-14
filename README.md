@@ -118,6 +118,8 @@ The working-tree Catalog contains:
   mappings, units, states, and naming compatibility;
 - `core/data-boundaries`, installed everywhere and activated for external data,
   trust transitions, parsing, and effect gating;
+- `core/implementation-simplicity`, installed everywhere and activated for code
+  design, implementation, refactoring, and review of complexity decisions;
 - `languages/go`;
 - `languages/go/performance`, explicitly selected and activated for Go
   performance objectives, profiles, hotspot changes, comparative evidence, and

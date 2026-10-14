@@ -267,6 +267,7 @@ Specification Proposal，以及它承载什么成熟度承诺。版本、摘要�
 
 - `core/semantic-naming`，实现型仓库必选；
 - `core/data-boundaries`，实现型仓库必选；
+- `core/implementation-simplicity`，实现型仓库必选，设计和实现代码时按真实需求控制复杂度；
 - `languages/go`；
 - `languages/go/performance`，面向 Go 性能目标、诊断、热点改动、比较验证和
   低层优化准入显式选择，并依赖 `languages/go`；

@@ -90,13 +90,14 @@ class CatalogTestCase(unittest.TestCase):
             catalog["catalog_id"],
             "io.github.xiaoweikin.engineering-specifications",
         )
-        self.assertEqual(catalog["catalog_version"], "1.7.1")
-        self.assertEqual(len(catalog["specs"]), 8)
+        self.assertEqual(catalog["catalog_version"], "1.8.0")
+        self.assertEqual(len(catalog["specs"]), 9)
         self.assertEqual(
             {item["id"] for item in catalog["specs"]},
             {
                 "core/semantic-naming",
                 "core/data-boundaries",
+                "core/implementation-simplicity",
                 "documentation/derived-explanations",
                 "documentation/technical-documentation",
                 "languages/go",
@@ -149,6 +150,10 @@ class CatalogTestCase(unittest.TestCase):
             for item in catalog["specs"]
             if item["id"] == "documentation/derived-explanations"
         )
+        simplicity = next(item for item in catalog["specs"] if item["id"] == "core/implementation-simplicity")
+        self.assertEqual(simplicity["version"], "0.1.0")
+        self.assertTrue(simplicity["required"])
+        self.assertEqual(simplicity["requires"], [])
         self.assertEqual(semantic_naming["version"], "1.2.0")
         self.assertEqual(data_boundaries["version"], "0.2.1")
         self.assertEqual(technical_documentation["version"], "0.1.0")
@@ -209,7 +214,7 @@ class CatalogTestCase(unittest.TestCase):
             self.assertNotIn("**Automated enforcement:** Warning", source)
             self.assertNotIn("**Automated enforcement:** Blocking", source)
             advisory_markers += marker_count
-        self.assertEqual(advisory_markers, 45)
+        self.assertEqual(advisory_markers, 53)
         self.assertEqual(
             CHECK.check_requirement_ids(ROOT, catalog),
             (
@@ -258,6 +263,14 @@ class CatalogTestCase(unittest.TestCase):
                 "SEM-SURFACE-001",
                 "SEM-TYPE-001",
                 "SEM-VERB-001",
+                "SIM-ABSTRACT-001",
+                "SIM-CHANGE-001",
+                "SIM-CHECK-001",
+                "SIM-FAIL-001",
+                "SIM-PATH-001",
+                "SIM-PERF-001",
+                "SIM-READ-001",
+                "SIM-SCOPE-001",
             ),
         )
 
