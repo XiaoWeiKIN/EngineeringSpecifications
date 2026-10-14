@@ -29,6 +29,7 @@ defined by `core/data-boundaries`.
   inputs, generator commands, or committed artifacts owned by a Go module;
 - designing exported Go APIs, package boundaries, errors, goroutines, resource
   ownership, or tests;
+- mapping external requests or events into application inputs and protocol responses;
 - mapping external data into Go domain types;
 - reviewing Go names whose meaning is not fully determined by the type.
 
@@ -260,11 +261,14 @@ consumer contract.
 Decoded requests, configuration, environment variables, storage rows, and tool
 results **MUST** remain untrusted until parsing or validation establishes the
 required domain invariants. Boundary code **MUST** establish those invariants
-before invoking core logic or side effects. When HTTP fields, semantics, and
-lifetime match an application Command, the Handler **MAY** bind directly to the
-Command and then validate it; binding alone does not make the value trusted.
-A separate request type **SHOULD** exist only when the protocol shape, field
-meaning, or lifecycle actually differs.
+before invoking core logic or side effects. An HTTP, RPC, CLI, or message
+entry point **MAY** decode or bind directly into an application Command when
+the incoming representation, field semantics, and lifetime match that
+Command; it **MUST** still validate untrusted values before dependent effects.
+A separate transport type **SHOULD** be introduced only when the protocol
+representation, field meaning, validation ownership, or lifetime materially
+differs. Boundary code **SHOULD NOT** copy identical fields through an extra
+request type without a concrete contract reason.
 
 Go boundary code **MUST** satisfy `DATA-SHAPE-001`, `DATA-PARSE-001`, and
 `DATA-EFFECT-001`. Error and normalization behavior **MUST** satisfy
@@ -302,18 +306,21 @@ is useful and callers inspect the original cause, wrapping **MUST** preserve
 that cause with `%w`. New error types or codes **SHOULD** correspond to outcomes
 that callers actually handle differently.
 
-When a project already has an error facility (such as `errutil`) separating
-classification, internal cause, and safe public message, implementations
-**SHOULD** reuse it instead of inventing a second classification path. Only
-the owning protocol boundary **MUST** translate internal errors into HTTP
-status and public responses; sensitive internal causes **MUST NOT** appear in
-public messages. A layer **SHOULD NOT** both log and return the same failure
-when an outer layer owns the operational signal. Error strings **SHOULD** begin
-with a lowercase word and omit terminal punctuation unless a fixed external
-message requires otherwise.
+When a project already has an error facility separating classification,
+internal cause, and safe public message, implementations **SHOULD** reuse it
+rather than invent another classification path. HTTP status, RPC status,
+CLI diagnostics, or message acknowledgement errors **MUST** be mapped by the
+component owning that protocol response, not retranslated at each internal
+call. Internal sensitive causes **MUST NOT** appear in public protocol output.
+A layer **SHOULD NOT** both log and return the same failure when another layer
+owns the operational signal. Error strings **SHOULD** begin with a lowercase
+word and omit terminal punctuation unless a fixed external message requires
+otherwise.
 
 **Rationale (non-normative):** Preserved identity supports recovery while clear
-ownership prevents duplicate signals and leaking implementation details.
+ownership prevents duplicate signals and leaking implementation details. An
+existing project package such as `errutil` can own classification and safe
+public messages without becoming a required dependency of this Specification.
 
 **Enforcement (hybrid):** Static analysis and tests cover returned errors,
 `errors.Is`/`errors.As`, wrapping, boundary translation, and logging ownership.
@@ -321,41 +328,45 @@ ownership prevents duplicate signals and leaking implementation details.
 **Evidence:** Focused error-path tests and reviewed logs or telemetry for a
 single emitted operational signal.
 
-### GO-HANDLER-001 — Handler validates inputs and maps HTTP responses
+### GO-ENTRY-001 — Entry boundaries own validation and response adaptation
 
-**Activation:** Load when designing Go HTTP Handlers, application Commands, Service calls, or query response mapping.
+**Activation:** Load when connecting Go protocol entry points, application inputs, business operations, or result mapping.
 
 **Context dependencies:** `GO-BOUNDARY-001`, `GO-ERROR-001`, `GO-API-001`
 
 **Automated enforcement:** Advisory
 
-For an HTTP request, the Handler **MUST** validate constraints decidable from
-the request before invoking the Service, rejecting invalid input before any
-dependent operation or side effect. The Service **SHOULD NOT** repeat those
-checks when every supported entry point already enforces the same precondition.
-The layer that has the necessary business state, storage result, or query result
-**MUST** enforce constraints that cannot be decided at the HTTP boundary.
-Internal invariants, real optional values, and externally untrusted data
-**MUST** be distinguished rather than removing every defensive check.
+At an entry point for HTTP, RPC, CLI, or message input, request-decidable
+constraints **MUST** be checked before invoking dependent application work or
+effects. Application logic **SHOULD NOT** repeat the same checks when a
+guaranteed shared entry contract already establishes those preconditions for
+every supported caller. If another caller can bypass the check, the common
+boundary **MUST** establish it rather than assume an HTTP Handler exists.
+Constraints requiring business state, storage data, or execution results
+**MUST** be enforced where that information is available. Internal invariants,
+genuinely optional values, and untrusted external data **MUST** remain
+distinguishable; avoiding duplication does not justify dropping required checks.
 
-A Service **SHOULD** return business results and necessary pagination metadata
-without echoing immutable request context its caller already holds. The Handler
-**SHOULD** populate any required HTTP response echo from the validated Command,
-preserving the external response contract. Result mapping **SHOULD NOT**
-revalidate invariants already established by the responsible layer.
+An application operation **SHOULD** return its business result and necessary
+metadata without echoing unchanged request context already held by its caller.
+If a protocol response requires that echo, its owning entry adapter
+**SHOULD** populate it from the validated input. Mapping an established
+internal result into a protocol response **SHOULD NOT** repeat validation of
+invariants already guaranteed by the responsible boundary.
 
-**Rationale (non-normative):** One validation owner and one response owner
-avoid duplicate DTOs, checks, and error paths without erasing genuine business
-constraints or client-visible response fields.
+**Rationale (non-normative):** Ownership follows the trust and information
+boundary, not a mandated Handler/Service directory layout. The same function
+may own several responsibilities in a small program; separate layers are
+useful only where they add an actual boundary.
 
-**Enforcement (hybrid):** Inspect Handler, Service, response mapping, and all
-supported entry points. Test invalid request rejection before Service calls,
-state-dependent failures at their owning layer, successful output, and
-unchanged HTTP response fields.
+**Enforcement (hybrid):** Inspect the entry points, shared application calls,
+and response ownership, including any alternate supported callers. Test
+invalid input rejection before dependent work, state-dependent failures
+at their owner, successful results, and preserved external response fields.
 
-**Evidence:** A bounded Handler/Service diff and focused tests showing
-validation once, downstream non-invocation on invalid input, correct Service
-results, and preserved HTTP output.
+**Evidence:** A bounded code diff and focused tests showing each precondition
+is established at its actual boundary, downstream calls are skipped on
+invalid input, and externally observable responses remain compatible.
 
 ### GO-LIFECYCLE-001 — Goroutines and resources have observable owners
 
@@ -446,6 +457,14 @@ matrix, and governed exceptions for intentionally uncovered dimensions.
 
 ## Approved patterns
 
+For an HTTP endpoint whose request shape matches a Command, direct binding
+followed by boundary validation avoids a duplicate DTO. A gRPC or event
+consumer whose wire representation differs may retain a transport type and
+convert once. An HTTP, CLI, or RPC adapter maps an established internal error
+into its own protocol output while preserving the original cause internally.
+These are non-normative examples; no particular application layering is
+required.
+
 The following examples are non-normative. The snippet omits its package
 declaration and import block; a runnable wrapper supplies the `errors` and
 `net/url` imports. It is not a complete service or proof that a consuming
@@ -495,11 +514,12 @@ inventory.
 - `response := decoded.(DomainType)` violates `GO-BOUNDARY-001`.
 - Logging or reclassifying an already identified error at each layer violates
   `GO-ERROR-001`.
-- Creating a duplicate HTTP input DTO solely to copy the same fields into a
-  Command, or repeating Handler validation inside the Service, conflicts with
-  `GO-BOUNDARY-001` and `GO-HANDLER-001`.
-- Returning a request's unchanged Dataset from a Service only so the Handler
-  can echo it in an HTTP response conflicts with `GO-HANDLER-001`.
+- Creating a duplicate transport DTO solely to copy the same fields into a
+  Command, or repeating entry validation behind a guaranteed common boundary,
+  conflicts with `GO-BOUNDARY-001` and `GO-ENTRY-001`.
+- Returning a request's unchanged Dataset from an application operation only
+  so an HTTP, RPC, or other entry adapter can echo it conflicts with
+  `GO-ENTRY-001` when the adapter already holds that value.
 - Starting a goroutine without cancellation or shutdown violates
   `GO-LIFECYCLE-001`.
 - Changing tag- or platform-specific behavior while testing only the default
@@ -533,7 +553,7 @@ silently omit materially affected supported behavior.
 | `GO-API-001` | Type checking and API contract tests |
 | `GO-BOUNDARY-001` | Parser and no-side-effect rejection tests |
 | `GO-ERROR-001` | Existing error identity, original cause, safe HTTP messages, and logging ownership tests |
-| `GO-HANDLER-001` | Handler rejection without Service calls, state-dependent validation, and HTTP contract tests |
+| `GO-ENTRY-001` | Entry rejection without dependent calls, state-owned checks, and preserved protocol response tests |
 | `GO-LIFECYCLE-001` | Shutdown, resource, race, and leak tests |
 | `GO-COMPAT-001` | API or schema compatibility tests |
 | `GO-TEST-001` | Repository canonical CI |
@@ -553,13 +573,13 @@ Compatibility or migration: none | <preserved API and removal condition>
 
 ## Compatibility and migration
 
-Version `0.6.0` permits direct HTTP-to-Command binding where fields, semantics,
-and lifetime match; validation remains mandatory at the trust boundary. It
-assigns request checks and HTTP output to Handlers, state-dependent invariants
-to their owning layer, and removes duplicated error classification and request
-context echoes from the expected Go implementation pattern. Existing HTTP
-contracts remain controlling. No code migration or consumer installation is
-performed by this Specification update.
+Version `0.6.0` permits direct binding to application Commands when incoming
+representation, semantics, and lifetime match, regardless of HTTP, RPC, CLI,
+or message transport. It assigns external validation, state-dependent checks,
+error presentation, and response mapping to their actual trust or information
+owners without requiring Handler/Service layering. Existing protocol contracts
+remain controlling. No code migration or consumer installation is performed
+by this Specification update.
 
 Version `0.5.1` clarifies that Go detection recommends rather than installs
 the optional Specification, in line with the existing explicit-selection
