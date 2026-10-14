@@ -125,6 +125,39 @@ including branches and work performed before returning.
 **Evidence:** A call-flow review or focused benchmark when the change claims
 a performance benefit; the supported rare case remains covered by a test.
 
+### SIM-ORDER-001 — Resolve decisive prerequisites before costly stages
+
+**Activation:** Load when ordering prerequisite checks, request conversion, routing, metadata loading, compilation, or execution.
+
+**Context dependencies:** `SIM-SCOPE-001`, `SIM-FAIL-001`
+
+**Automated enforcement:** Advisory
+
+When dependencies permit, multi-stage operations **SHOULD** resolve inexpensive,
+decisive prerequisites using already available inputs before costly request
+conversion, metadata loading, compilation, or execution. Required configuration
+lookup or data-source routing **SHOULD** precede work that cannot succeed
+without it. Each stage's failure **SHOULD** be handled immediately, before
+starting work dependent on a successful result.
+
+Reordering **MUST NOT** introduce redundant validation, parsing, or network
+probes solely to fail earlier. The implementation **SHOULD NOT** construct an
+intermediate request only to recover fields already available in the input.
+When multiple conditions are invalid, a documented error precedence **MUST**
+be preserved; otherwise the selected priority **SHOULD** be explicit and tested.
+A failed prerequisite **MUST NOT** trigger downstream dependent work or effects,
+except cleanup or recovery required by an owning contract.
+
+**Rationale (non-normative):** Decisive early failures avoid unnecessary
+work while keeping the selected error observable and predictable.
+
+**Enforcement (hybrid):** Review dependencies and error priority; test
+simultaneously invalid inputs, normal and existing failure paths, and that a
+failed prerequisite does not call subsequent dependencies.
+
+**Evidence:** A reviewed call order and focused tests for selected errors,
+absence of downstream calls, and unchanged supported behavior.
+
 ### SIM-FAIL-001 — Fail explicitly outside the supported contract
 
 **Activation:** Load when handling invalid, unsupported, or unexpected inputs or designing fallback behavior.
@@ -219,6 +252,32 @@ callers; identify states and control-flow branches that affect supported cases.
 
 **Evidence:** A code review explaining the necessary branches and any
 intentional complex supported path.
+
+### SIM-STAGE-001 — Mark meaningful orchestration phases concisely
+
+**Activation:** Load when writing or reordering a function that coordinates several distinct business stages.
+
+**Context dependencies:** `SIM-READ-001`
+
+**Automated enforcement:** Advisory
+
+A multi-stage orchestration function **SHOULD** use short, consecutively
+numbered Chinese comments in the language's valid comment syntax to identify
+the purpose of each meaningful stage and any important constraint. The comments
+**SHOULD** reflect the actual execution order and failure boundaries rather
+than paraphrasing each statement or using vague labels. Simple functions
+**SHOULD NOT** receive numbered comments solely for uniformity. After
+reordering stages, the comments **MUST** remain accurate and in execution
+order; no trivial forwarding helpers should be introduced just to mark stages.
+
+**Rationale (non-normative):** Purposeful stage headings expose an
+orchestrator's sequence without adding more call indirection.
+
+**Enforcement (review):** Trace the function from top to bottom, verifying
+that numbered comments match the stages, dependencies, and error handling.
+
+**Evidence:** A reviewed multi-stage function with accurate stage comments,
+or a simple function for which no stage headings are justified.
 
 ### SIM-PERF-001 — Optimize demonstrated bottlenecks
 
@@ -317,10 +376,12 @@ simplicity exception materially affects review.
 | --- | --- |
 | `SIM-SCOPE-001` | Review supported cases against requirements and call sites |
 | `SIM-PATH-001` | Trace common/rare paths and test supported rare behavior |
+| `SIM-ORDER-001` | Check preconditions, error priority, and no dependent calls after failure |
 | `SIM-FAIL-001` | Exercise representative unsupported input or justified recovery |
 | `SIM-CHECK-001` | Review trust-boundary ownership and relevant guard tests |
 | `SIM-ABSTRACT-001` | Review abstraction consumers against a direct alternative |
 | `SIM-READ-001` | Review local control flow, branches, states, and failure visibility |
+| `SIM-STAGE-001` | Verify numbered Chinese stage comments match the real execution order |
 | `SIM-PERF-001` | Review representative workload and evidence for nontrivial optimization |
 | `SIM-CHANGE-001` | Review patch scope, removable complexity, and focused regressions |
 
@@ -339,6 +400,11 @@ Unsupported cases: <explicit failure outcomes>
 ```
 
 ## Compatibility and migration
+
+Version `0.2.0` adds prerequisite-first execution and meaningful numbered
+Chinese stage comments for multi-stage orchestration. The owning error
+precedence, necessary cleanup, security and compatibility contracts remain
+controlling. No automatic consumer migration is performed.
 
 Version `0.1.0` introduces a Development implementation-simplicity contract
 with eight Advisory Requirements. It adds review obligations for code design,
