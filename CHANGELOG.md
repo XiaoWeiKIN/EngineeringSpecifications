@@ -24,6 +24,13 @@ All notable Catalog and normative specification changes are recorded here.
 
 ### Changed
 
+- Update `languages/go` to `0.6.0`: allow direct binding to application
+  Commands when protocol and application meanings match; place validation
+  and error presentation at their owning trust or information boundary across
+  HTTP, RPC, CLI, and message consumers. Reuse existing error classification
+  without repeated wrapping or logging. Add `GO-ENTRY-001` and revise
+  `GO-BOUNDARY-001` and `GO-ERROR-001`, preserving existing protocol contracts.
+
 - Align non-normative authoring, governance, README, and release documentation
   with the existing Catalog, explicit optional-Spec selection, mandatory
   maturity markers, and immutable-tag publication boundary. Reuse the existing

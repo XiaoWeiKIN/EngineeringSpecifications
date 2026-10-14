@@ -17,13 +17,30 @@ FOLLOWUP = json.loads(
 )
 GO = "specification/languages/go.md"
 DERIVED = "specification/documentation/derived-explanations.md"
+GO_REVIEW = json.loads(
+    (ROOT / "tests/fixtures/go-entry-boundary-review.json").read_text(encoding="utf-8")
+)
 
 
 def digest(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
+def previous_go_version(text: str) -> str:
+    if digest(text) != GO_REVIEW["sha256"]:
+        raise AssertionError("Current Go contract changed without a reviewed delta")
+    for edit in reversed(GO_REVIEW["replacements"]):
+        if text.count(edit["after"]) != 1:
+            raise AssertionError("Missing or duplicated Go contract edit")
+        text = text.replace(edit["after"], edit["before"])
+    if digest(text) != GO_REVIEW["baseline_sha256"]:
+        raise AssertionError("Go contract did not restore the prior reviewed revision")
+    return text
+
+
 def restore(relative: str, text: str) -> str:
+    if relative == GO:
+        text = previous_go_version(text)
     for edit in reversed(FOLLOWUP["edits"][relative]["replacements"]):
         if text.count(edit["after"]) != 1:
             raise AssertionError("Missing or duplicated reviewed replacement")
@@ -61,13 +78,15 @@ class FollowupEditorialTests(unittest.TestCase):
         for relative, data in FOLLOWUP["edits"].items():
             with self.subTest(path=relative):
                 text = (ROOT / relative).read_text(encoding="utf-8")
-                self.assertEqual(digest(text), data["sha256"])
+                reviewed = previous_go_version(text) if relative == GO else text
+                self.assertEqual(digest(reviewed), data["sha256"])
                 self.assertEqual(digest(restore(relative, text)), data["before_sha256"])
 
     def test_requirements_except_named_subject_and_protected_sections_match(self) -> None:
         for relative in (GO, DERIVED):
-            text = (ROOT / relative).read_text(encoding="utf-8")
-            before = restore(relative, text)
+            current = (ROOT / relative).read_text(encoding="utf-8")
+            text = previous_go_version(current) if relative == GO else current
+            before = restore(relative, current)
             for title in ("Applicability", "Agent workflow", "Terminology", "Exceptions", "Verification", "Agent handoff"):
                 with self.subTest(path=relative, section=title):
                     self.assertEqual(section(text, title), section(before, title))
@@ -93,6 +112,11 @@ class FollowupEditorialTests(unittest.TestCase):
             for changed in (text.replace(after, "", 1), text + after):
                 with self.subTest(path=relative), self.assertRaises(AssertionError):
                     restore(relative, changed)
+
+    def test_go_layer_delta_restores_previous_normative_source(self) -> None:
+        text = (ROOT / GO).read_text(encoding="utf-8")
+        self.assertEqual(GO_REVIEW["updated_version"], "0.6.0")
+        self.assertEqual(digest(previous_go_version(text)), FOLLOWUP["edits"][GO]["sha256"])
 
     def test_go_route_distinguishes_recommendation_from_selection(self) -> None:
         text = (ROOT / GO).read_text(encoding="utf-8")

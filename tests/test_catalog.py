@@ -183,7 +183,7 @@ class CatalogTestCase(unittest.TestCase):
             "`Extract` **MUST NOT** be a catch-all name",
             semantic_naming_text,
         )
-        self.assertEqual(go_spec["version"], "0.5.1")
+        self.assertEqual(go_spec["version"], "0.6.0")
         self.assertIn("**/go.sum", go_spec["applies_to"])
         self.assertIn("**/vendor/modules.txt", go_spec["applies_to"])
         self.assertEqual(functional_options_spec["version"], "0.2.1")
@@ -214,7 +214,7 @@ class CatalogTestCase(unittest.TestCase):
             self.assertNotIn("**Automated enforcement:** Warning", source)
             self.assertNotIn("**Automated enforcement:** Blocking", source)
             advisory_markers += marker_count
-        self.assertEqual(advisory_markers, 55)
+        self.assertEqual(advisory_markers, 56)
         self.assertEqual(
             CHECK.check_requirement_ids(ROOT, catalog),
             (
@@ -234,6 +234,7 @@ class CatalogTestCase(unittest.TestCase):
                 "GO-API-001",
                 "GO-BOUNDARY-001",
                 "GO-COMPAT-001",
+                "GO-ENTRY-001",
                 "GO-ERROR-001",
                 "GO-FACTORY-ABSENCE-001",
                 "GO-FACTORY-CONSTRUCT-001",

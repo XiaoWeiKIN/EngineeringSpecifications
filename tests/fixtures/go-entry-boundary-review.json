@@ -1,0 +1,56 @@
+{
+  "baseline_version": "0.5.1",
+  "baseline_sha256": "83ac7fd8b367a7305bbb95cee8bd4b42293969ce5150ea35030a39aabcc2e557",
+  "updated_version": "0.6.0",
+  "sha256": "ea35e19b6b8f22d2965d4a6aee58a7cdc493c807b905cee676a08ad4348f681d",
+  "replacements": [
+    {
+      "before": "  ownership, or tests;\n- mapping external data into Go domain types;",
+      "after": "  ownership, or tests;\n- mapping external requests or events into application inputs and protocol responses;\n- mapping external data into Go domain types;"
+    },
+    {
+      "before": "Decoded requests, configuration, environment variables, storage rows, and tool\nresults **MUST** be treated as untrusted shapes. Boundary code **MUST** parse or\nconvert them into domain-safe Go values before invoking core logic or side\neffects.\n",
+      "after": "Decoded requests, configuration, environment variables, storage rows, and tool\nresults **MUST** remain untrusted until parsing or validation establishes the\nrequired domain invariants. Boundary code **MUST** establish those invariants\nbefore invoking core logic or side effects. An HTTP, RPC, CLI, or message\nentry point **MAY** decode or bind directly into an application Command when\nthe incoming representation, field semantics, and lifetime match that\nCommand; it **MUST** still validate untrusted values before dependent effects.\nA separate transport type **SHOULD** be introduced only when the protocol\nrepresentation, field meaning, validation ownership, or lifetime materially\ndiffers. Boundary code **SHOULD NOT** copy identical fields through an extra\nrequest type without a concrete contract reason.\n"
+    },
+    {
+      "before": "\n**Enforcement (hybrid):** Keep transport or storage inputs distinct from domain\ncommands. Tests must assert that rejected input cannot invoke downstream\neffects.",
+      "after": "\n**Enforcement (hybrid):** Review the trust transition and validation owner;\ndo not require a duplicate request type when direct binding preserves the\ncontract. Tests must assert that rejected input cannot invoke downstream\neffects."
+    },
+    {
+      "before": "\nExpected failures **MUST** return errors rather than panic. An error\n**MUST** be wrapped with `%w` when callers need to inspect its cause, and typed\nor sentinel error behavior **MUST** remain stable across layers that promise\nthat identity.\n",
+      "after": "\nExpected failures **MUST** return errors rather than panic. Existing typed or\nsentinel error identities **MUST** survive propagation through layers that\npromise them. An error already carrying the needed classification **SHOULD**\nbe returned without repeated wrapping or translation. When additional context\nis useful and callers inspect the original cause, wrapping **MUST** preserve\nthat cause with `%w`. New error types or codes **SHOULD** correspond to outcomes\nthat callers actually handle differently.\n"
+    },
+    {
+      "before": "\nInternal errors **MUST** be translated into protocol errors only at the owning\nboundary. A layer **SHOULD NOT** both log and return the same failure when an\nouter layer owns the operational signal. Error strings **SHOULD** begin with a\nlowercase word and omit terminal punctuation unless a fixed external message\nrequires otherwise.\n",
+      "after": "\nWhen a project already has an error facility separating classification,\ninternal cause, and safe public message, implementations **SHOULD** reuse it\nrather than invent another classification path. HTTP status, RPC status,\nCLI diagnostics, or message acknowledgement errors **MUST** be mapped by the\ncomponent owning that protocol response, not retranslated at each internal\ncall. Internal sensitive causes **MUST NOT** appear in public protocol output.\nA layer **SHOULD NOT** both log and return the same failure when another layer\nowns the operational signal. Error strings **SHOULD** begin with a lowercase\nword and omit terminal punctuation unless a fixed external message requires\notherwise.\n"
+    },
+    {
+      "before": "**Rationale (non-normative):** Preserved identity supports recovery while clear\nownership prevents duplicate signals and leaking implementation details.\n",
+      "after": "**Rationale (non-normative):** Preserved identity supports recovery while clear\nownership prevents duplicate signals and leaking implementation details. An\nexisting project package such as `errutil` can own classification and safe\npublic messages without becoming a required dependency of this Specification.\n"
+    },
+    {
+      "before": "\n### GO-LIFECYCLE-001 — Goroutines and resources have observable owners",
+      "after": "\n### GO-ENTRY-001 — Entry boundaries own validation and response adaptation\n\n**Activation:** Load when connecting Go protocol entry points, application inputs, business operations, or result mapping.\n\n**Context dependencies:** `GO-BOUNDARY-001`, `GO-ERROR-001`, `GO-API-001`\n\n**Automated enforcement:** Advisory\n\nAt an entry point for HTTP, RPC, CLI, or message input, request-decidable\nconstraints **MUST** be checked before invoking dependent application work or\neffects. Application logic **SHOULD NOT** repeat the same checks when a\nguaranteed shared entry contract already establishes those preconditions for\nevery supported caller. If another caller can bypass the check, the common\nboundary **MUST** establish it rather than assume an HTTP Handler exists.\nConstraints requiring business state, storage data, or execution results\n**MUST** be enforced where that information is available. Internal invariants,\ngenuinely optional values, and untrusted external data **MUST** remain\ndistinguishable; avoiding duplication does not justify dropping required checks.\n\nAn application operation **SHOULD** return its business result and necessary\nmetadata without echoing unchanged request context already held by its caller.\nIf a protocol response requires that echo, its owning entry adapter\n**SHOULD** populate it from the validated input. Mapping an established\ninternal result into a protocol response **SHOULD NOT** repeat validation of\ninvariants already guaranteed by the responsible boundary.\n\n**Rationale (non-normative):** Ownership follows the trust and information\nboundary, not a mandated Handler/Service directory layout. The same function\nmay own several responsibilities in a small program; separate layers are\nuseful only where they add an actual boundary.\n\n**Enforcement (hybrid):** Inspect the entry points, shared application calls,\nand response ownership, including any alternate supported callers. Test\ninvalid input rejection before dependent work, state-dependent failures\nat their owner, successful results, and preserved external response fields.\n\n**Evidence:** A bounded code diff and focused tests showing each precondition\nis established at its actual boundary, downstream calls are skipped on\ninvalid input, and externally observable responses remain compatible.\n\n### GO-LIFECYCLE-001 — Goroutines and resources have observable owners"
+    },
+    {
+      "before": "\nThe following examples are non-normative. The snippet omits its package",
+      "after": "\nFor an HTTP endpoint whose request shape matches a Command, direct binding\nfollowed by boundary validation avoids a duplicate DTO. A gRPC or event\nconsumer whose wire representation differs may retain a transport type and\nconvert once. An HTTP, CLI, or RPC adapter maps an established internal error\ninto its own protocol output while preserving the original cause internally.\nThese are non-normative examples; no particular application layering is\nrequired.\n\nThe following examples are non-normative. The snippet omits its package"
+    },
+    {
+      "before": "- `response := decoded.(DomainType)` violates `GO-BOUNDARY-001`.\n- Logging an error in every layer before returning it violates\n  `GO-ERROR-001`.",
+      "after": "- `response := decoded.(DomainType)` violates `GO-BOUNDARY-001`.\n- Logging or reclassifying an already identified error at each layer violates\n  `GO-ERROR-001`."
+    },
+    {
+      "before": "  `GO-ERROR-001`.\n- Starting a goroutine without cancellation or shutdown violates",
+      "after": "  `GO-ERROR-001`.\n- Creating a duplicate transport DTO solely to copy the same fields into a\n  Command, or repeating entry validation behind a guaranteed common boundary,\n  conflicts with `GO-BOUNDARY-001` and `GO-ENTRY-001`.\n- Returning a request's unchanged Dataset from an application operation only\n  so an HTTP, RPC, or other entry adapter can echo it conflicts with\n  `GO-ENTRY-001` when the adapter already holds that value.\n- Starting a goroutine without cancellation or shutdown violates"
+    },
+    {
+      "before": "| `GO-BOUNDARY-001` | Parser and no-side-effect rejection tests |\n| `GO-ERROR-001` | Error identity, wrapping, translation, and signal tests |\n| `GO-LIFECYCLE-001` | Shutdown, resource, race, and leak tests |",
+      "after": "| `GO-BOUNDARY-001` | Parser and no-side-effect rejection tests |\n| `GO-ERROR-001` | Existing error identity, original cause, safe HTTP messages, and logging ownership tests |\n| `GO-ENTRY-001` | Entry rejection without dependent calls, state-owned checks, and preserved protocol response tests |\n| `GO-LIFECYCLE-001` | Shutdown, resource, race, and leak tests |"
+    },
+    {
+      "before": "\nVersion `0.5.1` clarifies that Go detection recommends rather than installs",
+      "after": "\nVersion `0.6.0` permits direct binding to application Commands when incoming\nrepresentation, semantics, and lifetime match, regardless of HTTP, RPC, CLI,\nor message transport. It assigns external validation, state-dependent checks,\nerror presentation, and response mapping to their actual trust or information\nowners without requiring Handler/Service layering. Existing protocol contracts\nremain controlling. No code migration or consumer installation is performed\nby this Specification update.\n\nVersion `0.5.1` clarifies that Go detection recommends rather than installs"
+    }
+  ]
+}
