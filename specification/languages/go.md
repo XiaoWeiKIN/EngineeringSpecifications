@@ -258,9 +258,13 @@ consumer contract.
 **Automated enforcement:** Advisory
 
 Decoded requests, configuration, environment variables, storage rows, and tool
-results **MUST** be treated as untrusted shapes. Boundary code **MUST** parse or
-convert them into domain-safe Go values before invoking core logic or side
-effects.
+results **MUST** remain untrusted until parsing or validation establishes the
+required domain invariants. Boundary code **MUST** establish those invariants
+before invoking core logic or side effects. When HTTP fields, semantics, and
+lifetime match an application Command, the Handler **MAY** bind directly to the
+Command and then validate it; binding alone does not make the value trusted.
+A separate request type **SHOULD** exist only when the protocol shape, field
+meaning, or lifecycle actually differs.
 
 Go boundary code **MUST** satisfy `DATA-SHAPE-001`, `DATA-PARSE-001`, and
 `DATA-EFFECT-001`. Error and normalization behavior **MUST** satisfy
@@ -274,8 +278,9 @@ or represented by an explicit unknown policy.
 **Rationale (non-normative):** Go struct decoding establishes structure but
 does not establish domain validity.
 
-**Enforcement (hybrid):** Keep transport or storage inputs distinct from domain
-commands. Tests must assert that rejected input cannot invoke downstream
+**Enforcement (hybrid):** Review the trust transition and validation owner;
+do not require a duplicate request type when direct binding preserves the
+contract. Tests must assert that rejected input cannot invoke downstream
 effects.
 
 **Evidence:** Table-driven parser tests covering valid, missing, malformed,
@@ -289,16 +294,23 @@ unknown, boundary, and cross-field-invalid inputs.
 
 **Automated enforcement:** Advisory
 
-Expected failures **MUST** return errors rather than panic. An error
-**MUST** be wrapped with `%w` when callers need to inspect its cause, and typed
-or sentinel error behavior **MUST** remain stable across layers that promise
-that identity.
+Expected failures **MUST** return errors rather than panic. Existing typed or
+sentinel error identities **MUST** survive propagation through layers that
+promise them. An error already carrying the needed classification **SHOULD**
+be returned without repeated wrapping or translation. When additional context
+is useful and callers inspect the original cause, wrapping **MUST** preserve
+that cause with `%w`. New error types or codes **SHOULD** correspond to outcomes
+that callers actually handle differently.
 
-Internal errors **MUST** be translated into protocol errors only at the owning
-boundary. A layer **SHOULD NOT** both log and return the same failure when an
-outer layer owns the operational signal. Error strings **SHOULD** begin with a
-lowercase word and omit terminal punctuation unless a fixed external message
-requires otherwise.
+When a project already has an error facility (such as `errutil`) separating
+classification, internal cause, and safe public message, implementations
+**SHOULD** reuse it instead of inventing a second classification path. Only
+the owning protocol boundary **MUST** translate internal errors into HTTP
+status and public responses; sensitive internal causes **MUST NOT** appear in
+public messages. A layer **SHOULD NOT** both log and return the same failure
+when an outer layer owns the operational signal. Error strings **SHOULD** begin
+with a lowercase word and omit terminal punctuation unless a fixed external
+message requires otherwise.
 
 **Rationale (non-normative):** Preserved identity supports recovery while clear
 ownership prevents duplicate signals and leaking implementation details.
@@ -308,6 +320,42 @@ ownership prevents duplicate signals and leaking implementation details.
 
 **Evidence:** Focused error-path tests and reviewed logs or telemetry for a
 single emitted operational signal.
+
+### GO-HANDLER-001 — Handler validates inputs and maps HTTP responses
+
+**Activation:** Load when designing Go HTTP Handlers, application Commands, Service calls, or query response mapping.
+
+**Context dependencies:** `GO-BOUNDARY-001`, `GO-ERROR-001`, `GO-API-001`
+
+**Automated enforcement:** Advisory
+
+For an HTTP request, the Handler **MUST** validate constraints decidable from
+the request before invoking the Service, rejecting invalid input before any
+dependent operation or side effect. The Service **SHOULD NOT** repeat those
+checks when every supported entry point already enforces the same precondition.
+The layer that has the necessary business state, storage result, or query result
+**MUST** enforce constraints that cannot be decided at the HTTP boundary.
+Internal invariants, real optional values, and externally untrusted data
+**MUST** be distinguished rather than removing every defensive check.
+
+A Service **SHOULD** return business results and necessary pagination metadata
+without echoing immutable request context its caller already holds. The Handler
+**SHOULD** populate any required HTTP response echo from the validated Command,
+preserving the external response contract. Result mapping **SHOULD NOT**
+revalidate invariants already established by the responsible layer.
+
+**Rationale (non-normative):** One validation owner and one response owner
+avoid duplicate DTOs, checks, and error paths without erasing genuine business
+constraints or client-visible response fields.
+
+**Enforcement (hybrid):** Inspect Handler, Service, response mapping, and all
+supported entry points. Test invalid request rejection before Service calls,
+state-dependent failures at their owning layer, successful output, and
+unchanged HTTP response fields.
+
+**Evidence:** A bounded Handler/Service diff and focused tests showing
+validation once, downstream non-invocation on invalid input, correct Service
+results, and preserved HTTP output.
 
 ### GO-LIFECYCLE-001 — Goroutines and resources have observable owners
 
@@ -445,8 +493,13 @@ inventory.
 - Hand-editing a committed generated file without updating its authoritative
   input and regenerating it violates `GO-GENERATE-001`.
 - `response := decoded.(DomainType)` violates `GO-BOUNDARY-001`.
-- Logging an error in every layer before returning it violates
+- Logging or reclassifying an already identified error at each layer violates
   `GO-ERROR-001`.
+- Creating a duplicate HTTP input DTO solely to copy the same fields into a
+  Command, or repeating Handler validation inside the Service, conflicts with
+  `GO-BOUNDARY-001` and `GO-HANDLER-001`.
+- Returning a request's unchanged Dataset from a Service only so the Handler
+  can echo it in an HTTP response conflicts with `GO-HANDLER-001`.
 - Starting a goroutine without cancellation or shutdown violates
   `GO-LIFECYCLE-001`.
 - Changing tag- or platform-specific behavior while testing only the default
@@ -479,7 +532,8 @@ silently omit materially affected supported behavior.
 | `GO-NAME-002` | Exported API and call-site review |
 | `GO-API-001` | Type checking and API contract tests |
 | `GO-BOUNDARY-001` | Parser and no-side-effect rejection tests |
-| `GO-ERROR-001` | Error identity, wrapping, translation, and signal tests |
+| `GO-ERROR-001` | Existing error identity, original cause, safe HTTP messages, and logging ownership tests |
+| `GO-HANDLER-001` | Handler rejection without Service calls, state-dependent validation, and HTTP contract tests |
 | `GO-LIFECYCLE-001` | Shutdown, resource, race, and leak tests |
 | `GO-COMPAT-001` | API or schema compatibility tests |
 | `GO-TEST-001` | Repository canonical CI |
@@ -498,6 +552,14 @@ Compatibility or migration: none | <preserved API and removal condition>
 ```
 
 ## Compatibility and migration
+
+Version `0.6.0` permits direct HTTP-to-Command binding where fields, semantics,
+and lifetime match; validation remains mandatory at the trust boundary. It
+assigns request checks and HTTP output to Handlers, state-dependent invariants
+to their owning layer, and removes duplicated error classification and request
+context echoes from the expected Go implementation pattern. Existing HTTP
+contracts remain controlling. No code migration or consumer installation is
+performed by this Specification update.
 
 Version `0.5.1` clarifies that Go detection recommends rather than installs
 the optional Specification, in line with the existing explicit-selection
