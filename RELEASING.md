@@ -111,6 +111,33 @@ The historical `v1.2.0` tag established the first fixed-version source. The
 RepoFoundry distribution chooses its own current default; consult that
 distribution rather than treating this historical version as the default.
 
+## Automatic RepoFoundry release notification
+
+After publishing an annotated Catalog tag, the
+[`notify-rf-on-spec-tag` workflow](.github/workflows/notify-rf-on-spec-tag.yml)
+verifies that the remote tag resolves to a merged commit, checks the exact
+Catalog and Spec digests, and sends a `spec-catalog-published`
+`repository_dispatch` to `XiaoWeiKIN/RepoFoundryAI`. A failed validation
+does not dispatch a publication event.
+
+Configure the Spec repository Actions secret `RF_DISPATCH_TOKEN` with a
+fine-grained token restricted to **RepoFoundryAI → Contents: Read and write**.
+Do not store the token in a source file or expose it to pull requests.
+The receiver re-verifies the remote release identity independently.
+Missing credentials fail the notification; they do not alter the Spec tag.
+
+GitHub does not trigger a second `push` workflow when a tag is created by
+a workflow using its default `GITHUB_TOKEN`. For such publication jobs,
+explicitly invoke `notify-rf-on-spec-tag.yml` via `workflow_dispatch`
+with the published version after remote tag verification. This dispatch is
+also available for retrying a failed notification. A regular maintainer
+`git push` of the published tag triggers the workflow automatically.
+
+RF distribution tags have their own version numbers. The receiver publishes
+a new RF version only after checking the Catalog and its compatibility and
+integrity tests. No existing consumer manifest or project lock is mutated.
+Publishing a tag is not authorization to bypass an RF test failure.
+
 ## Consumer upgrade
 
 Publishing does not mutate any consuming repository. A maintainer upgrades
