@@ -83,8 +83,10 @@ flowchart TD
   blanket reading for unrelated docs, audits, or operational tasks.
 - Catalog description: `Load when designing, implementing, refactoring, or
   reviewing code complexity, common paths, validation, abstractions, or performance`.
-- No change to existing Spec dependency graph, Catalog schema, RF defaults,
-  selection semantics, or automated-enforcement machinery.
+- No change to existing Spec dependency graph, Catalog schema, RF source
+  code, release pin, selection mechanism, or automated-enforcement machinery.
+  On an explicit upgrade to this Catalog, required-only consumers will gain
+  this third required Core Spec; this adoption effect requires ESP approval.
 
 ## Compatibility and maturity
 
