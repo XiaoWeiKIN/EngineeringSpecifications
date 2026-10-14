@@ -1,0 +1,87 @@
+{
+  "source_revision": "5deda62dbacdbc753b9edbb00d1a891c76415b4a",
+  "catalog_metadata": {
+    "core/semantic-naming": {
+      "metadata_sha256": "537de2914483249feff9c0a2a0e0db56faab032eb1caf6508cbf123e10c216f7",
+      "version": "1.2.0",
+      "sha256": "b190713f27efc11eba59551d4026036d87f30027dd624b17e62d6627e5814c83"
+    },
+    "core/data-boundaries": {
+      "metadata_sha256": "99f9f28894a7ec3b724f22e52350c582f0776b37c399ec852834a798b1091c0e",
+      "version": "0.2.0",
+      "sha256": "7d3691af05770bcd4500c69040bd1aff3ec47d2d9558459d38528435eb9c95ec"
+    },
+    "languages/go": {
+      "metadata_sha256": "2ade6b9a78918df8dbc91c9aa56e22a77670685a1e3971c8e58e11e9f8bdd6c5",
+      "version": "0.5.0",
+      "sha256": "81ac50ab7987ac45255fd2e67f1d7b8b4381e7d98a85bf3ba8dfb308f98f8d94"
+    },
+    "languages/go/performance": {
+      "metadata_sha256": "e5f1a895fd17abe9aca694d8274aaca5f1e72a46c273973519dc08a0a900c16e",
+      "version": "0.1.0",
+      "sha256": "7c1399228a609af8671fa7e8df982ac1a8744cc588ab01de9bec5c4f77b3fe22"
+    },
+    "languages/go/functional-options": {
+      "metadata_sha256": "342ec2f10479662fb3fe979f9f1e5b248557524daf955ee287c4ecd3a65e81a4",
+      "version": "0.2.0",
+      "sha256": "bc29018852cbb45e5a7ad5c58ff726d550d494e22130de760045cf6dde95ce49"
+    },
+    "languages/go/factory-delegation": {
+      "metadata_sha256": "cbd632496d7a55eb08b3c717eae6dc094d95e8cabd8a3bb180164d606edd03f9",
+      "version": "0.2.0",
+      "sha256": "f12b2bcfa0f9a74ad8103690ffa3e86c5ff76a6041684bf60f0ad14f0f2e4436"
+    },
+    "documentation/technical-documentation": {
+      "metadata_sha256": "e256447291833abe09998abcdeb91936346cc84b5f4679dea9bfe02f1f4858bd",
+      "version": "0.1.0",
+      "sha256": "22a3325883a37df48f5d0040c18be8c5fdc6079315265d733a540d0efc38d1ba"
+    },
+    "documentation/derived-explanations": {
+      "metadata_sha256": "cdd6eb0c0e134e138964c4ea6dd5251a2f11f6c7270e2a4018dc6178e0a0f0c0",
+      "version": "0.1.0",
+      "sha256": "fdbe9951e1beb1d7ddb69ba18868b8afa4fc2d77b93770e53e49da36facb9adc"
+    }
+  },
+  "sections": {
+    "specification/core/data-boundaries.md": {
+      "preamble": "865fef4597d7c68e75283726181020a19ee5a8181d54b0881a19d1ee9220d4e6",
+      "Purpose": "9e48443bb2112e941818507e397b80d374593e6b1eae24744d20538f35592fff",
+      "Applicability": "1468b9515c5c891fbf44405a6e1820d3263a662916c9cca0a54ef103d4964882",
+      "Agent workflow": "d698950310d0d7b537a01d374ed3a746e8dcb8f51fe803551400c2bd4f046572",
+      "Terminology": "8c61895b2a54a91f714fe58838c7ecfb933bcb7979273a4b0661cd7b70bf5e94",
+      "Requirements": "d51742c68a28b5ebfe6eb531320458b37b2c1eb00474de8e608c8e2d410b4080",
+      "Rejected patterns": "4105ca717496a617fcb9526b1f4a982605524e9035e7f25409377870eab401d8",
+      "Exceptions": "0d44fcdc072c912db53e3bb91cb5321c55743ba7e090cace4a012dd05bb83cea",
+      "Verification": "65ad3c551b2a147afaec00b6c9fb42a12d905044bc0844b3e359a7d809913eb3",
+      "Agent handoff": "03af8ceda991150a3dc50baf88b55668e6f07e23bb09405b763631bfe2ee7383",
+      "References": "d8c6be2c6ab3bda968303353de64d82dbfd8b05c5b335ead7bf574c7b8285119"
+    },
+    "specification/languages/go/functional-options.md": {
+      "preamble": "ccb107c071768fa251bd6c7d4cbb2829cb67c893810207a5aae31805559f60f2",
+      "Purpose": "6b7f3a1d13cf0d4526ba60bd0ab9c909f7ebdfa160987c2a3913d323fcb94523",
+      "Applicability": "31a4bd1bd8292be95b6274358bfcdaa202cbfd1f0082dbf122c137530aad22d1",
+      "Agent workflow": "a104f234a082a2eba01efb26618806953adb2038ba349196a03bf8726cfda5c8",
+      "Terminology": "75b4f1440afd04e58f93310d1d045c1dfb480230a00eca620ab160d00bbf02d0",
+      "Requirements": "bb50e5d5edd1e6296b0722f2fb602a9a4dd49668b0a4c7a3321bc7d347fa2716",
+      "Approved patterns": "04dab1db55463e9ddeee1fe696cace8e5413cc0dafdb9006b236619be8dd8ec5",
+      "Rejected patterns": "348370e7436f525dc113915449863035989315d80c68b5797fe1c40deb5d903c",
+      "Exceptions": "c7774dcf586e806d2c5d310ad093720b6b2940aff2525ca982104326401155f6",
+      "Verification": "84f18393744ce73c6c804f6b78caaf20aad5b9c6e7d32f9b2c76603b9b1ccd52",
+      "Agent handoff": "f9a02252a4fdd7c5e7a7edb3beab508e9880700f9503ed7842e770bdea8c0ab9",
+      "References": "8de25e94ba8e2c34bca917bfcd8d69698e38c8120fa91ba20732045d2a78be43"
+    }
+  },
+  "requirement_edits": {
+    "specification/languages/go/functional-options.md": [
+      [
+        "configuration. It **SHOULD** prefer a dedicated constructor or configuration\nmethod when the behavior is a distinct mode rather than an independent\noptional setting.",
+        "configuration. The API **SHOULD** prefer a dedicated constructor or\nconfiguration method when the behavior is a distinct mode rather than an\nindependent optional setting."
+      ],
+      [
+        "valid baseline configuration. It **MUST** apply each supplied option exactly\nonce in documented application order.",
+        "valid baseline configuration. The constructor **MUST** apply each supplied\noption exactly once in documented application order."
+      ]
+    ]
+  },
+  "release_history_sha256": "147bc7ce2110d8eb2f7a63901fc8124fe827b4969aaba7adc9cefb68c774aa42"
+}

@@ -173,7 +173,7 @@ and pin the resolved Git revision before materializing files.
 
 Read [CONTRIBUTING.md](CONTRIBUTING.md) for the normative change and
 compatibility process and the
-[Specification writing guide](governance/specification-writing.md) for
+[Specification writing guide](governance/specification-authoring.md) for
 non-normative authoring and review methods. In summary:
 
 1. Classify the change as editorial, scoped normative, or significant.

@@ -6,23 +6,39 @@ All notable Catalog and normative specification changes are recorded here.
 
 ### Changed
 
-- Prepare development Catalog `1.7.1` for an editorial consistency pass. The
-  prepared `1.7.0` release commit and any immutable tags remain unchanged.
-- Clarify authoring routes, explicit selection versus detection, current
-  Catalog availability versus release identity, document maturity markers,
-  and the local-only scope of release validation. Add non-normative
-  Specification-writing guidance without new consumer dependencies.
-- Clarify code-fragment and synthetic-example boundaries, repair the
-  no-side-effect rejection example to exercise the full entry point, and
-  separate derived-bundle authority from embedded-source attribution.
-- Advance `core/semantic-naming` to `1.2.1`, `core/data-boundaries` to `0.2.1`,
-  `languages/go` to `0.5.1`, Go functional-options and factory-delegation to
-  `0.2.1`, and Go performance plus both documentation Specs to `0.1.1`.
-  Requirement IDs, obligations, scopes, dependencies, enforcement ceilings,
-  and Verification mappings remain unchanged; source digests are refreshed.
-- Record the full tracked-file review and intentionally preserved history in
-  `docs/editorial-consistency-review.md`. No release or project migration is
-  performed by this change.
+- Align non-normative authoring, governance, README, and release documentation
+  with the existing Catalog, explicit optional-Spec selection, mandatory
+  maturity markers, and immutable-tag publication boundary. Reuse the existing
+  Specification authoring guide; no second consumer contract is introduced.
+- Clarify examples, source references, and Requirements review instructions.
+  Catalog version, Requirement texts, Spec digests, and released history are
+  unchanged by this documentation-only follow-up.
+
+## [1.7.1] - 2026-10-04
+
+### Changed
+
+- Prepare development Catalog `1.7.1` for an editorial review of existing Spec
+  prose and examples; no release tag is created or moved by this change.
+- Advance `core/data-boundaries` and `languages/go/functional-options` to
+  `0.2.1`. Replace the parser-only no-effects illustration with an executable
+  boundary-entry fixture and positive control; name the API and constructor
+  explicitly in two functional-option sentences. Conformance duties,
+  Requirement IDs, scopes, dependencies, exceptions, enforcement levels, and
+  Verification mappings remain unchanged.
+- Add local non-normative Specification authoring guidance and route AGENTS,
+  CONTRIBUTING, and the formal template to it. Correct the old consumer name
+  and include documentation in the repository guide's taxonomy.
+- Record a bounded semantic review and add preservation and example regression
+  tests. Existing `core/semantic-naming` prose remains unchanged after review.
+- Continue the bounded editorial review with `languages/go` at `0.5.1` and
+  `documentation/derived-explanations` at `0.1.1`. Clarify optional Go selection
+  and the exported-identifier subject; align provenance examples with the
+  unchanged source-identity/currentness contract. Keep other reviewed Specs
+  unchanged and preserve the prepared `1.7.0` release.
+- Extend preservation tests with a separate follow-up delta and exercise the
+  unchanged Go implementation snippet with valid and invalid inputs. This is
+  example evidence, not a production conformance or accessibility claim.
 
 ## [1.7.0] - 2026-10-04
 

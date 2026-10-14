@@ -198,10 +198,10 @@ accessibility check and a review of the engineering information it preserves.
 
 ## Approved patterns
 
-The following examples are non-normative. Artifact IDs and abbreviated
-revisions are placeholders, not evidence for a real project.
+The following examples are non-normative.
 
-A generated diagram bundle can record:
+A generated diagram bundle can record the following illustrative values
+(the artifact and revision are placeholders, not measured project evidence):
 
 ```text
 Derived explanation: yes
@@ -210,6 +210,17 @@ Source revision: abc123
 Authority: none
 Relationships: A requires B; B owns state C
 ```
+
+A revision is one source-identity option, not a requirement to use Git. A
+snapshot or digest can identify the represented source as described by
+`DOC-DERIVED-PROV-001`. Identity alone does not prove that the view is current.
+For example, these non-normative cases lead to different reading decisions:
+
+| Source condition | Reader-facing result |
+| --- | --- |
+| The source identity cannot be established | Freshness is unknown; do not label the view current, even with a disclaimer |
+| An exact snapshot is identified, but current applicability was not checked | The view explains that snapshot; no current-state claim follows |
+| The source changed in a way that affects the view | Regenerate or revalidate before presenting the view as current |
 
 An interactive benchmark explorer can expose the same parameter values and
 result table in structured text rather than requiring pointer interaction.
@@ -223,8 +234,10 @@ preserves the engineering claims and source references.
   violates `DOC-DERIVED-AUTH-001`.
 - Labeling synthetic timing animation as measured runtime violates
   `DOC-DERIVED-AUTH-001`.
-- Publishing a derived view as "current" without a source revision or explicit
-  freshness limitation violates `DOC-DERIVED-PROV-001`.
+- Publishing a derived view as "current" when its source identity cannot be
+  established violates `DOC-DERIVED-PROV-001`, even if a freshness disclaimer
+  is also present. A usable snapshot or digest is not rejected merely because
+  it is not a Git revision.
 - Using green and red as the only representation of verification status
   violates `DOC-A11Y-001`.
 - Requiring a mouse hover to discover the only copy of a failure condition
@@ -260,8 +273,7 @@ An agent applying this Specification reports:
 Activated requirements: <DOC-DERIVED-* / DOC-A11Y-* IDs>
 Canonical sources: <artifact IDs or paths>
 Source identity: <revision / snapshot / digests, or unverifiable>
-Derived authority: none
-Embedded source attribution: none | <owning source and its unchanged authority>
+Derived authority: none | <exact embedded source that retains its original authority>
 Simulation or synthetic data: none | <assumptions and label>
 Equivalent representation: <text, relationship list, keyboard path, captions, transcript>
 Freshness: current at <source identity> | stale | unknown
@@ -269,10 +281,11 @@ Freshness: current at <source identity> | stale | unknown
 
 ## Compatibility and migration
 
-Version `0.1.1` clarifies prose, example boundaries, and reference authority.
-It preserves Requirement IDs, obligations, activation metadata, context
-dependencies, automated enforcement levels, and Verification mappings.
-No consumer behavior migration is introduced by this editorial patch.
+Version `0.1.1` aligns the non-normative provenance examples with the existing
+Requirement: an unknown identity cannot support a current-state claim, and
+a snapshot or digest remains a valid identity form. Requirement blocks,
+metadata, exceptions, Verification rows, and authority remain unchanged.
+No renderer or metadata schema is introduced.
 
 Version `0.1.0` introduces the first Development contract for reusable derived
 explanation surfaces. It does not require any renderer or media format and does
@@ -285,9 +298,6 @@ Existing outputs do not become current merely because the Specification is
 selected.
 
 ## References
-
-References provide provenance and explanation. They do not add undeclared
-normative obligations or require adoption of an external style guide.
 
 - [ESP-0014: Reusable documentation integrity contracts](../../proposals/0014_documentation-integrity-contracts.md)
 - [Technical Documentation Integrity](technical-documentation.md)

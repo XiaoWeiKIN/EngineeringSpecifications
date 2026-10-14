@@ -149,9 +149,9 @@ class CatalogTestCase(unittest.TestCase):
             for item in catalog["specs"]
             if item["id"] == "documentation/derived-explanations"
         )
-        self.assertEqual(semantic_naming["version"], "1.2.1")
+        self.assertEqual(semantic_naming["version"], "1.2.0")
         self.assertEqual(data_boundaries["version"], "0.2.1")
-        self.assertEqual(technical_documentation["version"], "0.1.1")
+        self.assertEqual(technical_documentation["version"], "0.1.0")
         self.assertEqual(
             technical_documentation["requires"], ["core/semantic-naming"]
         )
@@ -184,13 +184,13 @@ class CatalogTestCase(unittest.TestCase):
         self.assertEqual(functional_options_spec["version"], "0.2.1")
         self.assertEqual(functional_options_spec["requires"], ["languages/go"])
         self.assertNotIn("detection", functional_options_spec)
-        self.assertEqual(factory_delegation_spec["version"], "0.2.1")
+        self.assertEqual(factory_delegation_spec["version"], "0.2.0")
         self.assertEqual(
             factory_delegation_spec["requires"],
             ["languages/go/functional-options"],
         )
         self.assertNotIn("detection", factory_delegation_spec)
-        self.assertEqual(performance_spec["version"], "0.1.1")
+        self.assertEqual(performance_spec["version"], "0.1.0")
         self.assertEqual(performance_spec["requires"], ["languages/go"])
         self.assertIn("**/*.s", performance_spec["applies_to"])
         self.assertNotIn("detection", performance_spec)

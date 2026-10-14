@@ -77,7 +77,7 @@ while making the target governance explicit.
 rubric: reusable, behavior-focused, evidence-backed, stable, consistent, simple,
 and verifiable.
 
-The non-normative [Specification writing guide](specification-writing.md)
+The non-normative [Specification writing guide](specification-authoring.md)
 helps authors apply that rubric without turning editorial preferences into
 consumer obligations.
 

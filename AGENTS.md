@@ -14,8 +14,8 @@ specifications consumed by RepoFoundry AI.
   changing automated enforcement levels.
 - Read `proposals/README.md` when a change is cross-cutting or significant.
 - Read `catalog.json` before adding or moving a specification.
-- Read `governance/specification-writing.md` before writing or reviewing prose.
-  This is local authoring guidance, not an additional consumer Specification.
+- Read [Specification authoring](governance/specification-authoring.md)
+  before drafting, revising, or reviewing Specification prose and examples.
 - Start a new normative document from `specification/0000-template.md`.
 - Read the relevant file under `specification/` before changing its rules.
 
@@ -31,8 +31,8 @@ specifications consumed by RepoFoundry AI.
 - Put shared rules in the broadest layer where they remain true; narrower
   specifications depend on them instead of copying them.
 - Reserve `core/` for rules required by every implementation repository.
-- Treat language, framework, database, testing, protocol, and documentation as
-  independent composition dimensions.
+- Treat language, framework, database, testing, protocol, and documentation
+  as independent composition dimensions.
 - Use BCP 14 keywords for explicit requirement strength and keep rationale
   clearly non-normative.
 - Give load-bearing requirements stable IDs and connect them to enforcement and

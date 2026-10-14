@@ -144,7 +144,7 @@ Advisory 起步；晋级必须提供版本化观测证据和回滚路径。
 ## 贡献
 
 规范变更与兼容流程见 [CONTRIBUTING.md](CONTRIBUTING.md)。
-正文、示例和评审方法见非规范性的[规范写作指导](governance/specification-writing.md)。
+正文、示例和评审方法见非规范性的[规范写作指导](governance/specification-authoring.md)。
 摘要如下：
 
 1. 把变更分为编辑性、局部规范性或重大变更。

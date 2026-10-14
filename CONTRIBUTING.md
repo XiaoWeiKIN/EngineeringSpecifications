@@ -8,9 +8,7 @@ a new category or specification dependency.
 
 Read the [Specification Principles](governance/specification-principles.md) and
 [Lifecycle](governance/lifecycle.md) before adding behavior or changing a
-compatibility promise. Read the non-normative
-[Specification writing guide](governance/specification-writing.md) before
-editing prose, examples, or review instructions.
+compatibility promise.
 
 ## Choose the broadest valid layer
 
@@ -41,8 +39,7 @@ nesting does not define inheritance or override precedence.
 Spelling, formatting, broken links, and wording changes that preserve required
 behavior can use a normal pull request. Explain why the change is
 non-normative. For changed Spec prose, use a patch version and refresh its
-Catalog digest. Record the preserved obligations and any unresolved semantic
-question rather than silently choosing a new interpretation.
+Catalog digest. Record preserved obligations and unresolved semantic questions.
 
 ### Scoped normative changes identify their contract
 
@@ -62,6 +59,11 @@ validation.
 
 ## Write normative text intentionally
 
+Read [Specification authoring](governance/specification-authoring.md) before
+drafting or editing prose and examples. This local, non-normative guidance
+helps reviewers distinguish clearer wording from a changed obligation; it is
+not a consumer dependency or an additional approval step.
+
 The keywords `MUST`, `MUST NOT`, `REQUIRED`, `SHOULD`, `SHOULD NOT`,
 `RECOMMENDED`, `NOT RECOMMENDED`, `MAY`, and `OPTIONAL` carry their BCP 14
 meaning only when written in uppercase.
@@ -75,11 +77,10 @@ Use these terms sparingly:
 - rationale, examples, and implementation suggestions use ordinary
   non-normative language.
 
-Current Catalog documents state their maturity immediately after the title:
-`> **Status:** Development`, `Stable`, or `Deprecated`. The canonical check
-requires this marker. The legacy default for historical sources without a
-marker is Development; that fallback does not permit new Catalog documents to
-omit it. Catalog schema 1 has no separate maturity field.
+Current Catalog Specifications must state `> **Status:** Development`,
+`Stable`, or `Deprecated` immediately after the title; the canonical validator
+requires the marker. Historical sources without a marker retain the legacy
+Development default. Catalog schema 1 has no separate maturity field.
 
 ## New specifications close the Harness feedback loop
 

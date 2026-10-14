@@ -14,9 +14,14 @@
 > content digest.
 
 Replace the title and metadata before review. Delete every authoring
-instruction that does not belong in the published Specification. Use the
-non-normative [Specification writing guide](../governance/specification-writing.md)
-for the prose review; do not copy authoring guidance into consumer requirements.
+instruction that does not belong in the published Specification.
+
+Before drafting or reviewing, use the non-normative
+[Specification authoring guide](../governance/specification-authoring.md).
+Identify the actor, action, conditions, exceptions, and evidence for each
+Requirement. Label examples as illustrative or runnable, and state what their
+checks actually demonstrate. Remove this authoring paragraph from the final
+Specification; do not add an authoring guide to consumer dependencies.
 
 ## Purpose
 
@@ -126,9 +131,9 @@ UTF-8 source.
 Provide small, representative implementations, data shapes, or workflows that
 satisfy the requirements. Mark examples as non-normative and identify whether
 code is runnable, a fragment requiring a named harness, or pseudocode. For a
-no-effect failure example, exercise the boundary entry point, not only the
-parser. Avoid turning an illustrative language or framework into a
-cross-ecosystem requirement.
+no-effect rejection example, exercise the boundary entry point, not just the
+parser. Avoid turning a language or framework choice into a cross-ecosystem
+requirement.
 
 ## Rejected patterns
 

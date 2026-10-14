@@ -107,9 +107,9 @@ functional options **MUST NOT** be the sole representation of required inputs.
 
 An API **SHOULD** prefer a configuration struct when callers need to decode,
 store, compare, inspect, validate independently, or reuse the complete
-configuration. It **SHOULD** prefer a dedicated constructor or configuration
-method when the behavior is a distinct mode rather than an independent
-optional setting.
+configuration. The API **SHOULD** prefer a dedicated constructor or
+configuration method when the behavior is a distinct mode rather than an
+independent optional setting.
 
 **Rationale (non-normative):** Functional options improve extensibility and
 default-call readability, but add package-level symbols, obscure the complete
@@ -308,11 +308,7 @@ flowchart LR
 
 This closed-interface implementation is one compliant representation; it is
 not required when a function type or an intentionally open contract better
-matches `GO-OPTION-TYPE-001`. The snippets are Go fragments: the server
-example needs a package declaration and imports for `errors`, `fmt`, and
-`time`. The call-site fragment belongs inside a function. The separate worker
-example needs `errors` and `fmt`; it is an alternative, not an extra option
-requirement.
+matches `GO-OPTION-TYPE-001`.
 
 ```go
 var ErrInvalidServerOption = errors.New("invalid server option")
@@ -491,10 +487,10 @@ Compatibility or migration: none | <preserved entry point, behavior effect, and 
 
 ## Compatibility and migration
 
-Version `0.2.1` clarifies prose, example boundaries, and reference authority.
-It preserves Requirement IDs, obligations, activation metadata, context
-dependencies, automated enforcement levels, and Verification mappings.
-No consumer behavior migration is introduced by this editorial patch.
+Version `0.2.1` clarifies the subjects of `GO-OPTION-USE-001` and
+`GO-OPTION-APPLY-001`. It preserves the conditions, requirement strength,
+exactly-once ordering, exceptions, routing metadata, and Verification contract.
+No consumer implementation change is required by this editorial patch.
 
 Version `0.2.0` adds the Requirement-level Automated enforcement contract and
 sets every existing `GO-OPTION-*` Requirement to `Advisory`. It preserves
@@ -524,9 +520,6 @@ not drift. Rollback preserves the earlier entry point and defaults while
 removing only unpublished adapters or newly added optional entry points.
 
 ## References
-
-References provide provenance and explanation. They do not add undeclared
-normative obligations or require adoption of an external style guide.
 
 - [Go Implementation Specification](../go.md)
 - [Keeping Your Modules Compatible](https://go.dev/blog/module-compatibility)

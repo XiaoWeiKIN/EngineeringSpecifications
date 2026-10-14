@@ -12,8 +12,8 @@
       "path": "specification/core/semantic-naming.md",
       "required": true,
       "requires": [],
-      "sha256": "56ab15b90b14122680c8d9c01fc19e084c7cc4ef77416a04d8f84f7adcc6107d",
-      "version": "1.2.1"
+      "sha256": "b190713f27efc11eba59551d4026036d87f30027dd624b17e62d6627e5814c83",
+      "version": "1.2.0"
     },
     {
       "applies_to": [
@@ -26,7 +26,7 @@
       "requires": [
         "core/semantic-naming"
       ],
-      "sha256": "fa52a6cc11cf6e68a3cae455c3dc61e4073710b5b8d1fc284a95dbd35e0f460b",
+      "sha256": "4a6a68d93110ff3853a825ec4ce78d1f8731bd1fe635b7aaa1eccb64a56819e9",
       "version": "0.2.1"
     },
     {
@@ -54,7 +54,7 @@
         "core/semantic-naming",
         "core/data-boundaries"
       ],
-      "sha256": "cc799acb6caeec9d0911845f4bf1c5731158288e319345767f3662243d20f4d5",
+      "sha256": "83ac7fd8b367a7305bbb95cee8bd4b42293969ce5150ea35030a39aabcc2e557",
       "version": "0.5.1"
     },
     {
@@ -69,8 +69,8 @@
       "requires": [
         "languages/go"
       ],
-      "sha256": "00c1c74b80b86391bc1f144539fbf9a1f7ec9ef6040bcd8af0ba3e530b056e67",
-      "version": "0.1.1"
+      "sha256": "7c1399228a609af8671fa7e8df982ac1a8744cc588ab01de9bec5c4f77b3fe22",
+      "version": "0.1.0"
     },
     {
       "applies_to": [
@@ -83,7 +83,7 @@
       "requires": [
         "languages/go"
       ],
-      "sha256": "c08e0778ad2fe58ae3bfdff53eb9ee41e633f22bc53735ad06b7bf8af42c5974",
+      "sha256": "dfc7660f9663286e1df592b557abb09f1d1f445c1a5d10cc2aa9c0250a8f2d1c",
       "version": "0.2.1"
     },
     {
@@ -97,8 +97,8 @@
       "requires": [
         "languages/go/functional-options"
       ],
-      "sha256": "f6cc71e80614c2383b3a9e23da58b7b808797a35140e8fc3fba6b86d7b5a5935",
-      "version": "0.2.1"
+      "sha256": "f12b2bcfa0f9a74ad8103690ffa3e86c5ff76a6041684bf60f0ad14f0f2e4436",
+      "version": "0.2.0"
     },
     {
       "applies_to": [
@@ -112,8 +112,8 @@
       "requires": [
         "core/semantic-naming"
       ],
-      "sha256": "b7ee1f9283cbe7a0b102bc9150a920fc0289187d4740e95f05e8283f8f0e149e",
-      "version": "0.1.1"
+      "sha256": "22a3325883a37df48f5d0040c18be8c5fdc6079315265d733a540d0efc38d1ba",
+      "version": "0.1.0"
     },
     {
       "applies_to": [
@@ -126,7 +126,7 @@
       "requires": [
         "documentation/technical-documentation"
       ],
-      "sha256": "21bd4f2a194a6dc16a79624f0727784ad3cce5f6c09189179dfb9edbcbabfcbd",
+      "sha256": "e4ce1cab5143b645185854781de93f6e5e5416c6be3faad2aa14a2cadc864ec8",
       "version": "0.1.1"
     }
   ]

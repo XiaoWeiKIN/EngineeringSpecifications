@@ -1,0 +1,54 @@
+{
+  "baseline_revision": "4a0268f0895106ab19b86a243d38ad43d86bc328",
+  "catalog_version": "1.7.1",
+  "edits": {
+    "specification/languages/go.md": {
+      "old_version": "0.5.0",
+      "version": "0.5.1",
+      "before_sha256": "81ac50ab7987ac45255fd2e67f1d7b8b4381e7d98a85bf3ba8dfb308f98f8d94",
+      "sha256": "83ac7fd8b367a7305bbb95cee8bd4b42293969ce5150ea35030a39aabcc2e557",
+      "replacements": [
+        {
+          "before": "> **Routing:** Selection installs this Specification when Go is detected. Load\n> it only for tasks that create, change, or review hand-written Go contracts.",
+          "after": "> **Routing:** Go detection recommends this optional Specification; explicit\n> project selection installs it. Load it only for tasks that create, change,\n> or review hand-written Go contracts."
+        },
+        {
+          "before": "their exported identifiers. They **SHOULD NOT** repeat information already\nprovided by the package name.",
+          "after": "their exported identifiers. Exported identifiers **SHOULD NOT** repeat\ninformation already provided by the package name."
+        },
+        {
+          "before": "The following examples are non-normative:\n\n```go",
+          "after": "The following examples are non-normative. The snippet omits its package\ndeclaration and import block; a runnable wrapper supplies the `errors` and\n`net/url` imports. It is not a complete service or proof that a consuming\nproject gates every effect.\n\n```go"
+        },
+        {
+          "before": "## Compatibility and migration\n\n",
+          "after": "## Compatibility and migration\n\nVersion `0.5.1` clarifies that Go detection recommends rather than installs\nthe optional Specification, in line with the existing explicit-selection\ncontract. It names exported identifiers as the subject of the anti-repetition\nguidance in `GO-NAME-002` and labels the example's omitted context. Requirement\nIDs, strength, applicability, dependencies, exceptions, and Verification rows\nare unchanged. No implementation migration is required.\n\n"
+        }
+      ]
+    },
+    "specification/documentation/derived-explanations.md": {
+      "old_version": "0.1.0",
+      "version": "0.1.1",
+      "before_sha256": "fdbe9951e1beb1d7ddb69ba18868b8afa4fc2d77b93770e53e49da36facb9adc",
+      "sha256": "e4ce1cab5143b645185854781de93f6e5e5416c6be3faad2aa14a2cadc864ec8",
+      "replacements": [
+        {
+          "before": "A generated diagram bundle can record:",
+          "after": "A generated diagram bundle can record the following illustrative values\n(the artifact and revision are placeholders, not measured project evidence):"
+        },
+        {
+          "before": "An interactive benchmark explorer can expose the same parameter values and",
+          "after": "A revision is one source-identity option, not a requirement to use Git. A\nsnapshot or digest can identify the represented source as described by\n`DOC-DERIVED-PROV-001`. Identity alone does not prove that the view is current.\nFor example, these non-normative cases lead to different reading decisions:\n\n| Source condition | Reader-facing result |\n| --- | --- |\n| The source identity cannot be established | Freshness is unknown; do not label the view current, even with a disclaimer |\n| An exact snapshot is identified, but current applicability was not checked | The view explains that snapshot; no current-state claim follows |\n| The source changed in a way that affects the view | Regenerate or revalidate before presenting the view as current |\n\nAn interactive benchmark explorer can expose the same parameter values and"
+        },
+        {
+          "before": "- Publishing a derived view as \"current\" without a source revision or explicit\n  freshness limitation violates `DOC-DERIVED-PROV-001`.",
+          "after": "- Publishing a derived view as \"current\" when its source identity cannot be\n  established violates `DOC-DERIVED-PROV-001`, even if a freshness disclaimer\n  is also present. A usable snapshot or digest is not rejected merely because\n  it is not a Git revision."
+        },
+        {
+          "before": "## Compatibility and migration\n\n",
+          "after": "## Compatibility and migration\n\nVersion `0.1.1` aligns the non-normative provenance examples with the existing\nRequirement: an unknown identity cannot support a current-state claim, and\na snapshot or digest remains a valid identity form. Requirement blocks,\nmetadata, exceptions, Verification rows, and authority remain unchanged.\nNo renderer or metadata schema is introduced.\n\n"
+        }
+      ]
+    }
+  }
+}

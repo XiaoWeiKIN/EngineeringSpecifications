@@ -44,7 +44,7 @@ classes, automated enforcement levels, verification mechanisms,
 implementation evidence, and an Agent handoff.
 
 Use the non-normative
-[Specification writing guide](../governance/specification-writing.md) to review
+[Specification writing guide](../governance/specification-authoring.md) to review
 prose and examples without changing requirement strength.
 
 The template is an authoring resource, not a Catalog Specification. A document
