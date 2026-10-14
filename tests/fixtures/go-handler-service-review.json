@@ -1,0 +1,43 @@
+{
+  "baseline_version": "0.5.1",
+  "baseline_sha256": "83ac7fd8b367a7305bbb95cee8bd4b42293969ce5150ea35030a39aabcc2e557",
+  "updated_version": "0.6.0",
+  "replacements": [
+    {
+      "before": "Decoded requests, configuration, environment variables, storage rows, and tool\nresults **MUST** be treated as untrusted shapes. Boundary code **MUST** parse or\nconvert them into domain-safe Go values before invoking core logic or side\neffects.\n",
+      "after": "Decoded requests, configuration, environment variables, storage rows, and tool\nresults **MUST** remain untrusted until parsing or validation establishes the\nrequired domain invariants. Boundary code **MUST** establish those invariants\nbefore invoking core logic or side effects. When HTTP fields, semantics, and\nlifetime match an application Command, the Handler **MAY** bind directly to the\nCommand and then validate it; binding alone does not make the value trusted.\nA separate request type **SHOULD** exist only when the protocol shape, field\nmeaning, or lifecycle actually differs.\n"
+    },
+    {
+      "before": "\n**Enforcement (hybrid):** Keep transport or storage inputs distinct from domain\ncommands. Tests must assert that rejected input cannot invoke downstream\neffects.",
+      "after": "\n**Enforcement (hybrid):** Review the trust transition and validation owner;\ndo not require a duplicate request type when direct binding preserves the\ncontract. Tests must assert that rejected input cannot invoke downstream\neffects."
+    },
+    {
+      "before": "\nExpected failures **MUST** return errors rather than panic. An error\n**MUST** be wrapped with `%w` when callers need to inspect its cause, and typed\nor sentinel error behavior **MUST** remain stable across layers that promise\nthat identity.\n",
+      "after": "\nExpected failures **MUST** return errors rather than panic. Existing typed or\nsentinel error identities **MUST** survive propagation through layers that\npromise them. An error already carrying the needed classification **SHOULD**\nbe returned without repeated wrapping or translation. When additional context\nis useful and callers inspect the original cause, wrapping **MUST** preserve\nthat cause with `%w`. New error types or codes **SHOULD** correspond to outcomes\nthat callers actually handle differently.\n"
+    },
+    {
+      "before": "\nInternal errors **MUST** be translated into protocol errors only at the owning\nboundary. A layer **SHOULD NOT** both log and return the same failure when an\nouter layer owns the operational signal. Error strings **SHOULD** begin with a\nlowercase word and omit terminal punctuation unless a fixed external message\nrequires otherwise.\n",
+      "after": "\nWhen a project already has an error facility (such as `errutil`) separating\nclassification, internal cause, and safe public message, implementations\n**SHOULD** reuse it instead of inventing a second classification path. Only\nthe owning protocol boundary **MUST** translate internal errors into HTTP\nstatus and public responses; sensitive internal causes **MUST NOT** appear in\npublic messages. A layer **SHOULD NOT** both log and return the same failure\nwhen an outer layer owns the operational signal. Error strings **SHOULD** begin\nwith a lowercase word and omit terminal punctuation unless a fixed external\nmessage requires otherwise.\n"
+    },
+    {
+      "before": "\n### GO-LIFECYCLE-001 — Goroutines and resources have observable owners",
+      "after": "\n### GO-HANDLER-001 — Handler validates inputs and maps HTTP responses\n\n**Activation:** Load when designing Go HTTP Handlers, application Commands, Service calls, or query response mapping.\n\n**Context dependencies:** `GO-BOUNDARY-001`, `GO-ERROR-001`, `GO-API-001`\n\n**Automated enforcement:** Advisory\n\nFor an HTTP request, the Handler **MUST** validate constraints decidable from\nthe request before invoking the Service, rejecting invalid input before any\ndependent operation or side effect. The Service **SHOULD NOT** repeat those\nchecks when every supported entry point already enforces the same precondition.\nThe layer that has the necessary business state, storage result, or query result\n**MUST** enforce constraints that cannot be decided at the HTTP boundary.\nInternal invariants, real optional values, and externally untrusted data\n**MUST** be distinguished rather than removing every defensive check.\n\nA Service **SHOULD** return business results and necessary pagination metadata\nwithout echoing immutable request context its caller already holds. The Handler\n**SHOULD** populate any required HTTP response echo from the validated Command,\npreserving the external response contract. Result mapping **SHOULD NOT**\nrevalidate invariants already established by the responsible layer.\n\n**Rationale (non-normative):** One validation owner and one response owner\navoid duplicate DTOs, checks, and error paths without erasing genuine business\nconstraints or client-visible response fields.\n\n**Enforcement (hybrid):** Inspect Handler, Service, response mapping, and all\nsupported entry points. Test invalid request rejection before Service calls,\nstate-dependent failures at their owning layer, successful output, and\nunchanged HTTP response fields.\n\n**Evidence:** A bounded Handler/Service diff and focused tests showing\nvalidation once, downstream non-invocation on invalid input, correct Service\nresults, and preserved HTTP output.\n\n### GO-LIFECYCLE-001 — Goroutines and resources have observable owners"
+    },
+    {
+      "before": "- `response := decoded.(DomainType)` violates `GO-BOUNDARY-001`.\n- Logging an error in every layer before returning it violates\n  `GO-ERROR-001`.",
+      "after": "- `response := decoded.(DomainType)` violates `GO-BOUNDARY-001`.\n- Logging or reclassifying an already identified error at each layer violates\n  `GO-ERROR-001`."
+    },
+    {
+      "before": "  `GO-ERROR-001`.\n- Starting a goroutine without cancellation or shutdown violates",
+      "after": "  `GO-ERROR-001`.\n- Creating a duplicate HTTP input DTO solely to copy the same fields into a\n  Command, or repeating Handler validation inside the Service, conflicts with\n  `GO-BOUNDARY-001` and `GO-HANDLER-001`.\n- Returning a request's unchanged Dataset from a Service only so the Handler\n  can echo it in an HTTP response conflicts with `GO-HANDLER-001`.\n- Starting a goroutine without cancellation or shutdown violates"
+    },
+    {
+      "before": "| `GO-BOUNDARY-001` | Parser and no-side-effect rejection tests |\n| `GO-ERROR-001` | Error identity, wrapping, translation, and signal tests |\n| `GO-LIFECYCLE-001` | Shutdown, resource, race, and leak tests |",
+      "after": "| `GO-BOUNDARY-001` | Parser and no-side-effect rejection tests |\n| `GO-ERROR-001` | Existing error identity, original cause, safe HTTP messages, and logging ownership tests |\n| `GO-HANDLER-001` | Handler rejection without Service calls, state-dependent validation, and HTTP contract tests |\n| `GO-LIFECYCLE-001` | Shutdown, resource, race, and leak tests |"
+    },
+    {
+      "before": "\nVersion `0.5.1` clarifies that Go detection recommends rather than installs",
+      "after": "\nVersion `0.6.0` permits direct HTTP-to-Command binding where fields, semantics,\nand lifetime match; validation remains mandatory at the trust boundary. It\nassigns request checks and HTTP output to Handlers, state-dependent invariants\nto their owning layer, and removes duplicated error classification and request\ncontext echoes from the expected Go implementation pattern. Existing HTTP\ncontracts remain controlling. No code migration or consumer installation is\nperformed by this Specification update.\n\nVersion `0.5.1` clarifies that Go detection recommends rather than installs"
+    }
+  ]
+}
