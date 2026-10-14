@@ -20,6 +20,9 @@ GO_PATH = "specification/languages/go/functional-options.md"
 FOLLOWUP = json.loads(
     (ROOT / "tests/fixtures/spec-editorial-followup.json").read_text(encoding="utf-8")
 )["edits"]
+GO_REVIEW = json.loads(
+    (ROOT / "tests/fixtures/go-handler-service-review.json").read_text(encoding="utf-8")
+)
 
 
 def digest(text: str) -> str:
@@ -66,6 +69,11 @@ class EditorialBoundaryTests(unittest.TestCase):
                 if item["path"] in (DATA_PATH, GO_PATH):
                     self.assertEqual(item["version"], "0.2.1")
                     self.assertNotEqual(item["sha256"], old["sha256"])
+                    self.assertEqual(item["sha256"], hashlib.sha256((ROOT / item["path"]).read_bytes()).hexdigest())
+                elif item["id"] == "languages/go":
+                    self.assertEqual(item["version"], GO_REVIEW["updated_version"])
+                    self.assertEqual(GO_REVIEW["baseline_sha256"], FOLLOWUP[item["path"]]["sha256"])
+                    self.assertEqual(item["sha256"], GO_REVIEW["sha256"])
                     self.assertEqual(item["sha256"], hashlib.sha256((ROOT / item["path"]).read_bytes()).hexdigest())
                 elif item["path"] in FOLLOWUP:
                     # A separate reviewed delta extends, not replaces, the
