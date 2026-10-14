@@ -90,7 +90,7 @@ class CatalogTestCase(unittest.TestCase):
             catalog["catalog_id"],
             "io.github.xiaoweikin.engineering-specifications",
         )
-        self.assertEqual(catalog["catalog_version"], "1.8.0")
+        self.assertEqual(catalog["catalog_version"], "1.9.0")
         self.assertEqual(len(catalog["specs"]), 9)
         self.assertEqual(
             {item["id"] for item in catalog["specs"]},
@@ -151,7 +151,7 @@ class CatalogTestCase(unittest.TestCase):
             if item["id"] == "documentation/derived-explanations"
         )
         simplicity = next(item for item in catalog["specs"] if item["id"] == "core/implementation-simplicity")
-        self.assertEqual(simplicity["version"], "0.1.0")
+        self.assertEqual(simplicity["version"], "0.2.0")
         self.assertTrue(simplicity["required"])
         self.assertEqual(simplicity["requires"], [])
         self.assertEqual(semantic_naming["version"], "1.2.0")
@@ -214,7 +214,7 @@ class CatalogTestCase(unittest.TestCase):
             self.assertNotIn("**Automated enforcement:** Warning", source)
             self.assertNotIn("**Automated enforcement:** Blocking", source)
             advisory_markers += marker_count
-        self.assertEqual(advisory_markers, 53)
+        self.assertEqual(advisory_markers, 55)
         self.assertEqual(
             CHECK.check_requirement_ids(ROOT, catalog),
             (
@@ -267,10 +267,12 @@ class CatalogTestCase(unittest.TestCase):
                 "SIM-CHANGE-001",
                 "SIM-CHECK-001",
                 "SIM-FAIL-001",
+                "SIM-ORDER-001",
                 "SIM-PATH-001",
                 "SIM-PERF-001",
                 "SIM-READ-001",
                 "SIM-SCOPE-001",
+                "SIM-STAGE-001",
             ),
         )
 

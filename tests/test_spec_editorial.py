@@ -51,7 +51,7 @@ class EditorialBoundaryTests(unittest.TestCase):
     def test_catalog_only_changes_reviewed_spec_patch_identities(self) -> None:
         catalog = json.loads((ROOT / "catalog.json").read_text(encoding="utf-8"))
         self.assertEqual(catalog["schema_version"], 1)
-        self.assertEqual(catalog["catalog_version"], "1.8.0")
+        self.assertEqual(catalog["catalog_version"], "1.9.0")
         self.assertEqual(
             {item["id"] for item in catalog["specs"]} - {"core/implementation-simplicity"},
             set(BASELINE["catalog_metadata"]),
