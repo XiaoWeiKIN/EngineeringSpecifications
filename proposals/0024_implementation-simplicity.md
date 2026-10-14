@@ -1,4 +1,4 @@
-# ESP-0000: Minimal sufficient implementation complexity
+# ESP-0024: Minimal sufficient implementation complexity
 
 > - **Status:** Proposed
 > - **Normative:** No
