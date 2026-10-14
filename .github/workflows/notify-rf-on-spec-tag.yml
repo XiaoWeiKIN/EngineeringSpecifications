@@ -1,0 +1,94 @@
+name: notify-rf-on-spec-tag
+
+# A published immutable Catalog is the only automatic RF release input.
+# Action-created tags do not emit another push workflow when created with
+# GITHUB_TOKEN. The publishing job must invoke workflow_dispatch explicitly.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Published Catalog version (MAJOR.MINOR.PATCH)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: notify-rf-spec-catalog
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    if: github.repository == 'XiaoWeiKIN/EngineeringSpecifications'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RELEASE_VERSION: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Verify immutable annotated release and exact Catalog
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${RELEASE_VERSION#v}"
+          [[ "$version" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || {
+            echo 'Expected MAJOR.MINOR.PATCH' >&2; exit 1;
+          }
+          tag="v$version"
+          ref="refs/tags/$tag"
+          git show-ref --verify --quiet "$ref"
+          test "$(git cat-file -t "$ref")" = tag
+          commit="$(git rev-parse "$ref^{commit}")"
+          object="$(git rev-parse "$ref")"
+          git merge-base --is-ancestor "$commit" origin/main
+          remote="$(git ls-remote --tags origin "$ref" "$ref^{}")"
+          test "$(printf '%s\n' "$remote" | awk -v r="$ref" '$2==r {print $1}')" = "$object"
+          test "$(printf '%s\n' "$remote" | awk -v r="$ref^{}" '$2==r {print $1}')" = "$commit"
+          git checkout --detach "$commit"
+          python3 -B scripts/check.py
+          python3 -B scripts/check_release.py "$version" --require-tag
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "commit=$commit" >> "$GITHUB_OUTPUT"
+          echo "tag_object=$object" >> "$GITHUB_OUTPUT"
+      - name: Notify RepoFoundryAI after verified publication
+        env:
+          RF_DISPATCH_TOKEN: ${{ secrets.RF_DISPATCH_TOKEN }}
+          VERSION: ${{ steps.release.outputs.version }}
+          COMMIT: ${{ steps.release.outputs.commit }}
+          TAG_OBJECT: ${{ steps.release.outputs.tag_object }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$RF_DISPATCH_TOKEN" || {
+            echo 'Configure RF_DISPATCH_TOKEN with Contents:write access to RepoFoundryAI' >&2
+            exit 1
+          }
+          python3 - <<'PY' > "$RUNNER_TEMP/spec-release-event.json"
+          import json, os
+          print(json.dumps({
+              "event_type": "spec-catalog-published",
+              "client_payload": {
+                  "version": os.environ["VERSION"],
+                  "commit": os.environ["COMMIT"],
+                  "tag_object": os.environ["TAG_OBJECT"],
+              },
+          }))
+          PY
+          curl --fail-with-body --silent --show-error --retry 2 \
+            -H "Authorization: Bearer $RF_DISPATCH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            -H 'Content-Type: application/json' \
+            --data-binary @"$RUNNER_TEMP/spec-release-event.json" \
+            https://api.github.com/repos/XiaoWeiKIN/RepoFoundryAI/dispatches
+          echo "Dispatched verified EngineeringSpecifications v$VERSION ($COMMIT)" >> "$GITHUB_STEP_SUMMARY"
