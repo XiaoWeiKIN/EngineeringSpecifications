@@ -39,5 +39,6 @@
       "before": "\nVersion `0.5.1` clarifies that Go detection recommends rather than installs",
       "after": "\nVersion `0.6.0` permits direct HTTP-to-Command binding where fields, semantics,\nand lifetime match; validation remains mandatory at the trust boundary. It\nassigns request checks and HTTP output to Handlers, state-dependent invariants\nto their owning layer, and removes duplicated error classification and request\ncontext echoes from the expected Go implementation pattern. Existing HTTP\ncontracts remain controlling. No code migration or consumer installation is\nperformed by this Specification update.\n\nVersion `0.5.1` clarifies that Go detection recommends rather than installs"
     }
-  ]
+  ],
+  "sha256": "bd10abbd01c98c3efa3b3e1bc1af7aa1b1f611dca0c46724c781e0c9d5d416ef"
 }
