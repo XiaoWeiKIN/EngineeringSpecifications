@@ -45,7 +45,8 @@ class DocumentationShapeTests(unittest.TestCase):
             self.assertEqual(set(entry), {"id", "version", "path", "sha256", "required",
                                          "requires", "applies_to", "description"})
             self.assertFalse(entry["required"])
-            self.assertEqual(entry["version"], "0.1.0")
+            # Editorial patch releases do not change this selection contract.
+            self.assertRegex(entry["version"], r"^0\.1\.\d+$")
             self.assertTrue(entry["description"].startswith("Load when "))
             self.assertLessEqual(len(entry["description"]), 180)
         self.assertEqual(plan[0]["requires"], ["core/semantic-naming"])
