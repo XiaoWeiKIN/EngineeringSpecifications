@@ -18,7 +18,7 @@ FOLLOWUP = json.loads(
 GO = "specification/languages/go.md"
 DERIVED = "specification/documentation/derived-explanations.md"
 GO_REVIEW = json.loads(
-    (ROOT / "tests/fixtures/go-handler-service-review.json").read_text(encoding="utf-8")
+    (ROOT / "tests/fixtures/go-entry-boundary-review.json").read_text(encoding="utf-8")
 )
 
 

@@ -21,7 +21,7 @@ FOLLOWUP = json.loads(
     (ROOT / "tests/fixtures/spec-editorial-followup.json").read_text(encoding="utf-8")
 )["edits"]
 GO_REVIEW = json.loads(
-    (ROOT / "tests/fixtures/go-handler-service-review.json").read_text(encoding="utf-8")
+    (ROOT / "tests/fixtures/go-entry-boundary-review.json").read_text(encoding="utf-8")
 )
 
 

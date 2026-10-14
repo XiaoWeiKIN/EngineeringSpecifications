@@ -24,13 +24,12 @@ All notable Catalog and normative specification changes are recorded here.
 
 ### Changed
 
-- Update `languages/go` to `0.6.0`: accept direct Handler-to-Command
-  binding when protocol and application semantics match, assign request
-  validation and HTTP response mapping to Handlers, leave state-dependent
-  checks to the layer holding that information, and reuse existing error
-  classification without repeated wrapping or logging. Add `GO-HANDLER-001`
-  and revise `GO-BOUNDARY-001` and `GO-ERROR-001`; preserve existing public
-  HTTP compatibility contracts.
+- Update `languages/go` to `0.6.0`: allow direct binding to application
+  Commands when protocol and application meanings match; place validation
+  and error presentation at their owning trust or information boundary across
+  HTTP, RPC, CLI, and message consumers. Reuse existing error classification
+  without repeated wrapping or logging. Add `GO-ENTRY-001` and revise
+  `GO-BOUNDARY-001` and `GO-ERROR-001`, preserving existing protocol contracts.
 
 - Align non-normative authoring, governance, README, and release documentation
   with the existing Catalog, explicit optional-Spec selection, mandatory
