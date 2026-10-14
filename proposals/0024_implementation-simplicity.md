@@ -1,6 +1,8 @@
 # ESP-0024: Minimal sufficient implementation complexity
 
-> - **Status:** Proposed
+> - **Status:** Approved
+> - **Approval:** The proposal and its separate integration PR were explicitly
+>   authorized for merge in the repository conversation on 2026-10-14.
 > - **Normative:** No
 > - **Integration targets:** New required `core/implementation-simplicity` Specification and a new Catalog version.
 
