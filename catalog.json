@@ -1,6 +1,6 @@
 {
   "catalog_id": "io.github.xiaoweikin.engineering-specifications",
-  "catalog_version": "1.8.0",
+  "catalog_version": "1.9.0",
   "schema_version": 1,
   "specs": [
     {
@@ -38,8 +38,8 @@
       "path": "specification/core/implementation-simplicity.md",
       "required": true,
       "requires": [],
-      "sha256": "58759dae5985f61ab6105ea41ca360122790d1d930f11e83a7c64f6c1ca7f41d",
-      "version": "0.1.0"
+      "sha256": "271be3ff8bd46a8fdac85da77337252766215cac2de5edcf7c9e09f5c4928a13",
+      "version": "0.2.0"
     },
     {
       "applies_to": [
