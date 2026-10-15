@@ -1,0 +1,90 @@
+name: publish-catalog-release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Catalog version (for example 1.9.0)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-catalog-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'XiaoWeiKIN/EngineeringSpecifications' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Verify release identity and source
+        env:
+          VERSION: ${{ inputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]] || exit 1
+          test "$(git rev-parse HEAD)" = "$(git ls-remote origin refs/heads/main | cut -f1)"
+          python3 -B scripts/check.py
+          python3 -B scripts/check_release.py "$VERSION"
+          tag="refs/tags/v$VERSION"
+          if git ls-remote --exit-code --tags origin "$tag" >/dev/null 2>&1; then
+            echo "Release tag already exists: $tag" >&2
+            exit 1
+          fi
+      - name: Publish immutable annotated Catalog tag
+        env:
+          VERSION: ${{ inputs.version }}
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v$VERSION"
+          git tag -a "$tag" -m "EngineeringSpecifications $tag"
+          git -c push.followTags=false push origin "refs/tags/$tag:refs/tags/$tag"
+          python3 -B scripts/check_release.py "$VERSION" --require-tag
+          ref="refs/tags/$tag"
+          remote="$(git ls-remote --tags origin "$ref" "$ref^{}")"
+          test "$(printf '%s\n' "$remote" | awk -v r="$ref" '$2==r {print $1}')" = "$(git rev-parse "$ref")"
+          test "$(printf '%s\n' "$remote" | awk -v r="$ref^{}" '$2==r {print $1}')" = "$(git rev-parse "$ref^{commit}")"
+      - name: Notify RF after successful publication
+        env:
+          VERSION: ${{ inputs.version }}
+          RF_DISPATCH_TOKEN: ${{ secrets.RF_DISPATCH_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$RF_DISPATCH_TOKEN" || { echo 'Missing RF_DISPATCH_TOKEN' >&2; exit 1; }
+          ref="refs/tags/v$VERSION"
+          VERSION="$VERSION" COMMIT="$(git rev-parse "$ref^{commit}")" TAG_OBJECT="$(git rev-parse "$ref")" \
+            python3 - <<'PY' > "$RUNNER_TEMP/spec-release.json"
+          import json, os
+          print(json.dumps({
+              "event_type": "spec-catalog-published",
+              "client_payload": {
+                  "version": os.environ["VERSION"],
+                  "commit": os.environ["COMMIT"],
+                  "tag_object": os.environ["TAG_OBJECT"],
+              },
+          }))
+          PY
+          curl --fail-with-body --silent --show-error --retry 2 \
+            -H "Authorization: Bearer $RF_DISPATCH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            -H 'Content-Type: application/json' \
+            --data-binary @"$RUNNER_TEMP/spec-release.json" \
+            https://api.github.com/repos/XiaoWeiKIN/RepoFoundryAI/dispatches
+          echo "Published Spec v$VERSION and dispatched RF release event" >> "$GITHUB_STEP_SUMMARY"
